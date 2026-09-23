@@ -114,7 +114,7 @@ impl ChainSupport {
         match core {
             Some(core) => matches!(
                 (self, core.as_str()),
-                (Self::ClashMeta, "verge-mihomo") | (Self::ClashMetaAlpha, "verge-mihomo-alpha")
+                (Self::ClashMeta, "orbit-mihomo") | (Self::ClashMetaAlpha, "orbit-mihomo-alpha")
             ),
             None => true,
         }

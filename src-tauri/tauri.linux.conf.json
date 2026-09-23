@@ -28,8 +28,8 @@
       "./sidecar/clash-orbit-service",
       "./sidecar/clash-orbit-service-install",
       "./sidecar/clash-orbit-service-uninstall",
-      "./sidecar/verge-mihomo",
-      "./sidecar/verge-mihomo-alpha"
+      "./sidecar/orbit-mihomo",
+      "./sidecar/orbit-mihomo-alpha"
     ]
   }
 }

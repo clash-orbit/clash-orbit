@@ -234,7 +234,7 @@ pub struct IOrbitTheme {
 }
 
 impl IOrbit {
-    pub const VALID_CLASH_CORES: &'static [&'static str] = &["verge-mihomo", "verge-mihomo-alpha"];
+    pub const VALID_CLASH_CORES: &'static [&'static str] = &["orbit-mihomo", "orbit-mihomo-alpha"];
 
     pub async fn validate_and_fix_config() -> Result<()> {
         let config_path = dirs::orbit_path()?;
@@ -251,19 +251,19 @@ impl IOrbit {
                 logging!(
                     warn,
                     Type::Config,
-                    "启动时发现无效的clash_core配置: '{}', 将自动修正为 'verge-mihomo'",
+                    "启动时发现无效的clash_core配置: '{}', 将自动修正为 'orbit-mihomo'",
                     core
                 );
-                config.clash_core = Some("verge-mihomo".into());
+                config.clash_core = Some("orbit-mihomo".into());
                 needs_fix = true;
             }
         } else {
             logging!(
                 info,
                 Type::Config,
-                "启动时发现未配置clash_core, 将设置为默认值 'verge-mihomo'"
+                "启动时发现未配置clash_core, 将设置为默认值 'orbit-mihomo'"
             );
-            config.clash_core = Some("verge-mihomo".into());
+            config.clash_core = Some("orbit-mihomo".into());
             needs_fix = true;
         }
 
@@ -296,7 +296,7 @@ impl IOrbit {
     }
 
     pub fn get_valid_clash_core(&self) -> String {
-        self.clash_core.clone().unwrap_or_else(|| "verge-mihomo".into())
+        self.clash_core.clone().unwrap_or_else(|| "orbit-mihomo".into())
     }
 
     /// The settings file was called `verge.yaml` before the rebrand. Without
@@ -349,7 +349,7 @@ impl IOrbit {
         Self {
             app_log_max_size: Some(128),
             app_log_max_count: Some(8),
-            clash_core: Some("verge-mihomo".into()),
+            clash_core: Some("orbit-mihomo".into()),
             language: Some(clash_orbit_i18n::system_language().into()),
             theme_mode: Some("system".into()),
             #[cfg(not(target_os = "windows"))]

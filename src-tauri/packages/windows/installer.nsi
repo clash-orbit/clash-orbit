@@ -566,35 +566,35 @@ FunctionEnd
     !endif
   ${EndIf}
 
-  ; Check if verge-mihomo-alpha.exe is running
+  ; Check if orbit-mihomo-alpha.exe is running
   !if "${INSTALLMODE}" == "currentUser"
-    nsis_tauri_utils::FindProcessCurrentUser "verge-mihomo-alpha.exe"
+    nsis_tauri_utils::FindProcessCurrentUser "orbit-mihomo-alpha.exe"
   !else
-    nsis_tauri_utils::FindProcess "verge-mihomo-alpha.exe"
+    nsis_tauri_utils::FindProcess "orbit-mihomo-alpha.exe"
   !endif
   Pop $R0
   ${If} $R0 = 0
-    DetailPrint "Kill verge-mihomo-alpha.exe..."
+    DetailPrint "Kill orbit-mihomo-alpha.exe..."
     !if "${INSTALLMODE}" == "currentUser"
-      nsis_tauri_utils::KillProcessCurrentUser "verge-mihomo-alpha.exe"
+      nsis_tauri_utils::KillProcessCurrentUser "orbit-mihomo-alpha.exe"
     !else
-      nsis_tauri_utils::KillProcess "verge-mihomo-alpha.exe"
+      nsis_tauri_utils::KillProcess "orbit-mihomo-alpha.exe"
     !endif
   ${EndIf}
 
-  ; Check if verge-mihomo.exe is running
+  ; Check if orbit-mihomo.exe is running
   !if "${INSTALLMODE}" == "currentUser"
-    nsis_tauri_utils::FindProcessCurrentUser "verge-mihomo.exe"
+    nsis_tauri_utils::FindProcessCurrentUser "orbit-mihomo.exe"
   !else
-    nsis_tauri_utils::FindProcess "verge-mihomo.exe"
+    nsis_tauri_utils::FindProcess "orbit-mihomo.exe"
   !endif
   Pop $R0
   ${If} $R0 = 0
-    DetailPrint "Kill verge-mihomo.exe..."
+    DetailPrint "Kill orbit-mihomo.exe..."
     !if "${INSTALLMODE}" == "currentUser"
-      nsis_tauri_utils::KillProcessCurrentUser "verge-mihomo.exe"
+      nsis_tauri_utils::KillProcessCurrentUser "orbit-mihomo.exe"
     !else
-      nsis_tauri_utils::KillProcess "verge-mihomo.exe"
+      nsis_tauri_utils::KillProcess "orbit-mihomo.exe"
     !endif
   ${EndIf}
 
@@ -967,16 +967,16 @@ Section Install
   ; exactly the bytes this installer unpacked: a core swapped on disk is refused, not published.
   ; Not fatal on failure; a later elevated service install can stage the cores again.
   !ifdef MIHOMO_SHA256
-    DetailPrint "Staging verge-mihomo for ${PRODUCTNAME} Service..."
-    nsExec::ExecToLog '"$INSTDIR\resources\clash-orbit-service-install.exe" --install-core "$INSTDIR\verge-mihomo.exe" --sha256 "${MIHOMO_SHA256}"'
+    DetailPrint "Staging orbit-mihomo for ${PRODUCTNAME} Service..."
+    nsExec::ExecToLog '"$INSTDIR\resources\clash-orbit-service-install.exe" --install-core "$INSTDIR\orbit-mihomo.exe" --sha256 "${MIHOMO_SHA256}"'
     Pop $0
-    ${IfThen} $0 != 0 ${|} DetailPrint "Staging verge-mihomo returned $0" ${|}
+    ${IfThen} $0 != 0 ${|} DetailPrint "Staging orbit-mihomo returned $0" ${|}
   !endif
   !ifdef MIHOMO_ALPHA_SHA256
-    DetailPrint "Staging verge-mihomo-alpha for ${PRODUCTNAME} Service..."
-    nsExec::ExecToLog '"$INSTDIR\resources\clash-orbit-service-install.exe" --install-core "$INSTDIR\verge-mihomo-alpha.exe" --sha256 "${MIHOMO_ALPHA_SHA256}"'
+    DetailPrint "Staging orbit-mihomo-alpha for ${PRODUCTNAME} Service..."
+    nsExec::ExecToLog '"$INSTDIR\resources\clash-orbit-service-install.exe" --install-core "$INSTDIR\orbit-mihomo-alpha.exe" --sha256 "${MIHOMO_ALPHA_SHA256}"'
     Pop $0
-    ${IfThen} $0 != 0 ${|} DetailPrint "Staging verge-mihomo-alpha returned $0" ${|}
+    ${IfThen} $0 != 0 ${|} DetailPrint "Staging orbit-mihomo-alpha returned $0" ${|}
   !endif
 
   !insertmacro StartVergeService
@@ -1152,8 +1152,8 @@ Section Uninstall
   {{/each}}
 
   ; A failed core upgrade leaves the displaced binary behind; it is never user data.
-  Delete "$INSTDIR\verge-mihomo.old"
-  Delete "$INSTDIR\verge-mihomo-alpha.old"
+  Delete "$INSTDIR\orbit-mihomo.old"
+  Delete "$INSTDIR\orbit-mihomo-alpha.old"
 
   ; Delete app associations
   {{#each file_associations as |association| ~}}

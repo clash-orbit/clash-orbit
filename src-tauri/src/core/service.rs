@@ -1974,7 +1974,7 @@ mod tests {
     fn nondevelopment_service_core_selection_preserves_sibling_without_staging() -> anyhow::Result<()> {
         let root = TestDirectory::new("release-path")?;
         let home = root.path().join("home");
-        let source = root.path().join("target/debug/verge-mihomo");
+        let source = root.path().join("target/debug/orbit-mihomo");
 
         let selected = service_core_path_for(&source, Some(&home), false)?;
 
@@ -1990,14 +1990,14 @@ mod tests {
 
         let root = TestDirectory::new("development-path")?;
         let home = root.path().join("home");
-        let source = root.path().join("verge-mihomo");
+        let source = root.path().join("orbit-mihomo");
         std::fs::write(&source, b"development core")?;
 
         let selected = service_core_path_for(&source, Some(&home), true)?;
 
         assert_eq!(
             selected,
-            home.join("Applications/.clash-orbit-dev/service-core/verge-mihomo")
+            home.join("Applications/.clash-orbit-dev/service-core/orbit-mihomo")
         );
         assert_eq!(std::fs::read(&selected)?, b"development core");
         let metadata = std::fs::symlink_metadata(&selected)?;
@@ -2032,12 +2032,12 @@ mod tests {
     fn development_service_core_refresh_atomically_replaces_bytes() -> anyhow::Result<()> {
         let root = TestDirectory::new("refresh")?;
         let home = root.path().join("home");
-        let source = root.path().join("verge-mihomo");
+        let source = root.path().join("orbit-mihomo");
         std::fs::write(&source, b"first core")?;
         let selected = service_core_path_for(&source, Some(&home), true)?;
         assert_eq!(
             selected,
-            home.join("Applications/.clash-orbit-dev/service-core/verge-mihomo")
+            home.join("Applications/.clash-orbit-dev/service-core/orbit-mihomo")
         );
 
         std::fs::write(&source, b"second core")?;
@@ -2045,7 +2045,7 @@ mod tests {
 
         assert_eq!(refreshed, selected);
         assert_eq!(std::fs::read(&refreshed)?, b"second core");
-        assert!(staging_temporary_entries(&home, "verge-mihomo")?.is_empty());
+        assert!(staging_temporary_entries(&home, "orbit-mihomo")?.is_empty());
         Ok(())
     }
 
@@ -2054,7 +2054,7 @@ mod tests {
     fn failed_development_refresh_preserves_good_core_and_cleans_temporary_entry() -> anyhow::Result<()> {
         let root = TestDirectory::new("failed-refresh")?;
         let home = root.path().join("home");
-        let source = root.path().join("verge-mihomo");
+        let source = root.path().join("orbit-mihomo");
         std::fs::write(&source, b"known good core")?;
         let selected = service_core_path_for(&source, Some(&home), true)?;
 
@@ -2081,7 +2081,7 @@ mod tests {
         assert!(publish_attempted.get());
         assert!(error.contains("injected post-creation publish failure"));
         assert_eq!(std::fs::read(&selected)?, b"known good core");
-        assert!(staging_temporary_entries(&home, "verge-mihomo")?.is_empty());
+        assert!(staging_temporary_entries(&home, "orbit-mihomo")?.is_empty());
         Ok(())
     }
 
@@ -2092,9 +2092,9 @@ mod tests {
 
         let root = TestDirectory::new("symlink")?;
         let home = root.path().join("home");
-        let source = root.path().join("verge-mihomo");
+        let source = root.path().join("orbit-mihomo");
         std::fs::write(&source, b"selected core")?;
-        let final_path = home.join("Applications/.clash-orbit-dev/service-core/verge-mihomo");
+        let final_path = home.join("Applications/.clash-orbit-dev/service-core/orbit-mihomo");
         std::fs::create_dir_all(final_path.parent().unwrap_or_else(|| Path::new(".")))?;
         let symlink_target = root.path().join("must-not-change");
         std::fs::write(&symlink_target, b"target bytes")?;
@@ -2199,7 +2199,7 @@ mod tests {
                 &store,
                 super::ServiceStartRefusal {
                     code: code as u16,
-                    core_path: "/development/service-core/verge-mihomo".into(),
+                    core_path: "/development/service-core/orbit-mihomo".into(),
                     message: "no administrator-approved copy is installed".into(),
                 },
             );

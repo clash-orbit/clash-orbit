@@ -1508,7 +1508,7 @@ mod tests {
                 || async {
                     Err(crate::core::service::ServiceStartRefusal {
                         code: clash_orbit_service_ipc::ServiceErrorCode::InvalidInstallLocation as u16,
-                        core_path: "verge-mihomo.exe".into(),
+                        core_path: "orbit-mihomo.exe".into(),
                         message: "no administrator-approved copy is installed".into(),
                     }
                     .into())

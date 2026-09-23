@@ -277,8 +277,8 @@ function clashMetaAlpha() {
   const isWin = platform === 'win32'
   const urlExt = isWin ? 'zip' : 'gz'
   return {
-    name: 'verge-mihomo-alpha',
-    targetFile: `verge-mihomo-alpha-${SIDECAR_HOST}${isWin ? '.exe' : ''}`,
+    name: 'orbit-mihomo-alpha',
+    targetFile: `orbit-mihomo-alpha-${SIDECAR_HOST}${isWin ? '.exe' : ''}`,
     exeFile: `${name}${isWin ? '.exe' : ''}`,
     zipFile: `${name}-${META_ALPHA_VERSION}.${urlExt}`,
     downloadURL: `${META_ALPHA_URL_PREFIX}/${name}-${META_ALPHA_VERSION}.${urlExt}`,
@@ -290,8 +290,8 @@ function clashMeta() {
   const isWin = platform === 'win32'
   const urlExt = isWin ? 'zip' : 'gz'
   return {
-    name: 'verge-mihomo',
-    targetFile: `verge-mihomo-${SIDECAR_HOST}${isWin ? '.exe' : ''}`,
+    name: 'orbit-mihomo',
+    targetFile: `orbit-mihomo-${SIDECAR_HOST}${isWin ? '.exe' : ''}`,
     exeFile: `${name}${isWin ? '.exe' : ''}`,
     zipFile: `${name}-${META_VERSION}.${urlExt}`,
     downloadURL: `${META_URL_PREFIX}/${META_VERSION}/${name}-${META_VERSION}.${urlExt}`,
@@ -679,8 +679,8 @@ const CORE_HASHES_NSH = path.join(
 async function resolveCoreHashes() {
   const lines = []
   for (const [define, name] of [
-    ['MIHOMO_SHA256', 'verge-mihomo'],
-    ['MIHOMO_ALPHA_SHA256', 'verge-mihomo-alpha'],
+    ['MIHOMO_SHA256', 'orbit-mihomo'],
+    ['MIHOMO_ALPHA_SHA256', 'orbit-mihomo-alpha'],
   ]) {
     const sidecar = path.join(SIDECAR_DIR, `${name}-${SIDECAR_HOST}.exe`)
     const digest = createHash('sha256')
@@ -731,13 +731,13 @@ const resolveUnSetDnsScript = () =>
 
 const tasks = [
   {
-    name: 'verge-mihomo-alpha',
+    name: 'orbit-mihomo-alpha',
     func: () =>
       getLatestAlphaVersion().then(() => resolveSidecar(clashMetaAlpha())),
     retry: 5,
   },
   {
-    name: 'verge-mihomo',
+    name: 'orbit-mihomo',
     func: () =>
       getLatestReleaseVersion().then(() => resolveSidecar(clashMeta())),
     retry: 5,
