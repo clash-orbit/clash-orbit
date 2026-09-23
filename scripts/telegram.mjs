@@ -4,8 +4,8 @@ import axios from 'axios'
 
 import { log_error, log_info, log_success } from './utils.mjs'
 
-const CHAT_ID_RELEASE = '-5422566642' // 正式发布通知群（Clash Orbit）
-const CHAT_ID_TEST = '-5422566642' // 测试通知群（同上）
+const CHAT_ID_RELEASE = '-1004327123943' // 正式发布频道（Clash Orbit / @clash_orbit）
+const CHAT_ID_TEST = '-1004327123943' // 测试通知同上
 
 async function sendTelegramNotification() {
   if (!process.env.TELEGRAM_BOT_TOKEN) {
