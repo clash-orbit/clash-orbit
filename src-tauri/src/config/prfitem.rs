@@ -16,6 +16,25 @@ use tokio::fs;
 use reqwest_dav::re_exports::url::form_urlencoded;
 use tauri::Url;
 
+/// Providers commonly answer a client they do not recognise with an empty skeleton: the keys
+/// are present but carry no nodes, which then surfaces as an empty proxy group in the core.
+pub(crate) fn profile_has_nodes(yaml: &Mapping) -> bool {
+    let inline = yaml
+        .get("proxies")
+        .and_then(|value| value.as_sequence())
+        .is_some_and(|proxies| !proxies.is_empty());
+    let provided = yaml
+        .get("proxy-providers")
+        .and_then(|value| value.as_mapping())
+        .is_some_and(|providers| !providers.is_empty());
+    inline || provided
+}
+
+/// The User-Agent those providers are known to serve a real config to.
+fn compat_user_agent() -> std::string::String {
+    format!("clash-verge/v{}", env!("CARGO_PKG_VERSION"))
+}
+
 pub(super) fn normalize_profile_home_url(raw: &str) -> Option<String> {
     let url = Url::parse(raw.trim()).ok()?;
 
@@ -357,10 +376,39 @@ impl PrfItem {
 
         let data = data.trim_start_matches('\u{feff}');
 
-        let yaml = serde_yaml_ng::from_str::<Mapping>(data).context("the remote profile data is invalid yaml")?;
+        let mut yaml = serde_yaml_ng::from_str::<Mapping>(data).context("the remote profile data is invalid yaml")?;
 
-        if !yaml.contains_key("proxies") && !yaml.contains_key("proxy-providers") {
-            bail!("profile does not contain `proxies` or `proxy-providers`");
+        // Some providers choose the response format from the User-Agent and answer a client
+        // they do not recognise with an empty skeleton: the keys are present but carry no
+        // nodes, which used to surface much later as an empty proxy group in the core. Keep
+        // this product's own UA as the default and retry once with a UA those providers are
+        // known to serve, but never override a UA the caller picked explicitly.
+        if !profile_has_nodes(&yaml) && user_agent.is_none() {
+            let compat = compat_user_agent();
+            if let Ok(retry) = NetworkManager::new()
+                .get(
+                    url.as_str(),
+                    proxy_type,
+                    Some(timeout),
+                    Some(compat.into()),
+                    accept_invalid_certs,
+                )
+                .await
+            {
+                if retry.status().is_success() {
+                    let retry_data = retry.text();
+                    let retry_data = retry_data.trim_start_matches('\u{feff}');
+                    if let Ok(retry_yaml) = serde_yaml_ng::from_str::<Mapping>(retry_data) {
+                        if profile_has_nodes(&retry_yaml) {
+                            yaml = retry_yaml;
+                        }
+                    }
+                }
+            }
+        }
+
+        if !profile_has_nodes(&yaml) {
+            bail!("the subscription returned no proxies; the provider may only serve recognised clients");
         }
 
         if merge.is_none() {
@@ -557,4 +605,26 @@ fn fix_dirty_url(input: &str) -> Result<Url> {
     }
 
     Ok(url)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::profile_has_nodes;
+    use serde_yaml_ng::Mapping;
+
+    fn parse(yaml: &str) -> Mapping {
+        serde_yaml_ng::from_str(yaml).expect("fixture yaml")
+    }
+
+    #[test]
+    fn empty_skeleton_is_not_usable() {
+        assert!(!profile_has_nodes(&parse("proxies: []\nproxy-groups: []\n")));
+        assert!(!profile_has_nodes(&parse("proxy-providers: {}\n")));
+    }
+
+    #[test]
+    fn nodes_or_providers_are_usable() {
+        assert!(profile_has_nodes(&parse("proxies:\n  - {name: a, type: ss}\n")));
+        assert!(profile_has_nodes(&parse("proxy-providers:\n  a: {type: http}\n")));
+    }
 }

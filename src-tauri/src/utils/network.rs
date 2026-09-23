@@ -249,6 +249,9 @@ impl NetworkManager {
         } else {
             headers.insert(
                 USER_AGENT,
+                // Providers choose the response format from the User-Agent; the profile
+                // fetch retries with a compatibility UA when a subscription comes back
+                // without any nodes. See `config::prfitem`.
                 HeaderValue::from_str(&format!("clash-orbit/v{}", env!("CARGO_PKG_VERSION")))?,
             );
         }
