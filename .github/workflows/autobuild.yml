@@ -26,7 +26,7 @@ jobs:
 
   update_tag:
     name: Update tag
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: check_commit
     if: ${{ needs.check_commit.outputs.should_run == 'true' }}
     outputs:
@@ -134,7 +134,7 @@ jobs:
             target: x86_64-pc-windows-msvc
           - os: windows-latest
             target: aarch64-pc-windows-msvc
-          - os: ubuntu-22.04
+          - os: ubuntu-26.04
             target: x86_64-unknown-linux-gnu
     runs-on: ${{ matrix.os }}
     steps:
@@ -162,7 +162,7 @@ jobs:
           cache-workspace-crates: true
 
       - name: Install dependencies (ubuntu only)
-        if: matrix.os == 'ubuntu-22.04'
+        if: matrix.os == 'ubuntu-26.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libxslt1.1 libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
@@ -225,12 +225,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # It should be ubuntu-22.04 to match the cross-compilation environment
+          # It should be ubuntu-26.04 to match the cross-compilation environment
           # ortherwise it is hard to resolve the dependencies
-          - os: ubuntu-22.04
+          - os: ubuntu-26.04
             target: aarch64-unknown-linux-gnu
             arch: arm64
-          - os: ubuntu-22.04
+          - os: ubuntu-26.04
             target: armv7-unknown-linux-gnueabihf
             arch: armhf
     runs-on: ${{ matrix.os }}
@@ -485,7 +485,7 @@ jobs:
 
   notify-telegram:
     name: Notify Telegram
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs:
       [
         update_tag,
