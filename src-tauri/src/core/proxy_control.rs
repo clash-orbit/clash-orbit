@@ -17,7 +17,7 @@ use crate::{
 };
 use anyhow::{Result, ensure};
 use clash_orbit_logging::{Type, logging};
-use clash_verge_service_ipc::{MacosProxyConfig, OwnerSessionProof, ProxyApplyOutcome};
+use clash_orbit_service_ipc::{MacosProxyConfig, OwnerSessionProof, ProxyApplyOutcome};
 use std::{
     future::Future,
     sync::atomic::{AtomicU64, Ordering},
@@ -663,7 +663,7 @@ mod tests {
         service_proxy_config,
     };
     use crate::{config::IOrbit, core::manager::RunningMode};
-    use clash_verge_service_ipc::{MacosProxyConfig, OwnerSessionProof, ProxyApplyOutcome};
+    use clash_orbit_service_ipc::{MacosProxyConfig, OwnerSessionProof, ProxyApplyOutcome};
     use parking_lot::Mutex;
     use std::sync::{
         Arc,

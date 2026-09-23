@@ -211,7 +211,7 @@ async fn init_orbit_config_before_window() -> bool {
 }
 
 async fn init_service_manager() {
-    clash_verge_service_ipc::set_config(Some(ServiceManager::config())).await;
+    clash_orbit_service_ipc::set_config(Some(ServiceManager::config())).await;
 
     SERVICE_MANAGER.detect_startup_status().await;
 }

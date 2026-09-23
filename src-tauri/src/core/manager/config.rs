@@ -12,7 +12,7 @@ use crate::{
 use anyhow::{Result, anyhow};
 use clash_orbit_draft::DraftTransaction;
 use clash_orbit_logging::{Type, logging};
-use clash_verge_service_ipc::StageRuntimeOutcome;
+use clash_orbit_service_ipc::StageRuntimeOutcome;
 use scopeguard::defer;
 use smartstring::alias::String;
 use std::{
@@ -402,7 +402,7 @@ impl CoreManager {
 #[cfg(test)]
 mod tests {
     use super::{ConfigApplication, StageAttempt, StageRequest, plan_config_application, stage_with_confirmation};
-    use clash_verge_service_ipc::{StageRejection, StageRuntimeOutcome};
+    use clash_orbit_service_ipc::{StageRejection, StageRuntimeOutcome};
     use std::{cell::Cell, time::Duration};
 
     const CONFIRM_WITHIN: Duration = Duration::from_secs(5);
@@ -472,7 +472,7 @@ mod tests {
 
     #[test]
     fn only_bundle_codes_count_as_a_refusal_of_the_bundle() {
-        use clash_verge_service_ipc::ServiceErrorCode;
+        use clash_orbit_service_ipc::ServiceErrorCode;
 
         assert!(StageRequest::is_about_the_bundle(
             ServiceErrorCode::InvalidRuntimeAsset as u16

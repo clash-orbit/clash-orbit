@@ -1,6 +1,6 @@
 //! Classifies service ownership samples; `CoreManager` performs any recovery it requests.
 
-use clash_verge_service_ipc::ServiceLifecycleState;
+use clash_orbit_service_ipc::ServiceLifecycleState;
 
 /// Tolerates transient service restarts and slow status calls.
 const SUSTAINED_SAMPLES: u8 = 3;

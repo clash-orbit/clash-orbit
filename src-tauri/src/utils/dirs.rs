@@ -171,7 +171,7 @@ pub fn get_encryption_key() -> Result<Vec<u8>> {
 }
 
 pub fn ipc_path() -> Result<PathBuf> {
-    Ok(PathBuf::from(clash_verge_service_ipc::mihomo_ipc_path(
+    Ok(PathBuf::from(clash_orbit_service_ipc::mihomo_ipc_path(
         &crate::core::owner_identity::current_owner_identity()?,
     )))
 }
@@ -193,14 +193,14 @@ pub fn sidecar_ipc_path() -> Result<PathBuf> {
 }
 
 #[cfg(target_os = "linux")]
-fn sidecar_ipc_path_for(app_root: &std::path::Path, _identity: &clash_verge_service_ipc::OwnerIdentity) -> PathBuf {
+fn sidecar_ipc_path_for(app_root: &std::path::Path, _identity: &clash_orbit_service_ipc::OwnerIdentity) -> PathBuf {
     app_root.join("verge-mihomo.sock")
 }
 
 #[cfg(target_os = "macos")]
 fn sidecar_ipc_path_for(
     _app_root: &std::path::Path,
-    _identity: &clash_verge_service_ipc::OwnerIdentity,
+    _identity: &clash_orbit_service_ipc::OwnerIdentity,
 ) -> Result<PathBuf> {
     use std::{ffi::OsStr, os::unix::ffi::OsStrExt as _};
 
@@ -237,23 +237,23 @@ fn sidecar_ipc_path_for(
 }
 
 #[cfg(windows)]
-fn sidecar_ipc_path_for(_app_root: &std::path::Path, identity: &clash_verge_service_ipc::OwnerIdentity) -> PathBuf {
+fn sidecar_ipc_path_for(_app_root: &std::path::Path, identity: &clash_orbit_service_ipc::OwnerIdentity) -> PathBuf {
     PathBuf::from(sidecar_pipe_name(identity, cfg!(feature = "orbit-dev")))
 }
 
 #[cfg(any(windows, test))]
-fn sidecar_pipe_name(identity: &clash_verge_service_ipc::OwnerIdentity, is_dev: bool) -> String {
+fn sidecar_pipe_name(identity: &clash_orbit_service_ipc::OwnerIdentity, is_dev: bool) -> String {
     let flavor = if is_dev { "dev" } else { "release" };
     format!(
         r"\\.\pipe\verge-mihomo-sidecar-{flavor}-{}",
-        clash_verge_service_ipc::owner_key(identity)
+        clash_orbit_service_ipc::owner_key(identity)
     )
 }
 
 #[cfg(all(test, target_os = "linux"))]
 mod ipc_tests {
     use super::sidecar_ipc_path_for;
-    use clash_verge_service_ipc::OwnerIdentity;
+    use clash_orbit_service_ipc::OwnerIdentity;
     use std::path::Path;
 
     #[test]
@@ -265,7 +265,7 @@ mod ipc_tests {
         assert_eq!(path, app_root.join("verge-mihomo.sock"));
         assert_ne!(
             path.to_string_lossy(),
-            clash_verge_service_ipc::mihomo_ipc_path(&identity)
+            clash_orbit_service_ipc::mihomo_ipc_path(&identity)
         );
     }
 }
@@ -273,7 +273,7 @@ mod ipc_tests {
 #[cfg(all(test, target_os = "macos"))]
 mod ipc_tests {
     use super::sidecar_ipc_path_for;
-    use clash_verge_service_ipc::OwnerIdentity;
+    use clash_orbit_service_ipc::OwnerIdentity;
     use std::{ffi::OsStr, os::unix::ffi::OsStrExt as _, path::Path};
 
     #[test]
@@ -297,7 +297,7 @@ mod ipc_tests {
 #[cfg(all(test, windows))]
 mod ipc_tests {
     use super::sidecar_ipc_path_for;
-    use clash_verge_service_ipc::OwnerIdentity;
+    use clash_orbit_service_ipc::OwnerIdentity;
     use std::path::Path;
 
     #[test]
@@ -312,7 +312,7 @@ mod ipc_tests {
             Path::new(&format!(
                 r"\\.\pipe\verge-mihomo-sidecar-{}-{}",
                 if cfg!(feature = "orbit-dev") { "dev" } else { "release" },
-                clash_verge_service_ipc::owner_key(&identity)
+                clash_orbit_service_ipc::owner_key(&identity)
             ))
         );
     }
@@ -337,14 +337,14 @@ impl PathBufExec for PathBuf {
 #[cfg(test)]
 mod windows_pipe_name_tests {
     use super::sidecar_pipe_name;
-    use clash_verge_service_ipc::OwnerIdentity;
+    use clash_orbit_service_ipc::OwnerIdentity;
 
     #[test]
     fn windows_sidecar_pipe_separates_dev_and_release_for_the_same_owner() {
         let identity = OwnerIdentity::Windows {
             sid: "S-1-5-21-1000".to_owned(),
         };
-        let owner_key = clash_verge_service_ipc::owner_key(&identity);
+        let owner_key = clash_orbit_service_ipc::owner_key(&identity);
 
         assert_eq!(
             sidecar_pipe_name(&identity, false),

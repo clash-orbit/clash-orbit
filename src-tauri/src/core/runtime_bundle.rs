@@ -1,6 +1,6 @@
 use anyhow::{Context as _, Result, bail};
 use clash_orbit_logging::{Type, logging};
-use clash_verge_service_ipc::{RemoteProvider, RuntimeAsset, RuntimeBundle};
+use clash_orbit_service_ipc::{RemoteProvider, RuntimeAsset, RuntimeBundle};
 use serde_yaml_ng::{Mapping, Value};
 use sha2::{Digest as _, Sha256};
 use std::collections::{BTreeMap, HashSet};

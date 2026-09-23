@@ -20,7 +20,7 @@ use crate::{
 use anyhow::{Context as _, Result, anyhow, bail};
 use clash_orbit_draft::Draft;
 use clash_orbit_logging::{Type, logging};
-use clash_verge_service_ipc::{
+use clash_orbit_service_ipc::{
     MacosProxyConfig, OwnerCredentials, OwnerSessionProof, ProtocolInfo, ProxyApplyOutcome, RuntimeBundle,
     RuntimeFileOutcome, RuntimeFileRequest, ServiceErrorCode, StageRuntimeOutcome, StartClashRequest, WriterConfig,
 };
@@ -115,7 +115,7 @@ impl ServiceCapabilities {
 /// Failed capability probes must not block startup.
 #[tracing::instrument(skip_all, level = "info", fields(supported = tracing::field::Empty))]
 async fn probe_service_capabilities() -> ServiceCapabilities {
-    match clash_verge_service_ipc::get_version().await {
+    match clash_orbit_service_ipc::get_version().await {
         Ok(response) if response.code == 0 => {
             let capabilities = response
                 .data
@@ -203,11 +203,11 @@ fn macos_service_install_markers() -> Vec<String> {
     vec![
         format!(
             "/Library/LaunchDaemons/{}.plist",
-            clash_verge_service_ipc::MACOS_SERVICE_ID
+            clash_orbit_service_ipc::MACOS_SERVICE_ID
         ),
         format!(
             "/Library/PrivilegedHelperTools/{}.bundle",
-            clash_verge_service_ipc::MACOS_SERVICE_ID
+            clash_orbit_service_ipc::MACOS_SERVICE_ID
         ),
         #[cfg(not(feature = "orbit-dev"))]
         "/Library/LaunchDaemons/io.github.clashORBIT.helper.plist".to_owned(),
@@ -237,7 +237,7 @@ pub(crate) fn trusted_service_evidence() -> Result<bool> {
     const ERROR_SERVICE_DOES_NOT_EXIST: i32 = 1060;
     let manager = WindowsServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT)?;
     match manager.open_service(
-        clash_verge_service_ipc::WINDOWS_SERVICE_NAME,
+        clash_orbit_service_ipc::WINDOWS_SERVICE_NAME,
         ServiceAccess::QUERY_STATUS,
     ) {
         Ok(service) => {
@@ -253,7 +253,7 @@ pub(crate) fn trusted_service_evidence() -> Result<bool> {
 
 #[cfg(target_os = "linux")]
 pub(crate) fn trusted_service_evidence() -> Result<bool> {
-    let unit = format!("{}.service", clash_verge_service_ipc::SERVICE_SLUG);
+    let unit = format!("{}.service", clash_orbit_service_ipc::SERVICE_SLUG);
     let output = StdCommand::new("systemctl")
         .args(["show", "--property=LoadState", "--value", &unit])
         .output()
@@ -649,7 +649,7 @@ fn install_service() -> Result<()> {
         .iter()
         .map(|core| {
             let name = format!("{core}{}", std::env::consts::EXE_SUFFIX);
-            clash_verge_service_ipc::management::CoreSource {
+            clash_orbit_service_ipc::management::CoreSource {
                 path: executable.with_file_name(&name),
                 name,
             }
@@ -658,7 +658,7 @@ fn install_service() -> Result<()> {
     invoke_service_install(&cores, false)
 }
 
-fn invoke_service_install(cores: &[clash_verge_service_ipc::management::CoreSource], core_only: bool) -> Result<()> {
+fn invoke_service_install(cores: &[clash_orbit_service_ipc::management::CoreSource], core_only: bool) -> Result<()> {
     let name = format!("clash-verge-service-install{}", std::env::consts::EXE_SUFFIX);
     let installer = packaged_service_tool_path(&name, || {
         #[cfg(target_os = "linux")]
@@ -671,7 +671,7 @@ fn invoke_service_install(cores: &[clash_verge_service_ipc::management::CoreSour
     let gid = Some(tauri_plugin_clash_orbit_sysinfo::current_gid());
     #[cfg(windows)]
     let gid = None;
-    clash_verge_service_ipc::management::install(
+    clash_orbit_service_ipc::management::install(
         &installer,
         cores,
         core_only,
@@ -705,7 +705,7 @@ fn force_reinstall_service() -> Result<()> {
 pub fn stage_approved_core(core_path: &Path) -> Result<()> {
     tokio::task::block_in_place(|| {
         invoke_service_install(
-            &[clash_verge_service_ipc::management::CoreSource {
+            &[clash_orbit_service_ipc::management::CoreSource {
                 name: core_path
                     .file_name()
                     .context("core has no filename")?
@@ -759,7 +759,7 @@ pub(super) async fn stage_runtime_by_service(config_file: &Path) -> Result<Stage
     let credentials = current_owner_credentials()?;
     let runtime = collect_service_runtime_bundle(config_file).await?;
 
-    let response = clash_verge_service_ipc::stage_runtime(&credentials, &session, &runtime)
+    let response = clash_orbit_service_ipc::stage_runtime(&credentials, &session, &runtime)
         .await
         .context("无法连接到系统服务")?;
     if response.code > 0 {
@@ -817,7 +817,7 @@ pub(super) async fn start_with_existing_service(config_file: &Path) -> Result<()
         macos_proxy: None,
     };
 
-    let response = match clash_verge_service_ipc::start_clash(&credentials, &request).await {
+    let response = match clash_orbit_service_ipc::start_clash(&credentials, &request).await {
         Ok(response) => response,
         Err(error) => {
             tracing::Span::current().record("outcome", "ipc-unreachable");
@@ -906,13 +906,13 @@ pub(super) async fn get_clash_logs_by_service() -> Result<Vec<String>> {
     // Frontend-polled: no per-call logging here.
     let credentials = current_owner_credentials()?;
     let (generation, response) = capture_generation_before(&OWNER_MONITOR_GENERATION, || {
-        clash_verge_service_ipc::get_clash_logs(&credentials)
+        clash_orbit_service_ipc::get_clash_logs(&credentials)
     })
     .await;
     let response = response.context("无法连接到系统服务")?;
 
     if response.code > 0 {
-        if response.code == clash_verge_service_ipc::ServiceErrorCode::NotActive as u16 {
+        if response.code == clash_orbit_service_ipc::ServiceErrorCode::NotActive as u16 {
             recover_after_owner_loss(generation, OwnerRecoveryReason::Displaced).await;
         }
         let err_msg = response.message;
@@ -925,12 +925,12 @@ pub(super) async fn get_clash_logs_by_service() -> Result<Vec<String>> {
 pub(crate) async fn get_clash_log_snapshot_by_service() -> Result<String> {
     let credentials = current_owner_credentials()?;
     let (generation, response) = capture_generation_before(&OWNER_MONITOR_GENERATION, || {
-        clash_verge_service_ipc::get_clash_log_snapshot(&credentials)
+        clash_orbit_service_ipc::get_clash_log_snapshot(&credentials)
     })
     .await;
     let response = response.context("无法连接到系统服务")?;
     if response.code > 0 {
-        if response.code == clash_verge_service_ipc::ServiceErrorCode::NotActive as u16 {
+        if response.code == clash_orbit_service_ipc::ServiceErrorCode::NotActive as u16 {
             recover_after_owner_loss(generation, OwnerRecoveryReason::Displaced).await;
         }
         bail!(response.message);
@@ -1228,7 +1228,7 @@ async fn read_chunk(
         destination: destination.to_owned(),
         offset,
     };
-    let response = clash_verge_service_ipc::read_runtime_file(credentials, session, &request)
+    let response = clash_orbit_service_ipc::read_runtime_file(credentials, session, &request)
         .await
         .context("无法连接到系统服务")?;
     if response.code == ServiceErrorCode::NotActive as u16
@@ -1377,7 +1377,7 @@ pub(super) async fn stop_core_by_service() -> Result<()> {
             return Err(error);
         }
     };
-    let response = match clash_verge_service_ipc::stop_clash(&credentials, &session).await {
+    let response = match clash_orbit_service_ipc::stop_clash(&credentials, &session).await {
         Ok(response) => response,
         Err(error) => {
             start_owner_monitor();
@@ -1388,8 +1388,8 @@ pub(super) async fn stop_core_by_service() -> Result<()> {
     if response.code > 0 {
         if matches!(
             response.code,
-            code if code == clash_verge_service_ipc::ServiceErrorCode::NotActive as u16
-                || code == clash_verge_service_ipc::ServiceErrorCode::StaleOwnerSession as u16
+            code if code == clash_orbit_service_ipc::ServiceErrorCode::NotActive as u16
+                || code == clash_orbit_service_ipc::ServiceErrorCode::StaleOwnerSession as u16
         ) {
             recover_after_owner_loss_while_locked(OwnerRecoveryReason::Displaced).await;
         } else {
@@ -1417,7 +1417,7 @@ pub(super) async fn stop_core_by_service() -> Result<()> {
 pub(crate) async fn update_writer_by_service(writer: &WriterConfig) -> Result<()> {
     let credentials = current_owner_credentials()?;
     let session = active_service_session()?;
-    let response = clash_verge_service_ipc::update_writer(&credentials, &session, writer)
+    let response = clash_orbit_service_ipc::update_writer(&credentials, &session, writer)
         .await
         .context("无法连接到系统服务")?;
     if response.code > 0 {
@@ -1443,7 +1443,7 @@ pub(super) async fn set_system_proxy_by_service_with_session(
     session: &OwnerSessionProof,
 ) -> Result<ProxyApplyOutcome> {
     let credentials = current_owner_credentials()?;
-    let response = clash_verge_service_ipc::set_system_proxy(&credentials, session, proxy)
+    let response = clash_orbit_service_ipc::set_system_proxy(&credentials, session, proxy)
         .await
         .context("无法连接到系统服务")?;
     if response.code > 0 {
@@ -1533,7 +1533,7 @@ fn start_owner_monitor() {
 /// Samples ownership, treating every unusable reply as unreadable.
 async fn read_owner_sample() -> OwnerSample {
     let response = match current_owner_credentials() {
-        Ok(credentials) => clash_verge_service_ipc::get_status(&credentials).await,
+        Ok(credentials) => clash_orbit_service_ipc::get_status(&credentials).await,
         Err(error) => Err(error),
     };
 
@@ -1545,7 +1545,7 @@ async fn read_owner_sample() -> OwnerSample {
         }
     };
 
-    if response.code == clash_verge_service_ipc::ServiceErrorCode::NotActive as u16 {
+    if response.code == clash_orbit_service_ipc::ServiceErrorCode::NotActive as u16 {
         return OwnerSample::NotActive;
     }
     if response.code != 0 {
@@ -1691,8 +1691,8 @@ async fn wait_for_service_ipc() -> Result<()> {
 }
 
 impl ServiceManager {
-    pub const fn config() -> clash_verge_service_ipc::IpcConfig {
-        clash_verge_service_ipc::IpcConfig {
+    pub const fn config() -> clash_orbit_service_ipc::IpcConfig {
+        clash_orbit_service_ipc::IpcConfig {
             default_timeout: Duration::from_millis(1000),
             retry_delay: Duration::from_millis(500),
             max_retries: 20,
@@ -1896,7 +1896,7 @@ mod tests {
     use super::{service_core_path_for_with_publisher, service_tool_path_for};
     use crate::core::runstate::{FakeEnv, OwnerRecoveryReason, PendingAction, RunStateStore};
     use anyhow::bail;
-    use clash_verge_service_ipc::OwnerSessionProof;
+    use clash_orbit_service_ipc::OwnerSessionProof;
     #[cfg(unix)]
     use std::cell::Cell;
     use std::{
@@ -2187,7 +2187,7 @@ mod tests {
 
     #[tokio::test]
     async fn refused_core_start_can_continue_with_sidecar() -> anyhow::Result<()> {
-        use clash_verge_service_ipc::ServiceErrorCode;
+        use clash_orbit_service_ipc::ServiceErrorCode;
         for code in [
             ServiceErrorCode::InvalidInstallLocation,
             ServiceErrorCode::InvalidRuntimeAsset,

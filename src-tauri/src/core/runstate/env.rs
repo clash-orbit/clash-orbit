@@ -27,12 +27,12 @@ pub struct RealEnv;
 
 impl RunStateEnv for RealEnv {
     async fn probe_service_version(&self) -> Result<ServiceVersionReply> {
-        let response = clash_verge_service_ipc::get_version().await?;
+        let response = clash_orbit_service_ipc::get_version().await?;
         let core = if response.code == 0
             && response.data.as_ref().is_some_and(|info| {
                 info.supports_client(
-                    clash_verge_service_ipc::ProtocolVersion::current(),
-                    clash_verge_service_ipc::MIN_REQUIRED_SERVICE_REVISION,
+                    clash_orbit_service_ipc::ProtocolVersion::current(),
+                    clash_orbit_service_ipc::MIN_REQUIRED_SERVICE_REVISION,
                 )
             }) {
             let name = format!(
@@ -40,7 +40,7 @@ impl RunStateEnv for RealEnv {
                 crate::config::Config::orbit().await.latest_arc().get_valid_clash_core(),
                 std::env::consts::EXE_SUFFIX
             );
-            let status = clash_verge_service_ipc::inspect_installation(&[clash_verge_service_ipc::CoreRequirement {
+            let status = clash_orbit_service_ipc::inspect_installation(&[clash_orbit_service_ipc::CoreRequirement {
                 name: name.clone(),
                 sha256: None,
             }])
@@ -102,7 +102,7 @@ pub use fake::FakeEnv;
 #[cfg(test)]
 mod fake {
     use anyhow::{Result, anyhow};
-    use clash_verge_service_ipc::ProtocolInfo;
+    use clash_orbit_service_ipc::ProtocolInfo;
     use parking_lot::Mutex;
 
     use super::{PendingAction, RunState, RunStateEnv, ServiceVersionReply};
@@ -145,7 +145,7 @@ mod fake {
         #[must_use]
         pub fn service_ready(self) -> Self {
             self.with_evidence(true).always_replying(Ok(ServiceVersionReply {
-                core: Some(clash_verge_service_ipc::CoreAvailability::Ready),
+                core: Some(clash_orbit_service_ipc::CoreAvailability::Ready),
                 code: 0,
                 message: "ok".to_owned(),
                 protocol: Some(ProtocolInfo::current()),
@@ -155,7 +155,7 @@ mod fake {
         #[must_use]
         pub fn service_version_mismatch(self) -> Self {
             self.with_evidence(true).always_replying(Ok(ServiceVersionReply {
-                core: Some(clash_verge_service_ipc::CoreAvailability::Ready),
+                core: Some(clash_orbit_service_ipc::CoreAvailability::Ready),
                 code: 0,
                 message: "ok".to_owned(),
                 protocol: None,

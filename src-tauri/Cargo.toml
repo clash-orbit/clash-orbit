@@ -17,7 +17,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
-orbit-dev = ["clash-orbit-logging/color", "clash_verge_service_ipc/development-channel"]
+orbit-dev = ["clash-orbit-logging/color", "clash_orbit_service_ipc/development-channel"]
 dev-sidecar = ["orbit-dev"]
 tauri-dev = ["dep:tauri-plugin-devtools"]
 tokio-trace = ["clash-orbit-logging/tokio-trace"]
@@ -99,7 +99,7 @@ tracing = { workspace = true }
 tauri-plugin-devtools = { version = "2.2.1", optional = true }
 tauri-plugin-mihomo = { git = "https://github.com/clash-orbit/tauri-plugin-mihomo", branch = "main" }
 async-trait = "0.1.92"
-clash_verge_service_ipc = { git = "https://github.com/clash-orbit/clash-orbit-service-ipc.git", tag = "v2.7.3", version = "2.7.3", features = [
+clash_orbit_service_ipc = { git = "https://github.com/clash-orbit/clash-orbit-service-ipc.git", tag = "v2.7.3", version = "2.7.3", features = [
   "client",
 ] }
 arc-swap = "1.9.2"

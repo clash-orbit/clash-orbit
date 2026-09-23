@@ -205,7 +205,7 @@ where
     };
     let refusal = error.downcast_ref::<crate::core::service::ServiceStartRefusal>();
     let location_refused = refusal.is_some_and(|refusal| {
-        refusal.code == clash_verge_service_ipc::ServiceErrorCode::InvalidInstallLocation as u16
+        refusal.code == clash_orbit_service_ipc::ServiceErrorCode::InvalidInstallLocation as u16
     });
     if refusal.is_some() && !location_refused {
         return Err(error);
@@ -379,7 +379,7 @@ impl CoreManager {
         }
         #[cfg(target_os = "windows")]
         if matches!(*mode, RunningMode::NotRunning) {
-            clash_verge_service_ipc::execution::check_sidecar_available().await?;
+            clash_orbit_service_ipc::execution::check_sidecar_available().await?;
         }
         SERVICE_MANAGER.allow_sidecar_for_session()?;
         // Settling on Sidecar is what makes the verdict final, so ask only once it is recorded.
@@ -603,7 +603,7 @@ impl CoreManager {
                 {
                     run_service_start_with_sidecar_fallback(
                         || self.start_core_by_service(),
-                        clash_verge_service_ipc::execution::check_sidecar_available,
+                        clash_orbit_service_ipc::execution::check_sidecar_available,
                         |error| self.start_sidecar_after_service_failure(error),
                         |reason| {
                             crate::core::runstate::RUN_STATE
@@ -646,7 +646,7 @@ impl CoreManager {
             ServiceHealth::VersionMismatch => "registered service is unavailable or incompatible".to_owned(),
             _ => return Ok(()),
         };
-        if let Err(error) = clash_verge_service_ipc::execution::check_sidecar_available().await {
+        if let Err(error) = clash_orbit_service_ipc::execution::check_sidecar_available().await {
             logging!(
                 warn,
                 Type::Core,
@@ -1507,7 +1507,7 @@ mod tests {
             let result = super::run_service_start_with_sidecar_fallback(
                 || async {
                     Err(crate::core::service::ServiceStartRefusal {
-                        code: clash_verge_service_ipc::ServiceErrorCode::InvalidInstallLocation as u16,
+                        code: clash_orbit_service_ipc::ServiceErrorCode::InvalidInstallLocation as u16,
                         core_path: "verge-mihomo.exe".into(),
                         message: "no administrator-approved copy is installed".into(),
                     }

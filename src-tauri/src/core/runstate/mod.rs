@@ -494,10 +494,10 @@ mod tests {
 
     fn ready_reply() -> ServiceVersionReply {
         ServiceVersionReply {
-            core: Some(clash_verge_service_ipc::CoreAvailability::Ready),
+            core: Some(clash_orbit_service_ipc::CoreAvailability::Ready),
             code: 0,
             message: "ok".to_owned(),
-            protocol: Some(clash_verge_service_ipc::ProtocolInfo::current()),
+            protocol: Some(clash_orbit_service_ipc::ProtocolInfo::current()),
         }
     }
 

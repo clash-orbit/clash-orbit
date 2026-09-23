@@ -47,7 +47,7 @@ pub async fn update_log_config(log_max_size: u64, log_max_count: usize) -> Resul
     // The service writer is auxiliary to the local logger. Synchronize it only
     // for an active service session and do not roll back local settings on failure.
     if should_sync_service_writer(*CoreManager::global().get_running_mode())
-        && let Err(error) = service::update_writer_by_service(&clash_verge_service_ipc::WriterConfig {
+        && let Err(error) = service::update_writer_by_service(&clash_orbit_service_ipc::WriterConfig {
             directory: String::new(),
             max_log_size: log_max_size * 1024,
             max_log_files: log_max_count,

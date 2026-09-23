@@ -153,7 +153,7 @@ impl CoreManager {
     #[tracing::instrument(skip_all, level = "info", fields(pid = tracing::field::Empty))]
     pub(super) async fn start_core_by_sidecar(&self) -> Result<()> {
         self.wait_for_sidecar_exit().await?;
-        let execution = clash_verge_service_ipc::execution::reserve_sidecar().await?;
+        let execution = clash_orbit_service_ipc::execution::reserve_sidecar().await?;
         self.core_stopped();
 
         let sidecar_ipc = dirs::sidecar_ipc_path()?;

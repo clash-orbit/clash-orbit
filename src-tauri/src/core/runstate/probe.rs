@@ -4,7 +4,7 @@
 //! on [`super::env::RunStateEnv`], so these classifications are testable without IPC,
 //! systemd, SCM or launchd.
 
-use clash_verge_service_ipc::{
+use clash_orbit_service_ipc::{
     MIN_REQUIRED_SERVICE_REVISION, ProtocolInfo, ProtocolVersion, VERSION as SERVICE_VERSION,
 };
 
@@ -16,7 +16,7 @@ pub struct ServiceVersionReply {
     pub code: u16,
     pub message: String,
     pub protocol: Option<ProtocolInfo>,
-    pub core: Option<clash_verge_service_ipc::CoreAvailability>,
+    pub core: Option<clash_orbit_service_ipc::CoreAvailability>,
 }
 
 /// The verdict on a [`ServiceVersionReply`].
@@ -45,8 +45,8 @@ pub fn classify_service_version_reply(reply: &ServiceVersionReply) -> ServiceVer
         })
     {
         return match &reply.core {
-            Some(clash_verge_service_ipc::CoreAvailability::Ready) => ServiceVersionCheck::Ready,
-            Some(clash_verge_service_ipc::CoreAvailability::Rejected { reason }) => {
+            Some(clash_orbit_service_ipc::CoreAvailability::Ready) => ServiceVersionCheck::Ready,
+            Some(clash_orbit_service_ipc::CoreAvailability::Rejected { reason }) => {
                 ServiceVersionCheck::CoreUnavailable(format!(
                     "approved core was rejected: {reason}; reinstall the service to repair it"
                 ))
@@ -116,7 +116,7 @@ mod tests {
 
     fn ready_reply() -> ServiceVersionReply {
         ServiceVersionReply {
-            core: Some(clash_verge_service_ipc::CoreAvailability::Ready),
+            core: Some(clash_orbit_service_ipc::CoreAvailability::Ready),
             code: 0,
             message: "ok".to_owned(),
             protocol: Some(ProtocolInfo::current()),
@@ -136,8 +136,8 @@ mod tests {
     fn compatible_service_with_missing_core_is_unavailable() {
         for core in [
             None,
-            Some(clash_verge_service_ipc::CoreAvailability::Missing),
-            Some(clash_verge_service_ipc::CoreAvailability::DigestMismatch),
+            Some(clash_orbit_service_ipc::CoreAvailability::Missing),
+            Some(clash_orbit_service_ipc::CoreAvailability::DigestMismatch),
         ] {
             let reply = ServiceVersionReply { core, ..ready_reply() };
             assert!(matches!(
@@ -151,7 +151,7 @@ mod tests {
     #[test]
     fn a_reply_without_protocol_information_needs_reinstall() {
         let reply = ServiceVersionReply {
-            core: Some(clash_verge_service_ipc::CoreAvailability::Ready),
+            core: Some(clash_orbit_service_ipc::CoreAvailability::Ready),
             code: 0,
             message: "ok".to_owned(),
             protocol: None,
@@ -169,7 +169,7 @@ mod tests {
     #[test]
     fn a_nonzero_code_needs_reinstall() {
         let reply = ServiceVersionReply {
-            core: Some(clash_verge_service_ipc::CoreAvailability::Ready),
+            core: Some(clash_orbit_service_ipc::CoreAvailability::Ready),
             code: 7,
             message: "nope".to_owned(),
             protocol: Some(ProtocolInfo::current()),
@@ -185,7 +185,7 @@ mod tests {
         let mut info = ProtocolInfo::current();
         info.protocol.epoch = info.protocol.epoch.wrapping_add(1);
         let reply = ServiceVersionReply {
-            core: Some(clash_verge_service_ipc::CoreAvailability::Ready),
+            core: Some(clash_orbit_service_ipc::CoreAvailability::Ready),
             code: 0,
             message: "ok".to_owned(),
             protocol: Some(info),
@@ -206,7 +206,7 @@ mod tests {
         let mut info = ProtocolInfo::current();
         info.protocol.revision = revision;
         let reply = ServiceVersionReply {
-            core: Some(clash_verge_service_ipc::CoreAvailability::Ready),
+            core: Some(clash_orbit_service_ipc::CoreAvailability::Ready),
             code: 0,
             message: "ok".to_owned(),
             protocol: Some(info),
