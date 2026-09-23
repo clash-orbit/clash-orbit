@@ -155,7 +155,7 @@
     }
   },
   "components": {
-    "verge": {
+    "orbit": {
       "basic": {
         "title": "Pengaturan Dasar Clash Orbit",
         "actions": {
@@ -204,7 +204,7 @@
           "liteModeSettings": "LightWeight Mode Settings",
           "exit": "Keluar",
           "exportDiagnostics": "Export Diagnostic Info",
-          "vergeVersion": "Versi Clash Orbit"
+          "orbitVersion": "Versi Clash Orbit"
         }
       },
       "theme": {

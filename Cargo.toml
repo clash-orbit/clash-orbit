@@ -1,13 +1,13 @@
 [workspace]
 members = [
   "src-tauri",
-  "crates/clash-verge-draft",
-  "crates/clash-verge-media-unlock",
-  "crates/clash-verge-logging",
-  "crates/clash-verge-signal",
-  "crates/tauri-plugin-clash-verge-sysinfo",
-  "crates/clash-verge-i18n",
-  "crates/clash-verge-limiter",
+  "crates/clash-orbit-draft",
+  "crates/clash-orbit-media-unlock",
+  "crates/clash-orbit-logging",
+  "crates/clash-orbit-signal",
+  "crates/tauri-plugin-clash-orbit-sysinfo",
+  "crates/clash-orbit-i18n",
+  "crates/clash-orbit-limiter",
 ]
 resolver = "2"
 
@@ -62,14 +62,14 @@ tray-icon = { git = "https://github.com/Tunglies/tray-icon.git", branch = "fix/m
 sysproxy = { git = "https://github.com/clash-orbit/sysproxy-rs.git", branch = "main" }
 
 [workspace.dependencies]
-clash-verge-draft = { path = "crates/clash-verge-draft" }
-clash-verge-media-unlock = { path = "crates/clash-verge-media-unlock" }
-clash-verge-logging = { path = "crates/clash-verge-logging" }
-clash-verge-signal = { path = "crates/clash-verge-signal" }
-clash-verge-i18n = { path = "crates/clash-verge-i18n" }
-clash-verge-limiter = { path = "crates/clash-verge-limiter" }
+clash-orbit-draft = { path = "crates/clash-orbit-draft" }
+clash-orbit-media-unlock = { path = "crates/clash-orbit-media-unlock" }
+clash-orbit-logging = { path = "crates/clash-orbit-logging" }
+clash-orbit-signal = { path = "crates/clash-orbit-signal" }
+clash-orbit-i18n = { path = "crates/clash-orbit-i18n" }
+clash-orbit-limiter = { path = "crates/clash-orbit-limiter" }
 tracing-estuary = { git = "https://github.com/Tunglies/tracing-estuary.git", branch = "main" }
-tauri-plugin-clash-verge-sysinfo = { path = "crates/tauri-plugin-clash-verge-sysinfo" }
+tauri-plugin-clash-orbit-sysinfo = { path = "crates/tauri-plugin-clash-orbit-sysinfo" }
 tracing = "0.1.44"
 
 tauri = { version = "2.11.6" }

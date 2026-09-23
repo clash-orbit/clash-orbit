@@ -1,5 +1,5 @@
 use crate::{
-    config::{Config, IVerge, MixedPort},
+    config::{Config, IOrbit, MixedPort},
     core::{
         CoreManager,
         manager::RunningMode,
@@ -16,7 +16,7 @@ use crate::{
     },
 };
 use anyhow::{Result, ensure};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use clash_verge_service_ipc::{MacosProxyConfig, OwnerSessionProof, ProxyApplyOutcome};
 use std::{
     future::Future,
@@ -323,13 +323,13 @@ fn truncate_utf8(value: &mut String, max_bytes: usize) {
     value.truncate(boundary);
 }
 
-fn service_bypass(verge: &IVerge) -> Result<String> {
-    let custom = verge.system_proxy_bypass.as_deref().unwrap_or("");
+fn service_bypass(orbit: &IOrbit) -> Result<String> {
+    let custom = orbit.system_proxy_bypass.as_deref().unwrap_or("");
     ensure!(!custom.contains('\0'), "system proxy bypass contains NUL");
 
     let mut bypass = if custom.is_empty() {
         MACOS_DEFAULT_BYPASS.to_owned()
-    } else if verge.use_default_bypass.unwrap_or(true) {
+    } else if orbit.use_default_bypass.unwrap_or(true) {
         format!("{MACOS_DEFAULT_BYPASS},{custom}")
     } else {
         custom.to_owned()
@@ -338,12 +338,12 @@ fn service_bypass(verge: &IVerge) -> Result<String> {
     Ok(bypass)
 }
 
-fn service_proxy_config(verge: &IVerge, mixed_port: u16, pac_port: u16) -> Result<MacosProxyConfig> {
-    if !verge.enable_system_proxy.unwrap_or_default() {
+fn service_proxy_config(orbit: &IOrbit, mixed_port: u16, pac_port: u16) -> Result<MacosProxyConfig> {
+    if !orbit.enable_system_proxy.unwrap_or_default() {
         return Ok(MacosProxyConfig::Disabled);
     }
 
-    if verge.proxy_auto_config.unwrap_or_default() {
+    if orbit.proxy_auto_config.unwrap_or_default() {
         ensure!(pac_port != 0, "embedded PAC server port must not be zero");
         Ok(MacosProxyConfig::Pac {
             url: format!("http://{LOOPBACK_HOST}:{pac_port}/commands/pac"),
@@ -353,7 +353,7 @@ fn service_proxy_config(verge: &IVerge, mixed_port: u16, pac_port: u16) -> Resul
         Ok(MacosProxyConfig::Global {
             host: LOOPBACK_HOST.to_owned(),
             port: mixed_port,
-            bypass: service_bypass(verge)?,
+            bypass: service_bypass(orbit)?,
         })
     }
 }
@@ -373,15 +373,15 @@ fn service_apply_result(requested: &MacosProxyConfig, outcome: ProxyApplyOutcome
     }
 }
 
-async fn current_service_proxy_config(verge: &IVerge) -> Result<MacosProxyConfig> {
-    if !verge.enable_system_proxy.unwrap_or_default() {
+async fn current_service_proxy_config(orbit: &IOrbit) -> Result<MacosProxyConfig> {
+    if !orbit.enable_system_proxy.unwrap_or_default() {
         return Ok(MacosProxyConfig::Disabled);
     }
-    if verge.proxy_auto_config.unwrap_or_default() {
-        return service_proxy_config(verge, 0, server::embedded_server_port()?);
+    if orbit.proxy_auto_config.unwrap_or_default() {
+        return service_proxy_config(orbit, 0, server::embedded_server_port()?);
     }
     let mixed_port = MixedPort::desired().await;
-    service_proxy_config(verge, mixed_port, 0)
+    service_proxy_config(orbit, mixed_port, 0)
 }
 
 /// Whether macOS has a network service to write the proxy on right now.
@@ -473,7 +473,7 @@ fn table_effect(result: &Result<()>) -> TableEffect<'_> {
 #[tracing::instrument(skip_all, level = "info", fields(route = tracing::field::Empty))]
 pub async fn apply() -> Result<()> {
     let running_mode = CoreManager::global().get_running_mode();
-    let verge = Config::verge().await.latest_arc();
+    let orbit = Config::orbit().await.latest_arc();
     let route = proxy_backend_route(cfg!(target_os = "macos"), &running_mode);
     tracing::Span::current().record("route", tracing::field::debug(&route));
     let result = match route {
@@ -482,7 +482,7 @@ pub async fn apply() -> Result<()> {
             Err(error) => Err(classify_local_apply_failure(error).await),
         },
         ProxyBackendRoute::Service => {
-            let proxy = current_service_proxy_config(&verge).await?;
+            let proxy = current_service_proxy_config(&orbit).await?;
             apply_through_service(
                 || Sysopt::global().stop_proxy_guard(),
                 || async {
@@ -579,15 +579,15 @@ pub async fn refresh_guard() -> Result<()> {
         return Ok(());
     }
 
-    let verge = Config::verge().await.latest_arc();
-    if !verge.enable_system_proxy.unwrap_or_default() || !verge.enable_proxy_guard.unwrap_or_default() {
+    let orbit = Config::orbit().await.latest_arc();
+    if !orbit.enable_system_proxy.unwrap_or_default() || !orbit.enable_proxy_guard.unwrap_or_default() {
         notification::retire_guard_failures();
         return Ok(());
     }
 
-    let proxy = current_service_proxy_config(&verge).await?;
+    let proxy = current_service_proxy_config(&orbit).await?;
     let proof = service::active_service_session()?;
-    let interval = Duration::from_secs(verge.proxy_guard_duration.unwrap_or(30).max(1));
+    let interval = Duration::from_secs(orbit.proxy_guard_duration.unwrap_or(30).max(1));
     AsyncHandler::spawn(move || async move {
         let mut consecutive_failures = 0u32;
         loop {
@@ -662,7 +662,7 @@ mod tests {
         ProxyBackendRoute, ServiceProxyOperations, guard_generation_is_current, proxy_backend_route,
         service_proxy_config,
     };
-    use crate::{config::IVerge, core::manager::RunningMode};
+    use crate::{config::IOrbit, core::manager::RunningMode};
     use clash_verge_service_ipc::{MacosProxyConfig, OwnerSessionProof, ProxyApplyOutcome};
     use parking_lot::Mutex;
     use std::sync::{
@@ -954,16 +954,16 @@ mod tests {
 
     #[test]
     fn service_proxy_config_forces_loopback_targets_and_bounds_bypass() {
-        let verge = IVerge {
+        let orbit = IOrbit {
             enable_system_proxy: Some(true),
             proxy_auto_config: Some(false),
             proxy_host: Some("192.0.2.1".into()),
             system_proxy_bypass: Some(format!("{}界", "x".repeat(8191)).into()),
             use_default_bypass: Some(false),
-            ..IVerge::default()
+            ..IOrbit::default()
         };
 
-        let proxy = service_proxy_config(&verge, 7897, 3333).unwrap_or_else(|_| unreachable!());
+        let proxy = service_proxy_config(&orbit, 7897, 3333).unwrap_or_else(|_| unreachable!());
         let MacosProxyConfig::Global { host, port, bypass } = proxy else {
             unreachable!();
         };
@@ -973,12 +973,12 @@ mod tests {
         assert!(bypass.len() <= 8192);
         assert!(bypass.is_char_boundary(bypass.len()));
 
-        let pac_verge = IVerge {
+        let pac_orbit = IOrbit {
             proxy_auto_config: Some(true),
-            ..verge
+            ..orbit
         };
         assert_eq!(
-            service_proxy_config(&pac_verge, 7897, 3333).unwrap_or_else(|_| unreachable!()),
+            service_proxy_config(&pac_orbit, 7897, 3333).unwrap_or_else(|_| unreachable!()),
             MacosProxyConfig::Pac {
                 url: "http://127.0.0.1:3333/commands/pac".to_owned()
             }

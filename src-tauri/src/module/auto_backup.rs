@@ -1,12 +1,12 @@
 use crate::{
-    config::{Config, IVerge},
+    config::{Config, IOrbit},
     feat::create_local_backup_with_namer,
     process::AsyncHandler,
     utils::dirs::local_backup_dir,
 };
 use anyhow::Result;
 use chrono::Local;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use once_cell::sync::OnceCell;
 use parking_lot::RwLock;
 use std::{
@@ -58,16 +58,16 @@ struct AutoBackupSettings {
 }
 
 impl AutoBackupSettings {
-    fn from_verge(verge: &IVerge) -> Self {
-        let interval = verge
+    fn from_orbit(orbit: &IOrbit) -> Self {
+        let interval = orbit
             .auto_backup_interval_hours
             .unwrap_or(DEFAULT_INTERVAL_HOURS)
             .clamp(MIN_INTERVAL_HOURS, MAX_INTERVAL_HOURS);
 
         Self {
-            schedule_enabled: verge.enable_auto_backup_schedule.unwrap_or(false),
+            schedule_enabled: orbit.enable_auto_backup_schedule.unwrap_or(false),
             interval_hours: interval,
-            change_enabled: verge.auto_backup_on_change.unwrap_or(true),
+            change_enabled: orbit.auto_backup_on_change.unwrap_or(true),
         }
     }
 }
@@ -233,8 +233,8 @@ impl AutoBackupManager {
     }
 
     async fn load_settings() -> AutoBackupSettings {
-        let verge = Config::verge().await;
-        AutoBackupSettings::from_verge(&verge.latest_arc())
+        let orbit = Config::orbit().await;
+        AutoBackupSettings::from_orbit(&orbit.latest_arc())
     }
 }
 

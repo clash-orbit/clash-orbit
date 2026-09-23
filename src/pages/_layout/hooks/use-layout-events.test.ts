@@ -1,7 +1,7 @@
 import { beforeEach, expect, it, vi } from 'vitest'
 
 import { takeDnsOverrideNotice, takeServiceRepairNotice } from '@/services/cmds'
-import { subscribeVergeEvents } from '@/services/events'
+import { subscribeOrbitEvents } from '@/services/events'
 import { showNotice } from '@/services/notice-service'
 import { revalidateQueries } from '@/services/query-client'
 import { requestService } from '@/services/service-request'
@@ -13,7 +13,7 @@ import { useLayoutEvents } from './use-layout-events'
 vi.mock('react', () => ({ useEffect: (effect: () => void) => effect() }))
 vi.mock('@/hooks/use-profiles', () => ({ revalidateProfiles: vi.fn() }))
 vi.mock('@/hooks/use-system-state', () => ({ runStateQueryKey: ['state'] }))
-vi.mock('@/services/events', () => ({ subscribeVergeEvents: vi.fn() }))
+vi.mock('@/services/events', () => ({ subscribeOrbitEvents: vi.fn() }))
 vi.mock('@/services/cmds', () => ({
   takeDiscardedKeysNotice: vi.fn().mockResolvedValue(null),
   takeDnsOverrideNotice: vi.fn(),
@@ -43,10 +43,10 @@ it('drains a DNS notice after listeners mount without duplicating its live event
   })
 
   expect(takeDnsOverrideNotice).not.toHaveBeenCalled()
-  const [handlers, onSubscribed] = vi.mocked(subscribeVergeEvents).mock.calls[0]
+  const [handlers, onSubscribed] = vi.mocked(subscribeOrbitEvents).mock.calls[0]
   onSubscribed?.()
   expect(takeDnsOverrideNotice).toHaveBeenCalledOnce()
-  handlers['verge://notice-message']?.(['dns_override::auto_disabled', ''])
+  handlers['orbit://notice-message']?.(['dns_override::auto_disabled', ''])
   await new Promise((resolve) => setTimeout(resolve, 0))
 
   expect(showNotice.info).toHaveBeenCalledExactlyOnceWith(
@@ -54,7 +54,7 @@ it('drains a DNS notice after listeners mount without duplicating its live event
   )
   expect(revalidateQueries).toHaveBeenCalledWith([
     ['getRuntimeState'],
-    ['getVergeConfig'],
+    ['getOrbitConfig'],
   ])
 })
 
@@ -67,9 +67,9 @@ it('offers service reinstallation for a startup path refusal even before listene
     handleNoticeMessage(status, message, (key) => key, vi.fn())
   })
 
-  const [handlers, onSubscribed] = vi.mocked(subscribeVergeEvents).mock.calls[0]
+  const [handlers, onSubscribed] = vi.mocked(subscribeOrbitEvents).mock.calls[0]
   onSubscribed?.()
-  handlers['verge://notice-message']?.(['service_core::repair_required', ''])
+  handlers['orbit://notice-message']?.(['service_core::repair_required', ''])
   await new Promise((resolve) => setTimeout(resolve, 0))
 
   expect(requestService).toHaveBeenCalledExactlyOnceWith({

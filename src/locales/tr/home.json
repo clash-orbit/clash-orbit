@@ -57,7 +57,7 @@
         "autoLaunch": "Otomatik Başlatma",
         "runningMode": "Çalışma Modu",
         "lastCheckUpdate": "Son Güncelleme Kontrolü",
-        "vergeVersion": "Clash Orbit Sürümü"
+        "orbitVersion": "Clash Orbit Sürümü"
       },
       "actions": {
         "settings": "Ayarlar"

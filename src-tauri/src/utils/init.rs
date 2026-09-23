@@ -1,5 +1,5 @@
 use crate::{
-    config::{Config, IClashTemp, IProfiles, IVerge},
+    config::{Config, IClashTemp, IOrbit, IProfiles},
     constants,
     core::handle,
     logging,
@@ -11,7 +11,7 @@ use crate::{
 };
 use anyhow::{Context as _, Result};
 use chrono::{Local, TimeZone as _};
-use clash_verge_logging::Type;
+use clash_orbit_logging::Type;
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 use std::path::Path;
 use std::{path::PathBuf, str::FromStr as _};
@@ -63,9 +63,9 @@ pub async fn delete_log() -> Result<()> {
     }
 
     let auto_log_clean = {
-        let verge = Config::verge().await;
-        let verge = verge.data_arc();
-        verge.auto_log_clean.unwrap_or(0)
+        let orbit = Config::orbit().await;
+        let orbit = orbit.data_arc();
+        orbit.auto_log_clean.unwrap_or(0)
     };
 
     let day = match auto_log_clean {
@@ -153,7 +153,7 @@ async fn is_logs_dir_writable(log_dir: &Path) -> bool {
     }
 
     let probe_path = log_dir.join(format!(
-        ".clash-verge-write-test-{}-{}",
+        ".clash-orbit-write-test-{}-{}",
         std::process::id(),
         Local::now().timestamp_nanos_opt().unwrap_or_default()
     ));
@@ -421,7 +421,7 @@ pub(super) async fn init_dns_config() -> Result<()> {
 
     if !dns_path.exists() {
         logging!(info, Type::Setup, "Creating default DNS config file");
-        help::save_yaml(&dns_path, &default_dns_config, Some("# Clash Verge DNS Config")).await?;
+        help::save_yaml(&dns_path, &default_dns_config, Some("# Clash Orbit DNS Config")).await?;
     }
 
     Ok(())
@@ -452,35 +452,35 @@ async fn initialize_config_files() -> Result<()> {
         && !path.exists()
     {
         let template = IClashTemp::template().0;
-        help::save_yaml(&path, &template, Some("# Clash Verge"))
+        help::save_yaml(&path, &template, Some("# Clash Orbit"))
             .await
             .map_err(|e| anyhow::anyhow!("Failed to create clash config: {}", e))?;
         logging!(info, Type::Setup, "Created clash config at {:?}", path);
     }
 
-    if let Ok(path) = dirs::verge_path()
+    if let Ok(path) = dirs::orbit_path()
         && !path.exists()
     {
-        let template = IVerge::template();
-        help::save_yaml(&path, &template, Some("# Clash Verge"))
+        let template = IOrbit::template();
+        help::save_yaml(&path, &template, Some("# Clash Orbit"))
             .await
-            .map_err(|e| anyhow::anyhow!("Failed to create verge config: {}", e))?;
-        logging!(info, Type::Setup, "Created verge config at {:?}", path);
+            .map_err(|e| anyhow::anyhow!("Failed to create orbit config: {}", e))?;
+        logging!(info, Type::Setup, "Created orbit config at {:?}", path);
     }
 
     if let Ok(path) = dirs::profiles_path()
         && !path.exists()
     {
         let template = IProfiles::default();
-        help::save_yaml(&path, &template, Some("# Clash Verge"))
+        help::save_yaml(&path, &template, Some("# Clash Orbit"))
             .await
             .map_err(|e| anyhow::anyhow!("Failed to create profiles config: {}", e))?;
         logging!(info, Type::Setup, "Created profiles config at {:?}", path);
     }
 
-    IVerge::validate_and_fix_config()
+    IOrbit::validate_and_fix_config()
         .await
-        .map_err(|e| anyhow::anyhow!("Failed to validate verge config: {}", e))?;
+        .map_err(|e| anyhow::anyhow!("Failed to validate orbit config: {}", e))?;
 
     Ok(())
 }
@@ -557,8 +557,8 @@ pub fn init_scheme() -> Result<()> {
 
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let (clash, _) = hkcu.create_subkey("Software\\Classes\\Clash")?;
-    clash.set_value("", &"Clash Verge")?;
-    clash.set_value("URL Protocol", &"Clash Verge URL Scheme Protocol")?;
+    clash.set_value("", &"Clash Orbit")?;
+    clash.set_value("URL Protocol", &"Clash Orbit URL Scheme Protocol")?;
     let (default_icon, _) = hkcu.create_subkey("Software\\Classes\\Clash\\DefaultIcon")?;
     default_icon.set_value("", &app_exe)?;
     let (command, _) = hkcu.create_subkey("Software\\Classes\\Clash\\Shell\\Open\\Command")?;
@@ -568,7 +568,7 @@ pub fn init_scheme() -> Result<()> {
 }
 #[cfg(target_os = "linux")]
 pub fn init_scheme() -> Result<()> {
-    const DESKTOP_FILE: &str = "clash-verge.desktop";
+    const DESKTOP_FILE: &str = "clash-orbit.desktop";
 
     for scheme in DEEP_LINK_SCHEMES {
         let handler = format!("x-scheme-handler/{scheme}");
@@ -594,14 +594,14 @@ pub const fn init_scheme() -> Result<()> {
 }
 
 #[cfg(target_os = "linux")]
-const DEEP_LINK_SCHEMES: &[&str] = &["clash", "clash-verge"];
+const DEEP_LINK_SCHEMES: &[&str] = &["clash", "clash-orbit"];
 
 pub async fn startup_script() -> Result<()> {
     let app_handle = handle::Handle::app_handle();
     let script_path = {
-        let verge = Config::verge().await;
-        let verge = verge.data_arc();
-        verge.startup_script.clone().unwrap_or_else(|| "".into())
+        let orbit = Config::orbit().await;
+        let orbit = orbit.data_arc();
+        orbit.startup_script.clone().unwrap_or_else(|| "".into())
     };
 
     if script_path.is_empty() {

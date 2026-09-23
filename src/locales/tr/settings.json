@@ -155,7 +155,7 @@
     }
   },
   "components": {
-    "verge": {
+    "orbit": {
       "basic": {
         "title": "Clash Orbit Temel Ayarı",
         "actions": {
@@ -204,7 +204,7 @@
           "liteModeSettings": "Hafif Mod Ayarları",
           "exit": "Çıkış",
           "exportDiagnostics": "Tanılama Bilgilerini Dışa Aktar",
-          "vergeVersion": "Clash Orbit Sürümü"
+          "orbitVersion": "Clash Orbit Sürümü"
         }
       },
       "theme": {

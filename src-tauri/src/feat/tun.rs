@@ -2,11 +2,11 @@
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use scopeguard::defer;
 
 use crate::{
-    config::{Config, IVerge},
+    config::{Config, IOrbit},
     core::{handle::Handle, manager::RunningMode, runstate::RUN_STATE},
 };
 
@@ -19,7 +19,7 @@ static DISABLING_TUN: AtomicBool = AtomicBool::new(false);
 pub async fn reconcile_startup_tun_availability() {
     // Read fresh state after prior config writes complete.
     let _config_write = Config::lock_config_write().await;
-    let tun_enabled = Config::verge().await.data_arc().enable_tun_mode.unwrap_or(false);
+    let tun_enabled = Config::orbit().await.data_arc().enable_tun_mode.unwrap_or(false);
     if !RUN_STATE.state().startup_tun_should_be_disabled(tun_enabled) {
         return;
     }
@@ -52,7 +52,7 @@ pub async fn reconcile_tun_availability() {
     }
 
     // Legacy writers may still hold an uncommitted draft.
-    let tun_enabled = Config::verge().await.data_arc().enable_tun_mode.unwrap_or(false);
+    let tun_enabled = Config::orbit().await.data_arc().enable_tun_mode.unwrap_or(false);
     if !state.tun_should_be_disabled(tun_enabled) {
         return;
     }
@@ -68,13 +68,13 @@ pub async fn reconcile_tun_availability() {
         Type::Core,
         "TUN mode cannot work in the current run state; turning it off"
     );
-    let patch = IVerge {
+    let patch = IOrbit {
         enable_tun_mode: Some(false),
-        ..IVerge::default()
+        ..IOrbit::default()
     };
 
     // Skip recursive reconciliation for this internal patch.
-    match super::apply_verge_patch_locked(&config_write, &patch, false).await {
+    match super::apply_orbit_patch_locked(&config_write, &patch, false).await {
         Ok(()) => Handle::notice_message("tun_mode::auto_disabled", ""),
         Err(error) => {
             logging!(error, Type::Core, "failed to turn TUN mode off: {error:#}");

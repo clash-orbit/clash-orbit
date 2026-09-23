@@ -5,8 +5,8 @@ use tauri::{Theme, WebviewWindow};
 
 use crate::{config::Config, core::handle, utils::resolve::window_script::build_window_initial_script};
 #[cfg(target_os = "macos")]
-use clash_verge_logging::logging;
-use clash_verge_logging::{Type, logging_error};
+use clash_orbit_logging::logging;
+use clash_orbit_logging::{Type, logging_error};
 
 const DARK_BACKGROUND_COLOR: Color = Color(46, 48, 61, 255); // #2E303D
 const LIGHT_BACKGROUND_COLOR: Color = Color(245, 245, 245, 255); // #F5F5F5
@@ -47,7 +47,7 @@ fn restore_default_size_if_needed(window: &WebviewWindow) {
 pub async fn build_new_window() -> Result<WebviewWindow, String> {
     let app_handle = handle::Handle::app_handle();
 
-    let config = Config::verge().await;
+    let config = Config::orbit().await;
     let latest = config.latest_arc();
     let start_page = latest.start_page.as_deref().unwrap_or("/");
     let initial_theme_mode = match latest.theme_mode.as_deref() {
@@ -81,7 +81,7 @@ pub async fn build_new_window() -> Result<WebviewWindow, String> {
         "main", /* the unique window label */
         tauri::WebviewUrl::App(start_page.into()),
     )
-    .title("Clash Verge")
+    .title("Clash Orbit")
     .center()
     .decorations(DEFAULT_DECORATIONS)
     .fullscreen(false)

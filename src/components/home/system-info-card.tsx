@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
+import { useOrbit } from '@/hooks/use-orbit'
 import { useServiceInstaller } from '@/hooks/use-service-installer'
 import { useSystemState } from '@/hooks/use-system-state'
 import {
@@ -19,7 +20,6 @@ import {
   updateLastCheckTime,
   readLastCheckTime,
 } from '@/hooks/use-update'
-import { useVerge } from '@/hooks/use-verge'
 import { getSystemInfo } from '@/services/cmds'
 import { showNotice } from '@/services/notice-service'
 import { version as appVersion } from '@root/package.json'
@@ -28,7 +28,7 @@ import { EnhancedCard } from './enhanced-card'
 
 export const SystemInfoCard = () => {
   const { t } = useTranslation()
-  const { verge, patchVerge } = useVerge()
+  const { orbit, patchOrbit } = useOrbit()
   const navigate = useNavigate()
   const { runningMode, isAdminMode, isSidecarMode, mutateSystemState } =
     useSystemState()
@@ -62,7 +62,7 @@ export const SystemInfoCard = () => {
   }, [])
 
   useEffect(() => {
-    if (!verge?.auto_check_update) return
+    if (!orbit?.auto_check_update) return
     if (readLastCheckTime() !== null) return
 
     updateLastCheckTime()
@@ -70,20 +70,20 @@ export const SystemInfoCard = () => {
       triggerCheckUpdate().catch(console.error)
     }, 5000)
     return () => window.clearTimeout(timeoutId)
-  }, [verge?.auto_check_update, triggerCheckUpdate])
+  }, [orbit?.auto_check_update, triggerCheckUpdate])
 
   const goToSettings = useCallback(() => {
     navigate('/settings')
   }, [navigate])
 
   const toggleAutoLaunch = useCallback(async () => {
-    if (!verge) return
+    if (!orbit) return
     try {
-      await patchVerge({ enable_auto_launch: !verge.enable_auto_launch })
+      await patchOrbit({ enable_auto_launch: !orbit.enable_auto_launch })
     } catch (err) {
       console.error('切换开机自启动状态失败:', err)
     }
-  }, [verge, patchVerge])
+  }, [orbit, patchOrbit])
 
   const handleRunningModeClick = useCallback(async () => {
     if (isSidecarMode || (isAdminMode && isSidecarMode)) {
@@ -103,7 +103,7 @@ export const SystemInfoCard = () => {
       const info = result.data
       if (!info?.available) {
         showNotice.success(
-          'settings.components.verge.advanced.notifications.latestVersion',
+          'settings.components.orbit.advanced.notifications.latestVersion',
         )
       } else {
         showNotice.info('shared.feedback.notifications.updateAvailable', 2000)
@@ -116,8 +116,8 @@ export const SystemInfoCard = () => {
   })
 
   const autoLaunchEnabled = useMemo(
-    () => verge?.enable_auto_launch || false,
-    [verge],
+    () => orbit?.enable_auto_launch || false,
+    [orbit],
   )
 
   const runningModeStyle = useMemo(
@@ -199,7 +199,7 @@ export const SystemInfoCard = () => {
     }
   }
 
-  if (!verge) return null
+  if (!orbit) return null
 
   return (
     <EnhancedCard
@@ -286,7 +286,7 @@ export const SystemInfoCard = () => {
         <Divider />
         <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
           <Typography variant="body2" color="text.secondary">
-            {t('home.components.systemInfo.fields.vergeVersion')}
+            {t('home.components.systemInfo.fields.orbitVersion')}
           </Typography>
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
             v{appVersion}

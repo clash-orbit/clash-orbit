@@ -10,7 +10,7 @@ import { Fragment, useMemo, useState, type ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Switch } from '@/components/base'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { showNotice } from '@/services/notice-service'
 
 const MIN_INTERVAL_HOURS = 1
@@ -24,17 +24,17 @@ interface AutoBackupState {
 
 export function AutoBackupSettings() {
   const { t } = useTranslation()
-  const { verge, patchVerge } = useVerge()
+  const { orbit, patchOrbit } = useOrbit()
   const derivedValues = useMemo<AutoBackupState>(() => {
     return {
-      scheduleEnabled: verge?.enable_auto_backup_schedule ?? false,
-      intervalHours: verge?.auto_backup_interval_hours ?? 24,
-      changeEnabled: verge?.auto_backup_on_change ?? true,
+      scheduleEnabled: orbit?.enable_auto_backup_schedule ?? false,
+      intervalHours: orbit?.auto_backup_interval_hours ?? 24,
+      changeEnabled: orbit?.auto_backup_on_change ?? true,
     }
   }, [
-    verge?.enable_auto_backup_schedule,
-    verge?.auto_backup_interval_hours,
-    verge?.auto_backup_on_change,
+    orbit?.enable_auto_backup_schedule,
+    orbit?.auto_backup_interval_hours,
+    orbit?.auto_backup_on_change,
   ])
   const [pendingValues, setPendingValues] = useState<AutoBackupState | null>(
     null,
@@ -59,12 +59,12 @@ export function AutoBackupSettings() {
   const applyPatch = useLockFn(
     async (
       partial: Partial<AutoBackupState>,
-      payload: Partial<IVergeConfig>,
+      payload: Partial<IOrbitConfig>,
     ) => {
       const nextValues = { ...values, ...partial }
       setPendingValues(nextValues)
       try {
-        await patchVerge(payload)
+        await patchOrbit(payload)
       } catch (error) {
         showNotice.error(error)
         setPendingValues(null)
@@ -72,7 +72,7 @@ export function AutoBackupSettings() {
     },
   )
 
-  const disabled = !verge
+  const disabled = !orbit
 
   const handleScheduleToggle = (
     _: ChangeEvent<HTMLInputElement>,

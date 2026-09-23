@@ -12,12 +12,12 @@ import { forwardRef, useImperativeHandle, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BaseDialog, DialogRef, Switch, TooltipIcon } from '@/components/base'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { showNotice } from '@/services/notice-service'
 
 export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
   const { t } = useTranslation()
-  const { verge, patchVerge } = useVerge()
+  const { orbit, patchOrbit } = useOrbit()
 
   const [open, setOpen] = useState(false)
   const [values, setValues] = useState({
@@ -39,19 +39,19 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
     open: () => {
       setOpen(true)
       setValues({
-        appLogLevel: verge?.app_log_level ?? 'warn',
-        appLogMaxSize: verge?.app_log_max_size ?? 128,
-        appLogMaxCount: verge?.app_log_max_count ?? 8,
-        autoCloseConnection: verge?.auto_close_connection ?? true,
-        autoCheckUpdate: verge?.auto_check_update ?? true,
-        enableBuiltinEnhanced: verge?.enable_builtin_enhanced ?? true,
-        proxyLayoutColumn: verge?.proxy_layout_column || 6,
-        enableAutoDelayDetection: verge?.enable_auto_delay_detection ?? false,
+        appLogLevel: orbit?.app_log_level ?? 'warn',
+        appLogMaxSize: orbit?.app_log_max_size ?? 128,
+        appLogMaxCount: orbit?.app_log_max_count ?? 8,
+        autoCloseConnection: orbit?.auto_close_connection ?? true,
+        autoCheckUpdate: orbit?.auto_check_update ?? true,
+        enableBuiltinEnhanced: orbit?.enable_builtin_enhanced ?? true,
+        proxyLayoutColumn: orbit?.proxy_layout_column || 6,
+        enableAutoDelayDetection: orbit?.enable_auto_delay_detection ?? false,
         autoDelayDetectionIntervalMinutes:
-          verge?.auto_delay_detection_interval_minutes ?? 5,
-        defaultLatencyTest: verge?.default_latency_test || '',
-        autoLogClean: verge?.auto_log_clean || 0,
-        defaultLatencyTimeout: verge?.default_latency_timeout || 10000,
+          orbit?.auto_delay_detection_interval_minutes ?? 5,
+        defaultLatencyTest: orbit?.default_latency_test || '',
+        autoLogClean: orbit?.auto_log_clean || 0,
+        defaultLatencyTimeout: orbit?.default_latency_timeout || 10000,
       })
     },
     close: () => setOpen(false),
@@ -59,7 +59,7 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
 
   const onSave = useLockFn(async () => {
     try {
-      await patchVerge({
+      await patchOrbit({
         app_log_level: values.appLogLevel,
         app_log_max_size: values.appLogMaxSize,
         app_log_max_count: values.appLogMaxCount,

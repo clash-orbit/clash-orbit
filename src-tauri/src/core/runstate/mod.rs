@@ -18,7 +18,7 @@ use std::{
 
 use anyhow::{Context as _, Result, bail};
 use arc_swap::ArcSwap;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use tokio::sync::Notify;

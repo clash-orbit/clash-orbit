@@ -57,7 +57,7 @@
         "autoLaunch": "Автозапуск",
         "runningMode": "Режим работы",
         "lastCheckUpdate": "Последняя проверка обновлений",
-        "vergeVersion": "Версия Clash Orbit"
+        "orbitVersion": "Версия Clash Orbit"
       },
       "actions": {
         "settings": "Настройки"

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { DialogRef, Switch, TooltipIcon } from '@/components/base'
 import ProxyControlSwitches from '@/components/shared/proxy-control-switches'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 
 import { GuardState } from './mods/guard-state'
 import { SettingList, SettingItem } from './mods/setting-comp'
@@ -17,9 +17,9 @@ interface Props {
 const SettingSystem = ({ onError }: Props) => {
   const { t } = useTranslation()
 
-  const { verge, mutateVerge, patchVerge } = useVerge()
+  const { orbit, mutateOrbit, patchOrbit } = useOrbit()
 
-  const { enable_auto_launch, enable_silent_start } = verge ?? {}
+  const { enable_auto_launch, enable_silent_start } = orbit ?? {}
 
   const sysproxyRef = useRef<DialogRef>(null)
   const tunRef = useRef<DialogRef>(null)
@@ -28,8 +28,8 @@ const SettingSystem = ({ onError }: Props) => {
     _e: React.ChangeEvent<HTMLInputElement>,
     value: boolean,
   ) => value
-  const onChangeData = (patch: Partial<IVergeConfig>) => {
-    mutateVerge({ ...verge, ...patch }, false)
+  const onChangeData = (patch: Partial<IOrbitConfig>) => {
+    mutateOrbit({ ...orbit, ...patch }, false)
   }
 
   return (
@@ -60,7 +60,7 @@ const SettingSystem = ({ onError }: Props) => {
             try {
               // 先触发UI更新立即看到反馈
               onChangeData({ enable_auto_launch: e })
-              await patchVerge({ enable_auto_launch: e })
+              await patchOrbit({ enable_auto_launch: e })
               return Promise.resolve()
             } catch (error) {
               // 如果出错，恢复原始状态
@@ -88,7 +88,7 @@ const SettingSystem = ({ onError }: Props) => {
           onCatch={onError}
           onFormat={onSwitchFormat}
           onChange={(e) => onChangeData({ enable_silent_start: e })}
-          onGuard={(e) => patchVerge({ enable_silent_start: e })}
+          onGuard={(e) => patchOrbit({ enable_silent_start: e })}
         >
           <Switch edge="end" />
         </GuardState>

@@ -155,7 +155,7 @@
     }
   },
   "components": {
-    "verge": {
+    "orbit": {
       "basic": {
         "title": "Clash Orbit Төп көйләүләр",
         "actions": {
@@ -204,7 +204,7 @@
           "liteModeSettings": "LightWeight Mode Settings",
           "exit": "Чыгу",
           "exportDiagnostics": "Export Diagnostic Info",
-          "vergeVersion": "Clash Orbit версиясе"
+          "orbitVersion": "Clash Orbit версиясе"
         }
       },
       "theme": {

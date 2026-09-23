@@ -19,9 +19,9 @@ import {
   StickyVirtualList,
   type StickyVirtualListHandle,
 } from '@/components/base'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useProfiles } from '@/hooks/use-profiles'
 import { useProxySelection } from '@/hooks/use-proxy-selection'
-import { useVerge } from '@/hooks/use-verge'
 import { useProxiesData, useSystemData } from '@/providers/app-data-context'
 import delayManager from '@/services/delay'
 import {
@@ -86,7 +86,7 @@ function useProxyRenderState(
   isChainMode: boolean,
   activeSelectedGroup: string | null,
 ) {
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const { proxyView } = useProxiesData()
   const { renderList, onProxies, onHeadState } = useRenderList(
     mode,
@@ -101,7 +101,7 @@ function useProxyRenderState(
     [activeSelectedGroup, isChainMode, mode],
   )
 
-  const timeout = verge?.default_latency_timeout || 10000
+  const timeout = orbit?.default_latency_timeout || 10000
 
   const handleCheckAll = useStableCallback(
     useLockFn(async (groupName: string) => {
@@ -169,7 +169,7 @@ function useProxyRenderState(
   }, [scrollPositionKey])
 
   return {
-    verge,
+    orbit,
     renderList,
     onProxies,
     onHeadState,
@@ -361,7 +361,7 @@ function NormalProxyGroups(props: { mode: string }) {
   const { mode } = props
   const stickyListRef = useRef<StickyVirtualListHandle>(null)
   const {
-    verge,
+    orbit,
     renderList,
     onProxies,
     onHeadState,
@@ -600,8 +600,8 @@ function NormalProxyGroups(props: { mode: string }) {
         <ProxyGroupNavigator
           proxyGroupNames={proxyGroupNames}
           onGroupLocation={handleGroupLocationByName}
-          enableHoverJump={verge?.enable_hover_jump_navigator ?? true}
-          hoverDelay={verge?.hover_jump_navigator_delay ?? DEFAULT_HOVER_DELAY}
+          enableHoverJump={orbit?.enable_hover_jump_navigator ?? true}
+          hoverDelay={orbit?.hover_jump_navigator_delay ?? DEFAULT_HOVER_DELAY}
         />
       )}
     </div>

@@ -1,5 +1,5 @@
 use anyhow::{Result, ensure};
-use clash_verge_draft::DraftTransaction;
+use clash_orbit_draft::DraftTransaction;
 use serde::Serialize;
 use smartstring::alias::String;
 
@@ -46,9 +46,9 @@ pub async fn set_dns_override(
         serde_yaml_ng::from_str::<serde_yaml_ng::Mapping>(&content)?;
     }
 
-    let verge = Config::verge().await;
-    let transaction = DraftTransaction::begin(vec![&verge])?;
-    verge.edit_draft(|draft| {
+    let orbit = Config::orbit().await;
+    let transaction = DraftTransaction::begin(vec![&orbit])?;
+    orbit.edit_draft(|draft| {
         draft.profile_dns_settings.insert(
             profile_uid.clone(),
             ProfileDnsSettings {
@@ -63,7 +63,7 @@ pub async fn set_dns_override(
     let mut outcome = DnsOverrideOutcome::Applied;
     // A subscription update can replace the file while Mihomo is validating it.
     if enabled && let Some(state) = state.filter(|state| !state.enabled) {
-        verge.edit_draft(|draft| {
+        orbit.edit_draft(|draft| {
             draft
                 .profile_dns_settings
                 .insert(profile_uid, ProfileDnsSettings::default());
@@ -74,8 +74,8 @@ pub async fn set_dns_override(
     }
 
     transaction.commit();
-    Handle::refresh_verge();
+    Handle::refresh_orbit();
     Handle::refresh_clash();
-    verge.data_arc().save_file().await?;
+    orbit.data_arc().save_file().await?;
     Ok(outcome)
 }

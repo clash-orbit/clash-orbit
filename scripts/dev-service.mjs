@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export const developmentServiceDirectoryEnvironment =
-  'CLASH_VERGE_DEV_SERVICE_DIR'
+  'CLASH_ORBIT_DEV_SERVICE_DIR'
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const serviceRepository = resolve(
   repositoryRoot,

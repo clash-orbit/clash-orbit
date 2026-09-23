@@ -13,10 +13,10 @@ import { useTranslation } from 'react-i18next'
 import { type DialogRef, Switch, TooltipIcon } from '@/components/base'
 import { SysproxyViewer } from '@/components/setting/mods/sysproxy-viewer'
 import { TunViewer } from '@/components/setting/mods/tun-viewer'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useServiceUninstaller } from '@/hooks/use-service-uninstaller'
 import { useSystemProxyState } from '@/hooks/use-system-proxy-state'
 import { useSystemState } from '@/hooks/use-system-state'
-import { useVerge } from '@/hooks/use-verge'
 import { showNotice } from '@/services/notice-service'
 import { requestService } from '@/services/service-request'
 
@@ -133,7 +133,7 @@ const ProxyControlSwitches = ({
   noRightPadding = false,
 }: ProxySwitchProps) => {
   const { t } = useTranslation()
-  const { verge, mutateVerge, patchVerge } = useVerge()
+  const { orbit, mutateOrbit, patchOrbit } = useOrbit()
   const { uninstallServiceAndStartSidecar } = useServiceUninstaller()
   const { indicator: systemProxyIndicator, toggleSystemProxy } =
     useSystemProxyState()
@@ -144,7 +144,7 @@ const ProxyControlSwitches = ({
   const sysproxyRef = useRef<DialogRef>(null)
   const tunRef = useRef<DialogRef>(null)
 
-  const { enable_tun_mode } = verge ?? {}
+  const { enable_tun_mode } = orbit ?? {}
 
   // Enabling needs a running core; disabling only writes OS state and must stay available.
   const handleSystemProxyToggle = async (value: boolean) => {
@@ -163,8 +163,8 @@ const ProxyControlSwitches = ({
       })
       return false
     }
-    mutateVerge({ ...verge, enable_tun_mode: value }, false)
-    await patchVerge({ enable_tun_mode: value })
+    mutateOrbit({ ...orbit, enable_tun_mode: value }, false)
+    await patchOrbit({ enable_tun_mode: value })
   }
 
   const onUninstallService = useLockFn(async () => {

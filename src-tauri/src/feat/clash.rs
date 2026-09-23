@@ -6,7 +6,7 @@ use crate::{
     utils,
 };
 use bytes::BytesMut;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use once_cell::sync::Lazy;
 use serde_yaml_ng::{Mapping, Value};
 use smartstring::alias::String;
@@ -99,7 +99,7 @@ pub async fn change_clash_mode(mode: String) -> Result<(), String> {
         tray::Tray::global().update_menu_and_icon().await;
     }
 
-    let is_auto_close_connection = Config::verge().await.data_arc().auto_close_connection.unwrap_or(false);
+    let is_auto_close_connection = Config::orbit().await.data_arc().auto_close_connection.unwrap_or(false);
     if is_auto_close_connection {
         after_change_clash_mode();
     }
@@ -125,8 +125,8 @@ pub async fn test_delay(url: String) -> anyhow::Result<u32> {
         .to_string();
     let port = parsed.port().unwrap_or(if is_https { 443 } else { 80 });
 
-    let verge = Config::verge().await.latest_arc();
-    let proxy_enabled = verge.enable_system_proxy.unwrap_or(false) || verge.enable_tun_mode.unwrap_or(false);
+    let orbit = Config::orbit().await.latest_arc();
+    let proxy_enabled = orbit.enable_system_proxy.unwrap_or(false) || orbit.enable_tun_mode.unwrap_or(false);
     let proxy_port = if proxy_enabled {
         Some(MixedPort::desired().await)
     } else {

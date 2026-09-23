@@ -10,8 +10,8 @@ use crate::{
     utils::{dirs, help},
 };
 use anyhow::{Result, anyhow};
-use clash_verge_draft::DraftTransaction;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_draft::DraftTransaction;
+use clash_orbit_logging::{Type, logging};
 use clash_verge_service_ipc::StageRuntimeOutcome;
 use scopeguard::defer;
 use smartstring::alias::String;
@@ -144,7 +144,7 @@ impl CoreManager {
             }
         });
 
-        help::save_yaml(&runtime_path, &clash_config, Some("# Clash Verge Runtime")).await?;
+        help::save_yaml(&runtime_path, &clash_config, Some("# Clash Orbit Runtime")).await?;
         handle::Handle::notice_message(error_key, error_msg);
         Ok(())
     }

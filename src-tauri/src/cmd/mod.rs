@@ -99,6 +99,7 @@ pub mod lightweight;
 pub mod listener;
 pub mod media_unlock_checker;
 pub mod network;
+pub mod orbit;
 pub mod profile;
 pub mod proxy;
 pub mod runtime;
@@ -107,7 +108,6 @@ pub mod service;
 pub mod system;
 pub mod uwp;
 pub mod validate;
-pub mod verge;
 pub mod webdav;
 
 // Re-export all command functions for backwards compatibility
@@ -118,6 +118,7 @@ pub use lightweight::*;
 pub use listener::*;
 pub use media_unlock_checker::*;
 pub use network::*;
+pub use orbit::*;
 pub use profile::*;
 pub use proxy::*;
 pub use runtime::*;
@@ -125,7 +126,6 @@ pub use save_profile::*;
 pub use service::*;
 pub use system::*;
 pub use uwp::*;
-pub use verge::*;
 pub use webdav::*;
 
 pub trait StringifyErr<T> {

@@ -6,8 +6,8 @@ pub fn build_window_initial_script(initial_theme_mode: &str, dark_background: &s
     };
     format!(
         r#"
-    window.__VERGE_INITIAL_THEME_MODE = "{theme_mode}";
-    window.__VERGE_INITIAL_THEME_COLORS = {{
+    window.__ORBIT_INITIAL_THEME_MODE = "{theme_mode}";
+    window.__ORBIT_INITIAL_THEME_COLORS = {{
         darkBg: "{dark_background}",
         lightBg: "{light_background}",
     }};
@@ -25,7 +25,7 @@ pub const WINDOW_INITIAL_SCRIPT: &str = r##"
 
     const initialColors = (() => {
         try {
-            const colors = window.__VERGE_INITIAL_THEME_COLORS;
+            const colors = window.__ORBIT_INITIAL_THEME_COLORS;
             if (colors && typeof colors === "object") {
                 const { darkBg, lightBg } = colors;
                 if (typeof darkBg === "string" && typeof lightBg === "string") {
@@ -47,8 +47,8 @@ pub const WINDOW_INITIAL_SCRIPT: &str = r##"
         }
     })();
 
-    const initialThemeMode = typeof window.__VERGE_INITIAL_THEME_MODE === "string"
-        ? window.__VERGE_INITIAL_THEME_MODE
+    const initialThemeMode = typeof window.__ORBIT_INITIAL_THEME_MODE === "string"
+        ? window.__ORBIT_INITIAL_THEME_MODE
         : "system";
 
     let initialTheme = prefersDark ? "dark" : "light";
@@ -80,7 +80,7 @@ pub const WINDOW_INITIAL_SCRIPT: &str = r##"
             paintBody();
         }
         try {
-            localStorage.setItem("verge-theme-mode-cache", theme);
+            localStorage.setItem("orbit-theme-mode-cache", theme);
         } catch (error) {
             console.warn("[Tauri] 缓存主题模式失败:", error);
         }

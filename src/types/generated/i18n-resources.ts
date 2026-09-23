@@ -134,9 +134,9 @@ export interface TranslationResources {
           fields: {
             autoLaunch: string
             lastCheckUpdate: string
+            orbitVersion: string
             osInfo: string
             runningMode: string
-            vergeVersion: string
           }
           title: string
         }
@@ -689,7 +689,7 @@ export interface TranslationResources {
     }
     settings: {
       components: {
-        verge: {
+        orbit: {
           advanced: {
             actions: {
               copyVersion: string
@@ -704,8 +704,8 @@ export interface TranslationResources {
               openCoreDir: string
               openDevTools: string
               openLogsDir: string
+              orbitVersion: string
               runtimeConfig: string
-              vergeVersion: string
             }
             notifications: {
               latestVersion: string

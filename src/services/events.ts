@@ -3,34 +3,34 @@ import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 import type { RunState } from './cmds'
 
 /** Centralizes frontend event names and payload types for the unchecked Rust IPC seam. */
-interface VergeEvents {
-  'verge://refresh-clash-config': string
-  'verge://refresh-verge-config': string
-  'verge://refresh-profiles': string
-  'verge://refresh-proxy-config': null
+interface OrbitEvents {
+  'orbit://refresh-clash-config': string
+  'orbit://refresh-verge-config': string
+  'orbit://refresh-profiles': string
+  'orbit://refresh-proxy-config': null
   /** A backend message for the user: `[status, message]`. */
-  'verge://notice-message': [string, string]
-  'verge://timer-updated': string
-  'verge://run-state-changed': RunState
-  'verge://pending-failures-changed': null
+  'orbit://notice-message': [string, string]
+  'orbit://timer-updated': string
+  'orbit://run-state-changed': RunState
+  'orbit://pending-failures-changed': null
   'profile-changed': string
   'profile-update-started': { uid?: string }
   'profile-update-completed': { uid?: string }
-  'verge://test-all': null
+  'orbit://test-all': null
 }
 
-type VergeEventName = keyof VergeEvents
+type OrbitEventName = keyof OrbitEvents
 
-type VergeEventHandlers = {
-  [Name in VergeEventName]?: (payload: VergeEvents[Name]) => void
+type OrbitEventHandlers = {
+  [Name in OrbitEventName]?: (payload: OrbitEvents[Name]) => void
 }
 
 /**
  * Returns synchronous teardown for asynchronous registrations. `onSubscribed` lets callers
  * reread event-only state after all listeners are live, closing the initial race window.
  */
-export const subscribeVergeEvents = (
-  handlers: VergeEventHandlers,
+export const subscribeOrbitEvents = (
+  handlers: OrbitEventHandlers,
   onSubscribed?: () => void,
 ): (() => void) => {
   let disposed = false

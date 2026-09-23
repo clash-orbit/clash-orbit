@@ -8,7 +8,7 @@ use crate::{
     core::{CoreManager, handle, timer::Timer},
     utils::help,
 };
-use clash_verge_logging::{Type, logging, logging_error};
+use clash_orbit_logging::{Type, logging, logging_error};
 
 pub(super) async fn resolve_scheme(param: &str) -> Result<()> {
     let param_str = if param.starts_with("[") && param.len() > 4 {
@@ -39,7 +39,7 @@ pub(super) async fn resolve_scheme(param: &str) -> Result<()> {
 }
 
 fn extract_subscription_info(link_parsed: &Url) -> Option<(std::string::String, Option<String>)> {
-    if !matches!(link_parsed.scheme(), "clash" | "clash-verge") {
+    if !matches!(link_parsed.scheme(), "clash" | "clash-ORBIT") {
         return None;
     }
 
@@ -123,7 +123,7 @@ async fn fetch_profile_item(url: &str, name: Option<&String>) -> Option<PrfItem>
 }
 
 async fn post_import_updates(uid: &String, had_current_profile: bool) {
-    handle::Handle::refresh_verge();
+    handle::Handle::refresh_orbit();
     handle::Handle::notify_profile_changed(uid);
 
     let should_update_core = if uid.is_empty() || had_current_profile {

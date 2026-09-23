@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { subscribeVergeEvents } from './events'
+import { subscribeOrbitEvents } from './events'
 
 const listen = vi.hoisted(() => vi.fn())
 
@@ -12,7 +12,7 @@ beforeEach(() => {
   listen.mockReset()
 })
 
-describe('subscribeVergeEvents', () => {
+describe('subscribeOrbitEvents', () => {
   it('reports readiness only after every listener is registered', async () => {
     const registrations: Array<() => void> = []
     listen.mockImplementation(
@@ -23,10 +23,10 @@ describe('subscribeVergeEvents', () => {
     )
     const onSubscribed = vi.fn()
 
-    subscribeVergeEvents(
+    subscribeOrbitEvents(
       {
-        'verge://run-state-changed': () => {},
-        'verge://notice-message': () => {},
+        'orbit://run-state-changed': () => {},
+        'orbit://notice-message': () => {},
       },
       onSubscribed,
     )
@@ -50,8 +50,8 @@ describe('subscribeVergeEvents', () => {
     )
     const onRunState = vi.fn()
 
-    subscribeVergeEvents({ 'verge://run-state-changed': onRunState })
-    handlers.get('verge://run-state-changed')?.({ mode: 'Sidecar' })
+    subscribeOrbitEvents({ 'orbit://run-state-changed': onRunState })
+    handlers.get('orbit://run-state-changed')?.({ mode: 'Sidecar' })
 
     expect(onRunState).toHaveBeenCalledWith({ mode: 'Sidecar' })
   })

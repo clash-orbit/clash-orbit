@@ -12,8 +12,8 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useOrbit } from '@/hooks/use-orbit'
 import { useTrafficGraphDataEnhanced } from '@/hooks/use-traffic-monitor'
-import { useVerge } from '@/hooks/use-verge'
 import { debugLog } from '@/utils/debug'
 import parseTraffic from '@/utils/parse-traffic'
 import {
@@ -97,9 +97,9 @@ export const EnhancedCanvasTrafficGraph = memo(
   }: EnhancedCanvasTrafficGraphProps) {
     const theme = useTheme()
     const { t } = useTranslation()
-    const verge = useVerge()
+    const orbit = useOrbit()
     const pause_render_traffic_stats_on_blur =
-      verge.verge?.pause_render_traffic_stats_on_blur ?? true
+      orbit.orbit?.pause_render_traffic_stats_on_blur ?? true
 
     const { dataPoints, requestRange, samplerStats } =
       useTrafficGraphDataEnhanced()

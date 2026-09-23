@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 
 import { BaseDialog, Switch } from '@/components/base'
 import { useDisplayedMixedPort } from '@/hooks/use-displayed-mixed-port'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { saveProxyPorts } from '@/services/cmds'
 import { showNotice } from '@/services/notice-service'
 import getSystem from '@/utils/get-system'
@@ -31,7 +31,7 @@ const generateRandomPort = () =>
 
 export const ClashPortViewer = forwardRef<ClashPortViewerRef>((_, ref) => {
   const { t } = useTranslation()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const displayedMixedPort = useDisplayedMixedPort()
   const [open, setOpen] = useState(false)
 
@@ -39,21 +39,21 @@ export const ClashPortViewer = forwardRef<ClashPortViewerRef>((_, ref) => {
   const [mixedPort, setMixedPort] = useState(displayedMixedPort)
 
   // 其他端口状态
-  const [socksPort, setSocksPort] = useState(verge?.verge_socks_port ?? 7898)
+  const [socksPort, setSocksPort] = useState(orbit?.orbit_socks_port ?? 7898)
   const [socksEnabled, setSocksEnabled] = useState(
-    verge?.verge_socks_enabled ?? false,
+    orbit?.orbit_socks_enabled ?? false,
   )
-  const [httpPort, setHttpPort] = useState(verge?.verge_port ?? 7899)
+  const [httpPort, setHttpPort] = useState(orbit?.orbit_port ?? 7899)
   const [httpEnabled, setHttpEnabled] = useState(
-    verge?.verge_http_enabled ?? false,
+    orbit?.orbit_http_enabled ?? false,
   )
-  const [redirPort, setRedirPort] = useState(verge?.verge_redir_port ?? 7895)
+  const [redirPort, setRedirPort] = useState(orbit?.orbit_redir_port ?? 7895)
   const [redirEnabled, setRedirEnabled] = useState(
-    verge?.verge_redir_enabled ?? false,
+    orbit?.orbit_redir_enabled ?? false,
   )
-  const [tproxyPort, setTproxyPort] = useState(verge?.verge_tproxy_port ?? 7896)
+  const [tproxyPort, setTproxyPort] = useState(orbit?.orbit_tproxy_port ?? 7896)
   const [tproxyEnabled, setTproxyEnabled] = useState(
-    verge?.verge_tproxy_enabled ?? false,
+    orbit?.orbit_tproxy_enabled ?? false,
   )
 
   // 添加保存请求，防止GUI卡死
@@ -77,14 +77,14 @@ export const ClashPortViewer = forwardRef<ClashPortViewerRef>((_, ref) => {
   useImperativeHandle(ref, () => ({
     open: () => {
       setMixedPort(displayedMixedPort)
-      setSocksPort(verge?.verge_socks_port ?? 7898)
-      setSocksEnabled(verge?.verge_socks_enabled ?? false)
-      setHttpPort(verge?.verge_port ?? 7899)
-      setHttpEnabled(verge?.verge_http_enabled ?? false)
-      setRedirPort(verge?.verge_redir_port ?? 7895)
-      setRedirEnabled(verge?.verge_redir_enabled ?? false)
-      setTproxyPort(verge?.verge_tproxy_port ?? 7896)
-      setTproxyEnabled(verge?.verge_tproxy_enabled ?? false)
+      setSocksPort(orbit?.orbit_socks_port ?? 7898)
+      setSocksEnabled(orbit?.orbit_socks_enabled ?? false)
+      setHttpPort(orbit?.orbit_port ?? 7899)
+      setHttpEnabled(orbit?.orbit_http_enabled ?? false)
+      setRedirPort(orbit?.orbit_redir_port ?? 7895)
+      setRedirEnabled(orbit?.orbit_redir_enabled ?? false)
+      setTproxyPort(orbit?.orbit_tproxy_port ?? 7896)
+      setTproxyEnabled(orbit?.orbit_tproxy_enabled ?? false)
       setOpen(true)
     },
     close: () => setOpen(false),

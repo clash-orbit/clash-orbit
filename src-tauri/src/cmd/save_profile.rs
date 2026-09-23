@@ -10,7 +10,7 @@ use crate::{
     module::auto_backup::{AutoBackupManager, AutoBackupTrigger},
     utils::dirs,
 };
-use clash_verge_logging::{Type, logging, logging_error};
+use clash_orbit_logging::{Type, logging, logging_error};
 use smartstring::alias::String;
 use tokio::fs;
 

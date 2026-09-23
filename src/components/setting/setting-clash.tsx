@@ -9,8 +9,8 @@ import { BaseDialog, DialogRef, Switch, TooltipIcon } from '@/components/base'
 import { useClash } from '@/hooks/use-clash'
 import { useClashLog } from '@/hooks/use-clash-log'
 import { useDisplayedMixedPort } from '@/hooks/use-displayed-mixed-port'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useProfiles } from '@/hooks/use-profiles'
-import { useVerge } from '@/hooks/use-verge'
 import { invoke_uwp_tool, setDnsOverride } from '@/services/cmds'
 import { showNotice } from '@/services/notice-service'
 import getSystem from '@/utils/get-system'
@@ -36,11 +36,11 @@ const SettingClash = ({ onError }: Props) => {
   const { t } = useTranslation()
 
   const { clash, version, mutateClash, patchClash } = useClash()
-  const { verge, mutateVerge } = useVerge()
+  const { orbit, mutateOrbit } = useOrbit()
   const { current: currentProfile } = useProfiles()
   const dnsEnabled = currentProfile
-    ? (verge?.profile_dns_settings?.[currentProfile.uid]?.enabled ??
-      verge?.enable_dns_settings ??
+    ? (orbit?.profile_dns_settings?.[currentProfile.uid]?.enabled ??
+      orbit?.enable_dns_settings ??
       false)
     : false
   const displayedMixedPort = useDisplayedMixedPort()
@@ -96,7 +96,7 @@ const SettingClash = ({ onError }: Props) => {
         } else {
           setDnsConfirmation(null)
         }
-        mutateVerge()
+        mutateOrbit()
         mutateClash()
       } catch (err: any) {
         showNotice.error(err)

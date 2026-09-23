@@ -20,8 +20,8 @@ import { useTranslation } from 'react-i18next'
 import { TrafficErrorBoundary } from '@/components/shared/traffic-error-boundary'
 import { useConnectionSummaryData } from '@/hooks/use-connection-data'
 import { useMemoryData } from '@/hooks/use-memory-data'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useTrafficData } from '@/hooks/use-traffic-data'
-import { useVerge } from '@/hooks/use-verge'
 import { useVisibility } from '@/hooks/use-visibility'
 import parseTraffic from '@/utils/parse-traffic'
 
@@ -130,13 +130,13 @@ CompactStatCard.displayName = 'CompactStatCard'
 export const EnhancedTrafficStats = () => {
   const { t } = useTranslation()
   const theme = useTheme()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const trafficRef = useRef<EnhancedCanvasTrafficGraphRef>(null)
   const pageVisible = useVisibility()
 
   // 是否显示流量图表
-  const trafficGraph = verge?.traffic_graph ?? true
-  const displayMemory = verge?.enable_memory_usage ?? true
+  const trafficGraph = orbit?.traffic_graph ?? true
+  const displayMemory = orbit?.enable_memory_usage ?? true
 
   const {
     response: { data: traffic },

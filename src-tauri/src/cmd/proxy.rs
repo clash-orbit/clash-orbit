@@ -9,7 +9,7 @@ use crate::{
     },
     process::AsyncHandler,
 };
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use serde_yaml_ng::Mapping;
 use std::{
     collections::HashSet,

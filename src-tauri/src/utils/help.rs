@@ -1,6 +1,6 @@
 use crate::{config::with_encryption, process::AsyncHandler};
 use anyhow::{Context as _, Result, anyhow, bail};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use nanoid::nanoid;
 use scopeguard::{ScopeGuard, guard};
 use serde::{Serialize, de::DeserializeOwned};

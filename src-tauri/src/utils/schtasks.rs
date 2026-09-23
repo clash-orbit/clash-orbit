@@ -1,6 +1,6 @@
 use crate::utils::dirs::{self, PathBufExec as _};
 use anyhow::{Context as _, Result, anyhow};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use std::fs;
 use std::os::windows::process::CommandExt as _;
 use std::path::{Path, PathBuf};
@@ -8,11 +8,11 @@ use std::process::{Command, Output};
 use windows::Win32::Globalization::{GetACP, GetOEMCP, MULTI_BYTE_TO_WIDE_CHAR_FLAGS, MultiByteToWideChar};
 
 const CREATE_NO_WINDOW: u32 = 0x08000000;
-const TASK_NAME_USER: &str = "Clash Verge";
-const TASK_NAME_ADMIN: &str = "Clash Verge (Admin)";
+const TASK_NAME_USER: &str = "Clash Orbit";
+const TASK_NAME_ADMIN: &str = "Clash Orbit (Admin)";
 const TASK_XML_DIR: &str = "tasks";
-const TASK_XML_USER: &str = "clash-verge-task-user.xml";
-const TASK_XML_ADMIN: &str = "clash-verge-task-admin.xml";
+const TASK_XML_USER: &str = "clash-orbit-task-user.xml";
+const TASK_XML_ADMIN: &str = "clash-orbit-task-admin.xml";
 
 #[derive(Clone, Copy)]
 pub enum TaskMode {
@@ -97,8 +97,8 @@ fn get_startup_dir() -> Result<PathBuf> {
 
 async fn cleanup_legacy_shortcuts() -> Result<()> {
     let startup_dir = get_startup_dir()?;
-    let old_shortcut = startup_dir.join("Clash-Verge.lnk");
-    let new_shortcut = startup_dir.join("Clash Verge.lnk");
+    let old_shortcut = startup_dir.join("Clash-ORBIT.lnk");
+    let new_shortcut = startup_dir.join("Clash Orbit.lnk");
 
     old_shortcut
         .remove_if_exists()

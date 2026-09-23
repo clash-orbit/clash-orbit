@@ -9,7 +9,7 @@ import type { ReactNode } from 'react'
 import { useMatch, useNavigate, useResolvedPath } from 'react-router'
 
 import type { SortableItemRenderProps } from '@/components/base/sortable-item'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 
 interface Props {
   to: string
@@ -19,9 +19,9 @@ interface Props {
 }
 export const LayoutItem = (props: Props) => {
   const { to, children, icon, sortable } = props
-  const { verge } = useVerge()
-  const { menu_icon } = verge ?? {}
-  const navCollapsed = verge?.collapse_navbar ?? false
+  const { orbit } = useOrbit()
+  const { menu_icon } = orbit ?? {}
+  const navCollapsed = orbit?.collapse_navbar ?? false
   const resolved = useResolvedPath(to)
   const match = useMatch({ path: resolved.pathname, end: true })
   const navigate = useNavigate()

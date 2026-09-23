@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BaseSearchBox } from '@/components/base'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import delayManager from '@/services/delay'
 import { showNotice } from '@/services/notice-service'
 import { debugLog } from '@/utils/debug'
@@ -66,9 +66,9 @@ export const ProxyHead = ({
     return () => clearTimeout(timer)
   }, [])
 
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const defaultLatencyUrl =
-    verge?.default_latency_test?.trim() ||
+    orbit?.default_latency_test?.trim() ||
     'http://cp.cloudflare.com/generate_204'
 
   useEffect(() => {

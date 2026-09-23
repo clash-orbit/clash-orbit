@@ -1,12 +1,12 @@
 use crate::{
-    config::{Config, IVerge},
+    config::{Config, IOrbit},
     core::{CoreManager, autostart, handle, hotkey, logger, proxy_control, tray},
     module::{auto_backup::AutoBackupManager, lightweight},
 };
 use anyhow::Result;
 use bitflags::bitflags;
-use clash_verge_draft::{DraftTransaction, SharedDraft};
-use clash_verge_logging::{Type, logging, logging_error};
+use clash_orbit_draft::{DraftTransaction, SharedDraft};
+use clash_orbit_logging::{Type, logging, logging_error};
 use serde_yaml_ng::Mapping;
 use tokio::sync::MutexGuard;
 
@@ -51,7 +51,7 @@ bitflags! {
      struct UpdateFlags: u16 {
         const RESTART_CORE = 1 << 0;
         const CLASH_CONFIG = 1 << 1;
-        const VERGE_CONFIG = 1 << 2;
+        const ORBIT_CONFIG = 1 << 2;
         const LAUNCH = 1 << 3;
         const SYS_PROXY = 1 << 4;
         const SYSTRAY_ICON = 1 << 5;
@@ -70,7 +70,7 @@ bitflags! {
      }
 }
 
-fn determine_update_flags(patch: &IVerge) -> UpdateFlags {
+fn determine_update_flags(patch: &IOrbit) -> UpdateFlags {
     let tun_mode = patch.enable_tun_mode;
     let auto_launch = patch.enable_auto_launch;
     let system_proxy = patch.enable_system_proxy;
@@ -78,7 +78,7 @@ fn determine_update_flags(patch: &IVerge) -> UpdateFlags {
     let pac_content = &patch.pac_file_content;
     let proxy_bypass = &patch.system_proxy_bypass;
     let language = &patch.language;
-    let mixed_port = patch.verge_mixed_port;
+    let mixed_port = patch.orbit_mixed_port;
     #[cfg(target_os = "macos")]
     let tray_icon = &patch.tray_icon;
     #[cfg(not(target_os = "macos"))]
@@ -87,17 +87,17 @@ fn determine_update_flags(patch: &IVerge) -> UpdateFlags {
     let sysproxy_tray_icon = patch.sysproxy_tray_icon;
     let tun_tray_icon = patch.tun_tray_icon;
     #[cfg(not(target_os = "windows"))]
-    let redir_enabled = patch.verge_redir_enabled;
+    let redir_enabled = patch.orbit_redir_enabled;
     #[cfg(not(target_os = "windows"))]
-    let redir_port = patch.verge_redir_port;
+    let redir_port = patch.orbit_redir_port;
     #[cfg(target_os = "linux")]
-    let tproxy_enabled = patch.verge_tproxy_enabled;
+    let tproxy_enabled = patch.orbit_tproxy_enabled;
     #[cfg(target_os = "linux")]
-    let tproxy_port = patch.verge_tproxy_port;
-    let socks_enabled = patch.verge_socks_enabled;
-    let socks_port = patch.verge_socks_port;
-    let http_enabled = patch.verge_http_enabled;
-    let http_port = patch.verge_port;
+    let tproxy_port = patch.orbit_tproxy_port;
+    let socks_enabled = patch.orbit_socks_enabled;
+    let socks_port = patch.orbit_socks_port;
+    let http_enabled = patch.orbit_http_enabled;
+    let http_port = patch.orbit_port;
     #[cfg(target_os = "macos")]
     let enable_tray_speed = patch.enable_tray_speed;
     #[cfg(not(target_os = "macos"))]
@@ -148,7 +148,7 @@ fn determine_update_flags(patch: &IVerge) -> UpdateFlags {
         update_flags.insert(UpdateFlags::CLASH_CONFIG | UpdateFlags::GROUP_SYS_TRAY);
     }
     if enable_global_hotkey.is_some() || home_cards.is_some() {
-        update_flags.insert(UpdateFlags::VERGE_CONFIG);
+        update_flags.insert(UpdateFlags::ORBIT_CONFIG);
     }
     if auto_launch.is_some() {
         update_flags.insert(UpdateFlags::LAUNCH);
@@ -201,7 +201,7 @@ fn determine_update_flags(patch: &IVerge) -> UpdateFlags {
 }
 
 #[allow(clippy::cognitive_complexity)]
-async fn process_terminated_flags(update_flags: UpdateFlags, patch: &IVerge) -> Result<()> {
+async fn process_terminated_flags(update_flags: UpdateFlags, patch: &IOrbit) -> Result<()> {
     // Process updates based on flags
     if update_flags.contains(UpdateFlags::RESTART_CORE) {
         Config::generate().await?;
@@ -217,13 +217,13 @@ async fn process_terminated_flags(update_flags: UpdateFlags, patch: &IVerge) -> 
     if update_flags.contains(UpdateFlags::LANGUAGE)
         && let Some(language) = &patch.language
     {
-        clash_verge_i18n::set_locale(language.as_str());
+        clash_orbit_i18n::set_locale(language.as_str());
     }
     if update_flags.contains(UpdateFlags::SYS_PROXY) {
         let manager = CoreManager::global();
         let _lifecycle = manager.lifecycle_lock.lock().await;
         // Turning it off only writes OS state, so it must stay available while the Core is down.
-        if Config::verge()
+        if Config::orbit()
             .await
             .latest_arc()
             .enable_system_proxy
@@ -245,7 +245,7 @@ async fn process_terminated_flags(update_flags: UpdateFlags, patch: &IVerge) -> 
     }
     if update_flags.contains(UpdateFlags::SYSTRAY_ICON) {
         tray::Tray::global()
-            .update_icon(&Config::verge().await.latest_arc())
+            .update_icon(&Config::orbit().await.latest_arc())
             .await?;
         #[cfg(target_os = "macos")]
         if patch.enable_tray_speed.is_some() {
@@ -279,8 +279,8 @@ async fn process_terminated_flags(update_flags: UpdateFlags, patch: &IVerge) -> 
 /// Apply a patch, then reconcile TUN when its setting changes.
 ///
 /// TUN patches do not always produce a Run State transition, so reconciliation is explicit.
-pub async fn patch_verge(patch: &IVerge, not_save_file: bool) -> Result<()> {
-    apply_verge_patch(patch, not_save_file).await?;
+pub async fn patch_orbit(patch: &IOrbit, not_save_file: bool) -> Result<()> {
+    apply_orbit_patch(patch, not_save_file).await?;
     if patch.enable_tun_mode.is_some() {
         super::reconcile_tun_availability().await;
     }
@@ -288,45 +288,45 @@ pub async fn patch_verge(patch: &IVerge, not_save_file: bool) -> Result<()> {
 }
 
 /// Apply a patch without post-update reconciliation.
-pub(super) async fn apply_verge_patch(patch: &IVerge, not_save_file: bool) -> Result<()> {
+pub(super) async fn apply_orbit_patch(patch: &IOrbit, not_save_file: bool) -> Result<()> {
     let config_write = Config::lock_config_write().await;
-    apply_verge_patch_locked(&config_write, patch, not_save_file).await
+    apply_orbit_patch_locked(&config_write, patch, not_save_file).await
 }
 
 /// Apply a patch with the shared configuration write lock already held.
 /// Callers must pass the guard returned by [`Config::lock_config_write`].
-pub(super) async fn apply_verge_patch_locked(
+pub(super) async fn apply_orbit_patch_locked(
     _config_write: &MutexGuard<'_, ()>,
-    patch: &IVerge,
+    patch: &IOrbit,
     not_save_file: bool,
 ) -> Result<()> {
-    let verge = Config::verge().await;
+    let orbit = Config::orbit().await;
     // Hold the claim across side effects so concurrent transactions cannot share this draft.
-    let transaction = DraftTransaction::begin(vec![&verge])?;
-    verge.edit_draft(|d| d.patch_config(patch));
+    let transaction = DraftTransaction::begin(vec![&orbit])?;
+    orbit.edit_draft(|d| d.patch_config(patch));
 
     let update_flags = determine_update_flags(patch);
     logging!(debug, Type::Setup, "Determined update flags: {:?}", update_flags);
     // A failed patch rolls back to what the user already had; it never invents a value for them.
     process_terminated_flags(update_flags, patch).await?;
     transaction.commit();
-    announce_verge_change();
+    announce_orbit_change();
 
     logging_error!(Type::Backup, AutoBackupManager::global().refresh_settings().await);
     if !not_save_file {
         // 分离数据获取和异步调用
-        let verge_data = verge.data_arc();
-        verge_data.save_file().await?;
+        let orbit_data = orbit.data_arc();
+        orbit_data.save_file().await?;
     }
     Ok(())
 }
 
-fn announce_verge_change() {
-    handle::Handle::refresh_verge();
+fn announce_orbit_change() {
+    handle::Handle::refresh_orbit();
 }
 
-pub async fn fetch_verge_config() -> Result<SharedDraft<IVerge>> {
-    let draft = Config::verge().await;
+pub async fn fetch_orbit_config() -> Result<SharedDraft<IOrbit>> {
+    let draft = Config::orbit().await;
     let data = draft.data_arc();
     Ok(data)
 }

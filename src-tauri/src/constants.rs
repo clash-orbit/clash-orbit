@@ -54,8 +54,8 @@ pub mod profile {
 }
 
 pub mod files {
-    pub const RUNTIME_CONFIG: &str = "clash-verge.yaml";
-    pub const CHECK_CONFIG: &str = "clash-verge-check.yaml";
+    pub const RUNTIME_CONFIG: &str = "clash-orbit.yaml";
+    pub const CHECK_CONFIG: &str = "clash-orbit-check.yaml";
     pub const DNS_CONFIG: &str = "dns_config.yaml";
     pub const WINDOW_STATE: &str = "window_state.json";
 }
@@ -65,7 +65,7 @@ pub mod tun {
 
     pub const DNS_HIJACK: &[&str] = &["any:53"];
 
-    /// Saved dialog fields; `enable` belongs to the verge switch.
+    /// Saved dialog fields; `enable` belongs to the orbit switch.
     pub const GUI_KEYS: &[&str] = &[
         "stack",
         "device",

@@ -1,12 +1,12 @@
 use anyhow::Result;
-use clash_verge_draft::DraftTransaction;
+use clash_orbit_draft::DraftTransaction;
 use serde::{Deserialize, Serialize};
 use serde_yaml_ng::{Mapping, Value};
 use sha2::{Digest as _, Sha256};
 use smartstring::alias::String;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use super::{Config, IVerge};
+use super::{Config, IOrbit};
 use crate::core::handle::Handle;
 
 static PENDING_DNS_OVERRIDE_NOTICE: AtomicBool = AtomicBool::new(false);
@@ -74,11 +74,11 @@ impl DnsOverrideState {
         }
     }
 
-    fn apply_to(&self, verge: &mut IVerge) -> bool {
+    fn apply_to(&self, orbit: &mut IOrbit) -> bool {
         if self.profile_uid.is_empty() {
             return false;
         }
-        let settings = verge.dns_settings_for(&self.profile_uid);
+        let settings = orbit.dns_settings_for(&self.profile_uid);
         // A later settings write must not be overwritten by an earlier runtime generation.
         if (settings.enabled, settings.confirmation.as_ref()) != (self.requested, self.confirmation.as_ref()) {
             return false;
@@ -86,11 +86,11 @@ impl DnsOverrideState {
         let clear_confirmation = self.confirmation.is_some() && self.source != self.confirmation;
         if self.enabled == self.requested
             && !clear_confirmation
-            && verge.profile_dns_settings.contains_key(&self.profile_uid)
+            && orbit.profile_dns_settings.contains_key(&self.profile_uid)
         {
             return false;
         }
-        verge.profile_dns_settings.insert(
+        orbit.profile_dns_settings.insert(
             self.profile_uid.clone(),
             ProfileDnsSettings {
                 enabled: self.enabled,
@@ -113,7 +113,7 @@ pub struct ProfileDnsSettings {
     pub confirmation: Option<String>,
 }
 
-impl IVerge {
+impl IOrbit {
     pub(crate) fn dns_settings_for(&self, profile_uid: &str) -> ProfileDnsSettings {
         self.profile_dns_settings
             .get(profile_uid)
@@ -132,19 +132,19 @@ impl Config {
         let Some(state) = state else {
             return Ok(());
         };
-        let verge = Self::verge().await;
-        let transaction = DraftTransaction::begin(vec![&verge])?;
-        if !verge.edit_draft(|draft| state.apply_to(draft)) {
+        let orbit = Self::orbit().await;
+        let transaction = DraftTransaction::begin(vec![&orbit])?;
+        if !orbit.edit_draft(|draft| state.apply_to(draft)) {
             return Ok(());
         }
         // The runtime is already committed; a disk failure cannot undo its effective settings.
         transaction.commit();
-        Handle::refresh_verge();
+        Handle::refresh_orbit();
         if state.requested && !state.enabled {
             PENDING_DNS_OVERRIDE_NOTICE.store(true, Ordering::Relaxed);
             Handle::notice_message("dns_override::auto_disabled", "");
         }
-        verge.data_arc().save_file().await
+        orbit.data_arc().save_file().await
     }
 }
 
@@ -152,7 +152,7 @@ impl Config {
 #[allow(clippy::expect_used, reason = "tests assert by panicking")]
 mod tests {
     use super::{DnsOverrideState, ProfileDnsSettings, dns_override_source};
-    use crate::config::IVerge;
+    use crate::config::IOrbit;
     use anyhow::Result;
     use serde_yaml_ng::Mapping;
 
@@ -197,7 +197,7 @@ mod tests {
     #[test]
     fn dns_override_confirmation_expires_on_restart() -> Result<()> {
         let source = Some("provider-dns".into());
-        let confirmed = IVerge {
+        let confirmed = IOrbit {
             profile_dns_settings: [(
                 "one".into(),
                 ProfileDnsSettings {
@@ -206,7 +206,7 @@ mod tests {
                 },
             )]
             .into(),
-            ..IVerge::default()
+            ..IOrbit::default()
         };
         let settings = confirmed.dns_settings_for("one");
         assert!(DnsOverrideState::new("one", source.clone(), settings.enabled, settings.confirmation).enabled);
@@ -214,7 +214,7 @@ mod tests {
             serde_yaml_ng::to_string(&confirmed)?,
             "enable_dns_settings: true\ndns_override_confirmation: provider-dns".to_owned(),
         ] {
-            let mut restarted: IVerge = serde_yaml_ng::from_str(&saved)?;
+            let mut restarted: IOrbit = serde_yaml_ng::from_str(&saved)?;
             let settings = restarted.dns_settings_for("one");
             let state = DnsOverrideState::new("one", source.clone(), settings.enabled, settings.confirmation);
             assert!(!state.enabled, "a previous session must not bypass startup protection");
@@ -226,49 +226,49 @@ mod tests {
 
     #[test]
     fn dns_override_applies_only_to_current_preferences() {
-        let mut verge = IVerge {
+        let mut orbit = IOrbit {
             enable_dns_settings: Some(true),
-            ..IVerge::default()
+            ..IOrbit::default()
         };
         let state = DnsOverrideState::new("one", Some("provider-dns".into()), true, None);
-        assert!(state.apply_to(&mut verge));
-        assert!(!verge.dns_settings_for("one").enabled);
-        assert!(!state.apply_to(&mut verge));
+        assert!(state.apply_to(&mut orbit));
+        assert!(!orbit.dns_settings_for("one").enabled);
+        assert!(!state.apply_to(&mut orbit));
         let disabled = DnsOverrideState::new("one", None, false, None);
-        assert!(!disabled.apply_to(&mut verge));
+        assert!(!disabled.apply_to(&mut orbit));
         assert!(!disabled.enabled);
 
-        verge.profile_dns_settings.insert(
+        orbit.profile_dns_settings.insert(
             "one".into(),
             ProfileDnsSettings {
                 enabled: true,
                 confirmation: Some("provider-dns".into()),
             },
         );
-        assert!(!state.apply_to(&mut verge));
-        let settings = verge.dns_settings_for("one");
+        assert!(!state.apply_to(&mut orbit));
+        let settings = orbit.dns_settings_for("one");
         assert!(settings.enabled);
         assert_eq!(settings.confirmation.as_deref(), Some("provider-dns"));
         let leaving = DnsOverrideState::new("one", None, true, settings.confirmation);
-        assert!(leaving.apply_to(&mut verge));
-        assert!(verge.dns_settings_for("one").confirmation.is_none());
+        assert!(leaving.apply_to(&mut orbit));
+        assert!(orbit.dns_settings_for("one").confirmation.is_none());
     }
 
     #[test]
     fn automatic_disable_is_saved_only_for_the_affected_profile() -> Result<()> {
-        let mut verge = IVerge {
+        let mut orbit = IOrbit {
             enable_dns_settings: Some(true),
-            ..IVerge::default()
+            ..IOrbit::default()
         };
         let first = DnsOverrideState::new("one", None, true, None);
-        assert!(first.apply_to(&mut verge));
+        assert!(first.apply_to(&mut orbit));
         let protected = DnsOverrideState::new("two", Some("provider-dns".into()), true, None);
-        assert!(protected.apply_to(&mut verge));
-        assert!(verge.dns_settings_for("one").enabled);
-        assert!(!verge.dns_settings_for("two").enabled);
-        assert!(verge.dns_settings_for("unvisited").enabled);
-        assert_eq!(verge.enable_dns_settings, Some(true));
-        let restarted: IVerge = serde_yaml_ng::from_str(&serde_yaml_ng::to_string(&verge)?)?;
+        assert!(protected.apply_to(&mut orbit));
+        assert!(orbit.dns_settings_for("one").enabled);
+        assert!(!orbit.dns_settings_for("two").enabled);
+        assert!(orbit.dns_settings_for("unvisited").enabled);
+        assert_eq!(orbit.enable_dns_settings, Some(true));
+        let restarted: IOrbit = serde_yaml_ng::from_str(&serde_yaml_ng::to_string(&orbit)?)?;
         assert!(restarted.dns_settings_for("one").enabled);
         assert!(!restarted.dns_settings_for("two").enabled);
         Ok(())
@@ -276,9 +276,9 @@ mod tests {
 
     #[test]
     fn switching_profiles_preserves_each_confirmation_until_its_source_changes() {
-        let mut verge = IVerge::default();
+        let mut orbit = IOrbit::default();
         for uid in ["one", "two"] {
-            verge.profile_dns_settings.insert(
+            orbit.profile_dns_settings.insert(
                 uid.into(),
                 ProfileDnsSettings {
                     enabled: true,
@@ -287,17 +287,17 @@ mod tests {
             );
         }
         for uid in ["one", "two", "one"] {
-            let settings = verge.dns_settings_for(uid);
+            let settings = orbit.dns_settings_for(uid);
             let state = DnsOverrideState::new(uid, Some(uid.into()), settings.enabled, settings.confirmation);
             assert!(state.enabled);
-            assert!(!state.apply_to(&mut verge));
+            assert!(!state.apply_to(&mut orbit));
         }
-        let settings = verge.dns_settings_for("two");
+        let settings = orbit.dns_settings_for("two");
         let updated = DnsOverrideState::new("two", Some("updated".into()), settings.enabled, settings.confirmation);
-        assert!(updated.apply_to(&mut verge));
-        assert!(!verge.dns_settings_for("two").enabled);
-        assert!(verge.dns_settings_for("two").confirmation.is_none());
-        assert!(verge.dns_settings_for("one").enabled);
-        assert_eq!(verge.dns_settings_for("one").confirmation.as_deref(), Some("one"));
+        assert!(updated.apply_to(&mut orbit));
+        assert!(!orbit.dns_settings_for("two").enabled);
+        assert!(orbit.dns_settings_for("two").confirmation.is_none());
+        assert!(orbit.dns_settings_for("one").enabled);
+        assert_eq!(orbit.dns_settings_for("one").confirmation.as_deref(), Some("one"));
     }
 }

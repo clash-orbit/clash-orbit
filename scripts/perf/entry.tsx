@@ -10,7 +10,7 @@ import { setPreloadConfig } from '../../src/services/preload'
 
 setPreloadConfig({
   pause_render_traffic_stats_on_blur: false,
-} as IVergeConfig)
+} as IOrbitConfig)
 await initializeLanguage('en')
 export function Replay() {
   const {

@@ -27,7 +27,7 @@ async fn capture_files(paths: &[PathBuf]) -> Result<Vec<FileSnapshot>> {
 
 pub(crate) async fn capture_config_files() -> Result<Vec<FileSnapshot>> {
     let runtime_path = dirs::app_home_dir()?.join(crate::constants::files::RUNTIME_CONFIG);
-    capture_files(&[dirs::clash_path()?, dirs::verge_path()?, runtime_path]).await
+    capture_files(&[dirs::clash_path()?, dirs::orbit_path()?, runtime_path]).await
 }
 
 pub(crate) async fn restore_files(snapshots: &[FileSnapshot]) -> Result<()> {
@@ -69,8 +69,8 @@ mod tests {
         tokio::fs::create_dir_all(&root).await?;
         let paths = [
             root.join("config.yaml"),
-            root.join("verge.yaml"),
-            root.join("clash-verge.yaml"),
+            root.join("orbit.yaml"),
+            root.join("clash-orbit.yaml"),
         ];
         for (index, path) in paths.iter().enumerate() {
             tokio::fs::write(path, format!("original-{index}")).await?;

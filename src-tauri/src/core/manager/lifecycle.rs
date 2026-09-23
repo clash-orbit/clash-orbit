@@ -1,16 +1,16 @@
 use super::{CoreManager, RunningMode};
-use crate::config::{Config, IVerge};
+use crate::config::{Config, IOrbit};
 use crate::core::handle::Handle;
 use crate::core::manager::CLASH_LOGGER;
 use crate::core::proxy_control::{self, SysproxyFailure};
 use crate::core::service::{SERVICE_MANAGER, ServiceStatus};
 use anyhow::Result;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use scopeguard::defer;
 use smartstring::alias::String;
 use std::path::Path;
 #[cfg(target_os = "windows")]
-use tauri_plugin_clash_verge_sysinfo::is_current_app_handle_admin;
+use tauri_plugin_clash_orbit_sysinfo::is_current_app_handle_admin;
 
 #[cfg(any(target_os = "windows", test))]
 const fn should_wait_for_service(tun_enabled: bool, service_ready: bool, is_admin: bool) -> bool {
@@ -367,7 +367,7 @@ impl CoreManager {
         defer! {
             self.finish_config_update();
         }
-        // Lock order is config then lifecycle. disable_tun_and_persist commits the shared Verge
+        // Lock order is config then lifecycle. disable_tun_and_persist commits the shared Orbit
         // draft without claiming it, so without this it can commit another transaction's staged patch.
         let config_write = Config::lock_config_write().await;
         let _life = self.lifecycle_lock.lock().await;
@@ -385,7 +385,7 @@ impl CoreManager {
         // Settling on Sidecar is what makes the verdict final, so ask only once it is recorded.
         // Elevation alone carries TUN on Sidecar; a Sidecar that cannot must write it off.
         let prepared = async {
-            let tun_enabled = Config::verge().await.latest_arc().enable_tun_mode.unwrap_or(false);
+            let tun_enabled = Config::orbit().await.latest_arc().enable_tun_mode.unwrap_or(false);
             if crate::core::runstate::RUN_STATE
                 .state()
                 .tun_should_be_disabled(tun_enabled)
@@ -448,7 +448,7 @@ impl CoreManager {
             },
             || async {
                 // Must be asked after the uninstall: until then the Service still makes TUN capable.
-                let tun_enabled = Config::verge().await.latest_arc().enable_tun_mode.unwrap_or(false);
+                let tun_enabled = Config::orbit().await.latest_arc().enable_tun_mode.unwrap_or(false);
                 if crate::core::runstate::RUN_STATE
                     .state()
                     .tun_should_be_disabled(tun_enabled)
@@ -524,7 +524,7 @@ impl CoreManager {
         #[cfg(target_os = "macos")]
         if crate::core::network_watch::is_armed()
             && !crate::utils::resolve::is_resolve_done()
-            && Config::verge()
+            && Config::orbit()
                 .await
                 .latest_arc()
                 .enable_system_proxy
@@ -565,7 +565,7 @@ impl CoreManager {
             );
         }
         // tell the window when a background apply lands
-        Handle::refresh_verge();
+        Handle::refresh_orbit();
         Ok(())
     }
 
@@ -749,17 +749,17 @@ impl CoreManager {
 
     #[tracing::instrument(skip_all, level = "info", fields(core = %clash_core))]
     pub async fn change_core(&self, clash_core: &String) -> Result<()> {
-        if !IVerge::VALID_CLASH_CORES.contains(&clash_core.as_str()) {
+        if !IOrbit::VALID_CLASH_CORES.contains(&clash_core.as_str()) {
             anyhow::bail!("invalid clash core: {clash_core}");
         }
 
-        Config::verge().await.edit_draft(|d| {
+        Config::orbit().await.edit_draft(|d| {
             d.clash_core = Some(clash_core.to_owned());
         });
-        Config::verge().await.apply();
+        Config::orbit().await.apply();
 
-        let verge_data = Config::verge().await.latest_arc();
-        verge_data.save_file().await?;
+        let orbit_data = Config::orbit().await.latest_arc();
+        orbit_data.save_file().await?;
         self.update_config_checked().await
     }
 
@@ -767,7 +767,7 @@ impl CoreManager {
         #[cfg(target_os = "windows")]
         self.wait_for_service_if_needed().await;
 
-        let service_required = Config::verge().await.latest_arc().enable_tun_mode.unwrap_or(false);
+        let service_required = Config::orbit().await.latest_arc().enable_tun_mode.unwrap_or(false);
         if service_required
             && matches!(SERVICE_MANAGER.current().await, ServiceStatus::NotInstalled)
             && SERVICE_MANAGER.require_install_for_session().is_err()
@@ -781,7 +781,7 @@ impl CoreManager {
     async fn wait_for_service_if_needed(&self) {
         use crate::{config::Config, constants::timing};
 
-        let tun_enabled = Config::verge().await.latest_arc().enable_tun_mode.unwrap_or(false);
+        let tun_enabled = Config::orbit().await.latest_arc().enable_tun_mode.unwrap_or(false);
         let service_ready = matches!(SERVICE_MANAGER.current().await, ServiceStatus::Ready);
         let is_admin = is_current_app_handle_admin(Handle::app_handle());
 
@@ -815,7 +815,7 @@ impl CoreManager {
         use std::time::Instant;
 
         // An accepted Sidecar is the user's decision for this session, not a wait for the Service.
-        let needs_service = Config::verge().await.latest_arc().enable_tun_mode.unwrap_or(false)
+        let needs_service = Config::orbit().await.latest_arc().enable_tun_mode.unwrap_or(false)
             && !crate::core::runstate::RUN_STATE.state().sidecar_allowed;
         if !needs_service {
             return;
@@ -891,7 +891,7 @@ impl CoreManager {
         let _life = self.lifecycle_lock.lock().await;
 
         if !matches!(*self.get_running_mode(), RunningMode::Sidecar)
-            || !Config::verge().await.latest_arc().enable_tun_mode.unwrap_or(false)
+            || !Config::orbit().await.latest_arc().enable_tun_mode.unwrap_or(false)
             || crate::core::runstate::RUN_STATE.state().sidecar_allowed
         {
             return HandoffOutcome::Done;

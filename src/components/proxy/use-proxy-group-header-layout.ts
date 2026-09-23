@@ -2,7 +2,7 @@ import { PointerActivationConstraints } from '@dnd-kit/dom'
 import { PointerSensor, type DragEndEvent } from '@dnd-kit/react'
 import { useCallback } from 'react'
 
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 
 // The header row is itself a click target and hosts buttons and text inputs,
 // so a drag may only start once the pointer has travelled; text inputs never
@@ -20,8 +20,8 @@ const headerPointerSensor = PointerSensor.configure({
 export const PROXY_GROUP_HEADER_SENSORS = [headerPointerSensor]
 
 export const useProxyGroupHeaderLayout = () => {
-  const { verge, mutateVerge, patchVerge } = useVerge()
-  const toolsOnLeft = verge?.proxy_group_tools_position === 'left'
+  const { orbit, mutateOrbit, patchOrbit } = useOrbit()
+  const toolsOnLeft = orbit?.proxy_group_tools_position === 'left'
 
   const onDragEnd = useCallback(
     async (event: DragEndEvent) => {
@@ -30,19 +30,19 @@ export const useProxyGroupHeaderLayout = () => {
       if (canceled || !operation.source || !operation.target) return
 
       const position = toolsOnLeft ? 'right' : 'left'
-      mutateVerge(
+      mutateOrbit(
         (prev) =>
           prev ? { ...prev, proxy_group_tools_position: position } : prev,
         false,
       )
       try {
-        await patchVerge({ proxy_group_tools_position: position })
+        await patchOrbit({ proxy_group_tools_position: position })
       } catch (error) {
         console.error('Failed to save proxy group header layout:', error)
-        mutateVerge()
+        mutateOrbit()
       }
     },
-    [toolsOnLeft, mutateVerge, patchVerge],
+    [toolsOnLeft, mutateOrbit, patchOrbit],
   )
 
   return { onDragEnd }

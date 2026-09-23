@@ -1,12 +1,12 @@
 use anyhow::Result;
-use clash_verge_logging::{LoggerConfig, Type, logging};
+use clash_orbit_logging::{LoggerConfig, Type, logging};
 
 use crate::{
     core::{CoreManager, manager::RunningMode, service},
     utils::dirs,
 };
 
-pub use clash_verge_logging::Logger;
+pub use clash_orbit_logging::Logger;
 
 const fn should_sync_service_writer(running_mode: RunningMode) -> bool {
     matches!(running_mode, RunningMode::Service)
@@ -14,12 +14,12 @@ const fn should_sync_service_writer(running_mode: RunningMode) -> bool {
 
 async fn logger_config() -> Result<LoggerConfig> {
     let (level, max_size, max_count) = {
-        let verge_guard = crate::config::Config::verge().await;
-        let verge = verge_guard.latest_arc();
+        let orbit_guard = crate::config::Config::orbit().await;
+        let orbit = orbit_guard.latest_arc();
         (
-            verge.get_log_level(),
-            verge.app_log_max_size.unwrap_or(128),
-            verge.app_log_max_count.unwrap_or(8),
+            orbit.get_log_level(),
+            orbit.app_log_max_size.unwrap_or(128),
+            orbit.app_log_max_count.unwrap_or(8),
         )
     };
     Ok(LoggerConfig {

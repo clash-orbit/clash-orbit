@@ -2,7 +2,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { getPendingFailures, type PendingFailure } from '@/services/cmds'
-import { subscribeVergeEvents } from '@/services/events'
+import { subscribeOrbitEvents } from '@/services/events'
 import { showNotice } from '@/services/notice-service'
 
 /** Failures handled by the recovery dialog instead of a toast. */
@@ -47,8 +47,8 @@ const usePendingFailureReader = (
       })()
     }
 
-    const unsubscribe = subscribeVergeEvents(
-      { 'verge://pending-failures-changed': read },
+    const unsubscribe = subscribeOrbitEvents(
+      { 'orbit://pending-failures-changed': read },
       read,
     )
 

@@ -18,7 +18,7 @@ use crate::{
     utils::{resolve, server},
 };
 use anyhow::Result;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use once_cell::sync::OnceCell;
 use tauri::{AppHandle, Manager as _};
 #[cfg(target_os = "macos")]
@@ -42,7 +42,7 @@ mod app_init {
     pub fn setup_plugins(builder: tauri::Builder<tauri::Wry>) -> tauri::Builder<tauri::Wry> {
         #[allow(unused_mut)]
         let mut builder = builder
-            .plugin(tauri_plugin_clash_verge_sysinfo::init())
+            .plugin(tauri_plugin_clash_orbit_sysinfo::init())
             .plugin(tauri_plugin_notification::init())
             .plugin(
                 tauri_plugin_updater::Builder::new()
@@ -125,9 +125,9 @@ mod app_init {
 
     pub fn generate_handlers() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync + 'static {
         tauri::generate_handler![
-            tauri_plugin_clash_verge_sysinfo::commands::get_system_info,
-            tauri_plugin_clash_verge_sysinfo::commands::get_app_uptime,
-            tauri_plugin_clash_verge_sysinfo::commands::export_diagnostic_info,
+            tauri_plugin_clash_orbit_sysinfo::commands::get_system_info,
+            tauri_plugin_clash_orbit_sysinfo::commands::get_app_uptime,
+            tauri_plugin_clash_orbit_sysinfo::commands::export_diagnostic_info,
             cmd::probe_listener,
             cmd::save_proxy_ports,
             cmd::get_sys_proxy,
@@ -176,8 +176,8 @@ mod app_init {
             cmd::get_dns_config_content,
             cmd::validate_dns_config,
             cmd::get_clash_logs,
-            cmd::get_verge_config,
-            cmd::patch_verge_config,
+            cmd::get_orbit_config,
+            cmd::patch_orbit_config,
             cmd::test_delay,
             cmd::get_app_dir,
             cmd::copy_icon_file,
@@ -238,7 +238,7 @@ fn handle_singleton_startup(
 }
 
 pub fn run() -> std::process::ExitCode {
-    #[cfg(all(target_os = "macos", not(debug_assertions), not(test), not(feature = "verge-dev")))]
+    #[cfg(all(target_os = "macos", not(debug_assertions), not(test), not(feature = "orbit-dev")))]
     if utils::macos_launch_guard::enforce_before_initialization() == utils::macos_launch_guard::LaunchDisposition::Exit
     {
         return std::process::ExitCode::SUCCESS;
@@ -250,7 +250,7 @@ pub fn run() -> std::process::ExitCode {
         utils::dirs::preinit_app_data_dir().and_then(|root| core::owner_identity::repair_app_data_root_owner(&root))
     {
         // The logger is installed later in setup(), so this would otherwise be lost.
-        eprintln!("[clash-verge] 应用数据目录所有权修复失败: {error:#}");
+        eprintln!("[clash-ORBIT] 应用数据目录所有权修复失败: {error:#}");
         logging!(error, Type::Setup, "应用数据目录所有权修复失败: {error:#}");
     }
 
@@ -274,7 +274,7 @@ pub fn run() -> std::process::ExitCode {
                     .map(|s| (*s).to_string())
                     .or_else(|| panic.downcast_ref::<String>().cloned())
                     .unwrap_or_else(|| "unknown panic payload".to_string());
-                eprintln!("[clash-verge] panic during app setup ({stage}), continuing in degraded mode: {msg}");
+                eprintln!("[clash-ORBIT] panic during app setup ({stage}), continuing in degraded mode: {msg}");
                 logging!(
                     error,
                     Type::Setup,
@@ -338,7 +338,7 @@ pub fn run() -> std::process::ExitCode {
             core::{self, handle, hotkey},
             process::AsyncHandler,
         };
-        use clash_verge_logging::{Type, logging};
+        use clash_orbit_logging::{Type, logging};
         use tauri::AppHandle;
         #[cfg(target_os = "macos")]
         use tauri::Manager as _;
@@ -354,7 +354,7 @@ pub fn run() -> std::process::ExitCode {
 
             #[cfg(target_os = "macos")]
             if let Some(window) = _app_handle.get_webview_window("main") {
-                let _ = window.set_title("Clash Verge");
+                let _ = window.set_title("Clash Orbit");
             }
         }
 
@@ -389,7 +389,7 @@ pub fn run() -> std::process::ExitCode {
 
         pub fn handle_window_focus(focused: bool) {
             AsyncHandler::spawn(move || async move {
-                let is_enable_global_hotkey = Config::verge().await.data_arc().enable_global_hotkey.unwrap_or(true);
+                let is_enable_global_hotkey = Config::orbit().await.data_arc().enable_global_hotkey.unwrap_or(true);
 
                 if focused {
                     #[cfg(target_os = "macos")]
@@ -427,7 +427,7 @@ pub fn run() -> std::process::ExitCode {
             AsyncHandler::spawn(move || async move {
                 let _ = hotkey::Hotkey::global().unregister_system_hotkey(SystemHotkey::CmdQ);
                 let _ = hotkey::Hotkey::global().unregister_system_hotkey(SystemHotkey::CmdW);
-                let is_enable_global_hotkey = Config::verge().await.data_arc().enable_global_hotkey.unwrap_or(true);
+                let is_enable_global_hotkey = Config::orbit().await.data_arc().enable_global_hotkey.unwrap_or(true);
                 if !is_enable_global_hotkey {
                     let _ = hotkey::Hotkey::global().reset();
                 }

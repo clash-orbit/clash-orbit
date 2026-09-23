@@ -8,13 +8,13 @@ import { BaseLoading } from '@/components/base'
 import { useIconCache } from '@/hooks/use-icon-cache'
 import { cmdTestDelay } from '@/services/cmds'
 import delayManager from '@/services/delay'
-import { subscribeVergeEvents } from '@/services/events'
+import { subscribeOrbitEvents } from '@/services/events'
 import { showNotice } from '@/services/notice-service'
 
 import { TestBox } from './test-box'
 
 interface Props {
-  itemData: IVergeTestItem
+  itemData: IOrbitTestItem
   onEdit: () => void
   onDelete: (uid: string) => void
 }
@@ -53,7 +53,7 @@ export const TestItem = ({ itemData, onEdit, onDelete: removeTest }: Props) => {
   ]
 
   useEffect(
-    () => subscribeVergeEvents({ 'verge://test-all': () => onDelay() }),
+    () => subscribeOrbitEvents({ 'orbit://test-all': () => onDelay() }),
     [url, onDelay],
   )
 

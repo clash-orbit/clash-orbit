@@ -17,8 +17,8 @@ use crate::{
     process::AsyncHandler,
 };
 use anyhow::{Context as _, Result, anyhow, bail};
-use clash_verge_draft::DraftTransaction;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_draft::DraftTransaction;
+use clash_orbit_logging::{Type, logging};
 use scopeguard::{ScopeGuard, defer, guard};
 
 pub async fn probe_listener(request: ListenerProbe) -> Result<ListenerProbeOutcome> {
@@ -43,10 +43,10 @@ pub async fn save_proxy_ports(settings: ProxyPortSettings) -> Result<SaveProxyPo
     let current = current_runtime_mapping().await?;
 
     let clash = Config::clash().await;
-    let verge = Config::verge().await;
+    let orbit = Config::orbit().await;
     let runtime = Config::runtime().await;
     // Roll back all three drafts if the candidate is rejected or fails.
-    let transaction = DraftTransaction::begin(vec![&clash, &verge, &runtime])?;
+    let transaction = DraftTransaction::begin(vec![&clash, &orbit, &runtime])?;
 
     stage_proxy_ports(&settings).await;
     // Hide PAC while the staged ports are not yet serving traffic.
@@ -127,7 +127,7 @@ pub async fn save_proxy_ports(settings: ProxyPortSettings) -> Result<SaveProxyPo
     // The save landed, so the port the app had borrowed is now irrelevant.
     let _ = ScopeGuard::into_inner(borrowed_port);
     Handle::refresh_clash();
-    Handle::refresh_verge();
+    Handle::refresh_orbit();
     logging!(info, Type::Config, "Proxy port configuration applied and persisted");
     Ok(SaveProxyPortsOutcome::Saved)
 }
@@ -189,21 +189,21 @@ async fn stage_proxy_ports(settings: &ProxyPortSettings) {
         #[cfg(target_os = "linux")]
         draft.0.insert("tproxy-port".into(), settings.tproxy.port.into());
     });
-    Config::verge().await.edit_draft(|draft| {
-        draft.verge_mixed_port = Some(settings.mixed_port);
-        draft.verge_socks_port = Some(settings.socks.port);
-        draft.verge_socks_enabled = Some(settings.socks.enabled);
-        draft.verge_port = Some(settings.http.port);
-        draft.verge_http_enabled = Some(settings.http.enabled);
+    Config::orbit().await.edit_draft(|draft| {
+        draft.orbit_mixed_port = Some(settings.mixed_port);
+        draft.orbit_socks_port = Some(settings.socks.port);
+        draft.orbit_socks_enabled = Some(settings.socks.enabled);
+        draft.orbit_port = Some(settings.http.port);
+        draft.orbit_http_enabled = Some(settings.http.enabled);
         #[cfg(not(target_os = "windows"))]
         {
-            draft.verge_redir_port = Some(settings.redir.port);
-            draft.verge_redir_enabled = Some(settings.redir.enabled);
+            draft.orbit_redir_port = Some(settings.redir.port);
+            draft.orbit_redir_enabled = Some(settings.redir.enabled);
         }
         #[cfg(target_os = "linux")]
         {
-            draft.verge_tproxy_port = Some(settings.tproxy.port);
-            draft.verge_tproxy_enabled = Some(settings.tproxy.enabled);
+            draft.orbit_tproxy_port = Some(settings.tproxy.port);
+            draft.orbit_tproxy_enabled = Some(settings.tproxy.enabled);
         }
     });
 }
@@ -215,7 +215,7 @@ async fn persist_proxy_port_sources() -> Result<()> {
         .save_config()
         .await
         .context("failed to persist Application Merge Configuration")?;
-    Config::verge()
+    Config::orbit()
         .await
         .latest_arc()
         .save_file()
@@ -227,7 +227,7 @@ async fn persist_proxy_port_sources() -> Result<()> {
 /// Discard candidate drafts before restoring files from committed configuration.
 async fn discard_proxy_port_drafts() {
     Config::clash().await.discard();
-    Config::verge().await.discard();
+    Config::orbit().await.discard();
     Config::runtime().await.discard();
 }
 

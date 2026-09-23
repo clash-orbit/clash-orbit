@@ -259,7 +259,7 @@ interface IProfilesConfig {
   items?: IProfileItem[]
 }
 
-interface IVergeTestItem {
+interface IOrbitTestItem {
   uid: string
   name?: string
   icon?: string
@@ -850,7 +850,7 @@ interface IProxyConfig
     | 'sudoku'
 }
 
-interface IVergeConfig {
+interface IOrbitConfig {
   app_log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | string
   app_log_max_size?: number // KB
   app_log_max_count?: number
@@ -895,15 +895,15 @@ interface IVergeConfig {
   pac_file_content?: string
   proxy_host?: string
   enable_random_port?: boolean
-  verge_mixed_port?: number
-  verge_socks_port?: number
-  verge_redir_port?: number
-  verge_tproxy_port?: number
-  verge_port?: number
-  verge_redir_enabled?: boolean
-  verge_tproxy_enabled?: boolean
-  verge_socks_enabled?: boolean
-  verge_http_enabled?: boolean
+  orbit_mixed_port?: number
+  orbit_socks_port?: number
+  orbit_redir_port?: number
+  orbit_tproxy_port?: number
+  orbit_port?: number
+  orbit_redir_enabled?: boolean
+  orbit_tproxy_enabled?: boolean
+  orbit_socks_enabled?: boolean
+  orbit_http_enabled?: boolean
   enable_proxy_guard?: boolean
   enable_bypass_check?: boolean
   use_default_bypass?: boolean
@@ -938,7 +938,7 @@ interface IVergeConfig {
   auto_backup_interval_hours?: number
   auto_backup_on_change?: boolean
   proxy_layout_column?: number
-  test_list?: IVergeTestItem[]
+  test_list?: IOrbitTestItem[]
   webdav_url?: string
   webdav_username?: string
   webdav_password?: string

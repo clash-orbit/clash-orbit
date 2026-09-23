@@ -128,7 +128,7 @@ corepack pnpm format:check             # biome
 
 ## 已知问题
 
-- 本机 `cargo test -p clash-verge --lib` 的测试二进制在 Windows **加载阶段**就失败
+- 本机 `cargo test -p clash-orbit --lib` 的测试二进制在 Windows **加载阶段**就失败
   （`STATUS_ENTRYPOINT_NOT_FOUND`，退出码 `0xC0000139`），一个用例都跑不到。已用
   `git stash` 把改名改动临时移开对比过：上游原始代码同样失败，属预先存在的环境/工具链
   问题，与改名无关。其余 crate 的 lib 测试全部通过，且 `cargo check --all-targets`

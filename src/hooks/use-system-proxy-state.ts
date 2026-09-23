@@ -2,12 +2,12 @@ import { useRef } from 'react'
 import { closeAllConnections } from 'tauri-plugin-mihomo-api'
 
 import { useDisplayedMixedPort } from '@/hooks/use-displayed-mixed-port'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useSystemData } from '@/providers/app-data-context'
 import {
   getAutotemProxy,
   getEmbeddedServerPort,
-  patchVergeConfig,
+  patchOrbitConfig,
 } from '@/services/cmds'
 import {
   removeCacheData,
@@ -16,7 +16,7 @@ import {
 } from '@/services/query-client'
 
 export const useSystemProxyState = () => {
-  const { verge, mutateVerge } = useVerge()
+  const { orbit, mutateOrbit } = useOrbit()
   const { sysproxy } = useSystemData()
   const displayedMixedPort = useDisplayedMixedPort()
   const { data: autoproxy } = useQuery({
@@ -30,7 +30,7 @@ export const useSystemProxyState = () => {
     queryFn: getEmbeddedServerPort,
   })
 
-  const { proxy_auto_config, proxy_host } = verge ?? {}
+  const { proxy_auto_config, proxy_host } = orbit ?? {}
 
   const indicator = (() => {
     const host = proxy_host || '127.0.0.1'
@@ -50,8 +50,8 @@ export const useSystemProxyState = () => {
 
   const toggleSystemProxy = async (enabled: boolean) => {
     // Roll failed optimistic writes back to the latest confirmed state.
-    let confirmed = verge?.enable_system_proxy ?? false
-    mutateVerge(
+    let confirmed = orbit?.enable_system_proxy ?? false
+    mutateOrbit(
       (prev) => (prev ? { ...prev, enable_system_proxy: enabled } : prev),
       false,
     )
@@ -64,14 +64,14 @@ export const useSystemProxyState = () => {
       while (pendingRef.current !== null) {
         const target = pendingRef.current
         pendingRef.current = null
-        await patchVergeConfig({ enable_system_proxy: target })
+        await patchOrbitConfig({ enable_system_proxy: target })
         confirmed = target
-        if (!target && verge?.auto_close_connection) {
+        if (!target && orbit?.auto_close_connection) {
           await closeAllConnections().catch(() => {})
         }
       }
     } catch (error) {
-      mutateVerge(
+      mutateOrbit(
         (prev) => (prev ? { ...prev, enable_system_proxy: confirmed } : prev),
         false,
       )
@@ -83,7 +83,7 @@ export const useSystemProxyState = () => {
       // Refreshing cached state is not part of the toggle's result: a failed read must not
       // turn a write that landed into a reported failure.
       try {
-        await revalidateQueries([['getVergeConfig']])
+        await revalidateQueries([['getOrbitConfig']])
       } catch (error) {
         console.warn(
           '[system-proxy] rereading the config after a toggle failed:',

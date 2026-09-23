@@ -47,7 +47,7 @@ All application data lives in a single directory:
 
 It contains:
 
-- `verge.yaml` — application settings. If you configure WebDAV backup, the
+- `orbit.yaml` — application settings. If you configure WebDAV backup, the
   server URL, user name and password are stored here **in plain text**.
 - `config.yaml`, `profiles.yaml` and `profiles/` — your proxy configuration and
   downloaded subscriptions. These normally contain **subscription URLs (which
@@ -83,7 +83,7 @@ to the extent any proxy operator can; their privacy policy applies.
 ### 4.2 Subscription (profile) updates
 
 When you add a remote profile, the application downloads it from the URL you
-supplied, sending a `User-Agent` of `clash-verge/v<version>` unless you set a
+supplied, sending a `User-Agent` of `clash-orbit/v<version>` unless you set a
 different one for that profile. If you enable automatic updates for a profile,
 this request repeats on the interval you choose. The subscription provider sees
 your IP address and this request; it is the same request your browser would
@@ -149,8 +149,8 @@ the DNS settings and in your own configuration.
 
 If you set up backup, the application uploads a ZIP archive to the WebDAV server
 you specify. The archive contains your profiles, `profiles.yaml`, `config.yaml`,
-the DNS configuration and `verge.yaml`; **WebDAV credentials are stripped from
-`verge.yaml` before upload, but proxy servers, passwords and subscription URLs
+the DNS configuration and `orbit.yaml`; **WebDAV credentials are stripped from
+`orbit.yaml` before upload, but proxy servers, passwords and subscription URLs
 inside your profiles are not**. Treat a backup as sensitive and use a server you
 trust. Backups are only transferred to that server.
 

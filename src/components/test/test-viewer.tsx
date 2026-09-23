@@ -6,16 +6,16 @@ import { useForm, Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { BaseDialog } from '@/components/base'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { showNotice } from '@/services/notice-service'
 
 interface Props {
-  onChange: (uid: string, patch?: Partial<IVergeTestItem>) => void
+  onChange: (uid: string, patch?: Partial<IOrbitTestItem>) => void
 }
 
 export interface TestViewerRef {
   create: () => void
-  edit: (item: IVergeTestItem) => void
+  edit: (item: IOrbitTestItem) => void
 }
 
 // create or edit the test item
@@ -25,9 +25,9 @@ export const TestViewer = forwardRef<TestViewerRef, Props>(
     const [open, setOpen] = useState(false)
     const [openType, setOpenType] = useState<'new' | 'edit'>('new')
     const [loading, setLoading] = useState(false)
-    const { verge, patchVerge } = useVerge()
-    const testList = verge?.test_list ?? []
-    const { control, ...formIns } = useForm<IVergeTestItem>({
+    const { orbit, patchOrbit } = useOrbit()
+    const testList = orbit?.test_list ?? []
+    const { control, ...formIns } = useForm<IOrbitTestItem>({
       defaultValues: {
         name: '',
         icon: '',
@@ -37,7 +37,7 @@ export const TestViewer = forwardRef<TestViewerRef, Props>(
 
     const patchTestList = async (
       uid: string,
-      patch: Partial<IVergeTestItem>,
+      patch: Partial<IOrbitTestItem>,
     ) => {
       const newList = testList.map((x) => {
         if (x.uid === uid) {
@@ -45,7 +45,7 @@ export const TestViewer = forwardRef<TestViewerRef, Props>(
         }
         return x
       })
-      await patchVerge({ test_list: newList })
+      await patchOrbit({ test_list: newList })
     }
 
     useImperativeHandle(ref, () => ({
@@ -79,7 +79,7 @@ export const TestViewer = forwardRef<TestViewerRef, Props>(
             const uid = nanoid()
             const item = { ...form, uid }
             const newList = [...testList, item]
-            await patchVerge({ test_list: newList })
+            await patchOrbit({ test_list: newList })
             onChange(uid)
           } else {
             if (!form.uid) {

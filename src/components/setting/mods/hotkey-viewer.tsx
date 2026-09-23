@@ -4,7 +4,7 @@ import { forwardRef, useImperativeHandle, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BaseDialog, DialogRef, Switch } from '@/components/base'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { showNotice } from '@/services/notice-service'
 
 import { HotkeyInput } from './hotkey-input'
@@ -44,11 +44,11 @@ export const HotkeyViewer = forwardRef<DialogRef>((props, ref) => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
-  const { verge, patchVerge } = useVerge()
+  const { orbit, patchOrbit } = useOrbit()
 
   const [hotkeyMap, setHotkeyMap] = useState<Record<string, string[]>>({})
   const [enableGlobalHotkey, setEnableGlobalHotkey] = useState(
-    verge?.enable_global_hotkey ?? true,
+    orbit?.enable_global_hotkey ?? true,
   )
 
   useImperativeHandle(ref, () => ({
@@ -57,7 +57,7 @@ export const HotkeyViewer = forwardRef<DialogRef>((props, ref) => {
 
       const map = {} as typeof hotkeyMap
 
-      verge?.hotkeys?.forEach((text) => {
+      orbit?.hotkeys?.forEach((text) => {
         const [func, key] = text.split(',').map((e) => e.trim())
 
         if (!func || !key) return
@@ -90,7 +90,7 @@ export const HotkeyViewer = forwardRef<DialogRef>((props, ref) => {
       .filter(Boolean)
 
     try {
-      await patchVerge({
+      await patchOrbit({
         hotkeys,
         enable_global_hotkey: enableGlobalHotkey,
       })

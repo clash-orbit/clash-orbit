@@ -6,7 +6,7 @@ import {
 import { Theme as TauriOsTheme } from '@tauri-apps/api/window'
 import { useEffect, useMemo } from 'react'
 
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { defaultDarkTheme, defaultTheme } from '@/pages/_theme'
 import { useSetThemeMode, useThemeMode } from '@/services/states'
 
@@ -67,8 +67,8 @@ ${css}
  */
 export const useCustomTheme = () => {
   const appWindow: WebviewWindow = useMemo(() => getCurrentWebviewWindow(), [])
-  const { verge } = useVerge()
-  const { theme_mode, theme_setting } = verge ?? {}
+  const { orbit } = useOrbit()
+  const { theme_mode, theme_setting } = orbit ?? {}
   const mode = useThemeMode()
   const setMode = useSetThemeMode()
   const userBackgroundImage = theme_setting?.background_image || ''
@@ -244,10 +244,10 @@ export const useCustomTheme = () => {
       rootEle.setAttribute('data-css-injection-root', 'true')
     }
 
-    let styleElement = document.querySelector('style#verge-theme')
+    let styleElement = document.querySelector('style#orbit-theme')
     if (!styleElement) {
       styleElement = document.createElement('style')
-      styleElement.id = 'verge-theme'
+      styleElement.id = 'orbit-theme'
       document.head.appendChild(styleElement!)
     }
 

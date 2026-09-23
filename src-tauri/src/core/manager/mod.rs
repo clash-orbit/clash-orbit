@@ -4,7 +4,7 @@ mod state;
 
 use anyhow::Result;
 use arc_swap::{ArcSwap, ArcSwapOption};
-use clash_verge_logging::{LogRing, Type, logging};
+use clash_orbit_logging::{LogRing, Type, logging};
 use once_cell::sync::Lazy;
 use std::{
     fmt,

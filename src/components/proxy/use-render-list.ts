@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 
 import { useRuntimeConfig } from '@/hooks/use-clash'
 import { useGroupsDelays } from '@/hooks/use-group-delays'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useAppRefreshers, useProxiesData } from '@/providers/app-data-context'
 import delayManager, { type DelaySnapshot } from '@/services/delay'
 import {
@@ -127,18 +127,18 @@ export const useRenderList = (
 ) => {
   const { proxyView } = useProxiesData()
   const { refreshProxy } = useAppRefreshers()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const { width } = useWindowWidth()
   const [headStates, setHeadState] = useHeadStateNew()
-  const latencyTimeout = verge?.default_latency_timeout
+  const latencyTimeout = orbit?.default_latency_timeout
   const { data: runtimeConfig } = useRuntimeConfig(!!isChainMode)
   const runtimeProxies = (
     runtimeConfig as RuntimeConfigWithProxySequence | null
   )?.proxies
 
   const col = useMemo(
-    () => calculateColumns(width, verge?.proxy_layout_column || 6),
-    [width, verge?.proxy_layout_column],
+    () => calculateColumns(width, orbit?.proxy_layout_column || 6),
+    [width, orbit?.proxy_layout_column],
   )
 
   const chainOccurrences = useMemo(() => {
@@ -192,7 +192,7 @@ export const useRenderList = (
     if (interactable.length === 0) return
 
     const handle = setTimeout(() => {
-      const timeout = verge?.default_latency_timeout || 10000
+      const timeout = orbit?.default_latency_timeout || 10000
       debugLog(`[ChainMode] 开始计算 ${interactable.length} 个节点的延迟`)
       void delayManager.checkListDelay(interactable, chainDelayGroup, timeout)
     }, 100)
@@ -204,7 +204,7 @@ export const useRenderList = (
     chainDelayGroup,
     chainDelayKey,
     isChainMode,
-    verge?.default_latency_timeout,
+    orbit?.default_latency_timeout,
   ])
 
   // Every group this list draws, so a test settling in any of them re-sorts that group.

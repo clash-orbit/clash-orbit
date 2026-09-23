@@ -1,4 +1,4 @@
-use crate::config::{IProfilePreview, IVerge};
+use crate::config::{IOrbit, IProfilePreview};
 use crate::core::tray::menu_def::TrayAction;
 use crate::module::lightweight;
 use crate::process::AsyncHandler;
@@ -11,8 +11,8 @@ use crate::{
     module::lightweight::is_in_lightweight_mode,
     utils::{dirs::find_target_icons, help},
 };
-use clash_verge_limiter::{Limiter, SystemClock, SystemLimiter};
-use clash_verge_logging::logging_error;
+use clash_orbit_limiter::{Limiter, SystemClock, SystemLimiter};
+use clash_orbit_logging::logging_error;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
 use tauri_plugin_mihomo::models::Proxies;
 use tokio::fs;
@@ -62,9 +62,9 @@ pub struct Tray {
 }
 
 impl TrayState {
-    async fn get_tray_icon(verge: &IVerge) -> (bool, Cow<'_, [u8]>) {
-        let tun_mode = verge.enable_tun_mode.unwrap_or(false) && crate::core::runstate::RUN_STATE.state().tun_capable();
-        let system_mode = verge.enable_system_proxy.unwrap_or(false);
+    async fn get_tray_icon(orbit: &IOrbit) -> (bool, Cow<'_, [u8]>) {
+        let tun_mode = orbit.enable_tun_mode.unwrap_or(false) && crate::core::runstate::RUN_STATE.state().tun_capable();
+        let system_mode = orbit.enable_system_proxy.unwrap_or(false);
         let kind = if tun_mode {
             IconKind::Tun
         } else if system_mode {
@@ -72,14 +72,14 @@ impl TrayState {
         } else {
             IconKind::Common
         };
-        Self::load_icon(verge, kind).await
+        Self::load_icon(orbit, kind).await
     }
 
-    async fn load_icon(verge: &IVerge, kind: IconKind) -> (bool, Cow<'_, [u8]>) {
+    async fn load_icon(orbit: &IOrbit, kind: IconKind) -> (bool, Cow<'_, [u8]>) {
         let (custom_enabled, icon_name) = match kind {
-            IconKind::Common => (verge.common_tray_icon.unwrap_or(false), "common"),
-            IconKind::SysProxy => (verge.sysproxy_tray_icon.unwrap_or(false), "sysproxy"),
-            IconKind::Tun => (verge.tun_tray_icon.unwrap_or(false), "tun"),
+            IconKind::Common => (orbit.common_tray_icon.unwrap_or(false), "common"),
+            IconKind::SysProxy => (orbit.sysproxy_tray_icon.unwrap_or(false), "sysproxy"),
+            IconKind::Tun => (orbit.tun_tray_icon.unwrap_or(false), "tun"),
         };
 
         if custom_enabled
@@ -89,14 +89,14 @@ impl TrayState {
             return (true, Cow::Owned(data));
         }
 
-        Self::default_icon(verge, kind)
+        Self::default_icon(orbit, kind)
     }
 
     #[allow(clippy::missing_const_for_fn)]
-    fn default_icon(verge: &IVerge, kind: IconKind) -> (bool, Cow<'_, [u8]>) {
+    fn default_icon(orbit: &IOrbit, kind: IconKind) -> (bool, Cow<'_, [u8]>) {
         #[cfg(target_os = "macos")]
         {
-            let is_mono = verge.tray_icon.as_deref().unwrap_or("monochrome") == "monochrome";
+            let is_mono = orbit.tray_icon.as_deref().unwrap_or("monochrome") == "monochrome";
             if is_mono {
                 return (
                     false,
@@ -112,7 +112,7 @@ impl TrayState {
         }
 
         #[cfg(not(target_os = "macos"))]
-        let _ = verge;
+        let _ = orbit;
 
         (
             false,
@@ -173,7 +173,7 @@ impl Tray {
         }
 
         let app_handle = handle::Handle::app_handle();
-        let tray_event = { Config::verge().await.latest_arc().tray_event.clone() };
+        let tray_event = { Config::orbit().await.latest_arc().tray_event.clone() };
         let tray_event = TrayAction::from(tray_event.as_deref().unwrap_or("main_window"));
         let tray = app_handle
             .tray_by_id(TRAY_ID)
@@ -200,9 +200,9 @@ impl Tray {
             return Ok(());
         };
 
-        let verge = Config::verge().await.latest_arc();
-        let system_proxy = verge.enable_system_proxy.as_ref().unwrap_or(&false);
-        let tun_mode = verge.enable_tun_mode.as_ref().unwrap_or(&false);
+        let orbit = Config::orbit().await.latest_arc();
+        let system_proxy = orbit.enable_system_proxy.as_ref().unwrap_or(&false);
+        let tun_mode = orbit.enable_tun_mode.as_ref().unwrap_or(&false);
         let tun_mode_available = crate::core::runstate::RUN_STATE.state().tun_capable();
         let mode = {
             Config::clash()
@@ -242,7 +242,7 @@ impl Tray {
         Ok(())
     }
 
-    pub async fn update_icon(&self, verge: &IVerge) -> Result<()> {
+    pub async fn update_icon(&self, orbit: &IOrbit) -> Result<()> {
         if handle::Handle::global().is_exiting() {
             logging!(debug, Type::Tray, "应用正在退出，跳过托盘图标更新");
             return Ok(());
@@ -255,12 +255,12 @@ impl Tray {
             return Ok(());
         };
 
-        let (_is_custom_icon, icon_bytes) = TrayState::get_tray_icon(verge).await;
+        let (_is_custom_icon, icon_bytes) = TrayState::get_tray_icon(orbit).await;
 
         let template = {
             #[cfg(target_os = "macos")]
             {
-                verge.tray_icon.as_ref().is_none_or(|v| v == "monochrome")
+                orbit.tray_icon.as_ref().is_none_or(|v| v == "monochrome")
             }
             #[cfg(not(target_os = "macos"))]
             {
@@ -282,9 +282,9 @@ impl Tray {
 
         let app_handle = handle::Handle::app_handle();
 
-        let verge = Config::verge().await.latest_arc();
-        let system_proxy = verge.enable_system_proxy.unwrap_or(false);
-        let tun_mode = verge.enable_tun_mode.unwrap_or(false) && crate::core::runstate::RUN_STATE.state().tun_capable();
+        let orbit = Config::orbit().await.latest_arc();
+        let system_proxy = orbit.enable_system_proxy.unwrap_or(false);
+        let tun_mode = orbit.enable_tun_mode.unwrap_or(false) && crate::core::runstate::RUN_STATE.state().tun_capable();
 
         let switch_str = |flag: bool| {
             if flag { "on" } else { "off" }
@@ -304,9 +304,9 @@ impl Tray {
             }
         }
 
-        let sys_proxy_text = clash_verge_i18n::t!("tray.tooltip.systemProxy");
-        let tun_text = clash_verge_i18n::t!("tray.tooltip.tun");
-        let profile_text = clash_verge_i18n::t!("tray.tooltip.profile");
+        let sys_proxy_text = clash_orbit_i18n::t!("tray.tooltip.systemProxy");
+        let tun_text = clash_orbit_i18n::t!("tray.tooltip.tun");
+        let profile_text = clash_orbit_i18n::t!("tray.tooltip.profile");
 
         let v = env!("CARGO_PKG_VERSION");
         let reassembled_version = v.split_once('+').map_or_else(
@@ -315,7 +315,7 @@ impl Tray {
         );
 
         let tooltip = format!(
-            "Clash Verge {}\n{}: {}\n{}: {}\n{}: {}",
+            "Clash Orbit {}\n{}: {}\n{}: {}\n{}: {}",
             reassembled_version,
             sys_proxy_text,
             switch_str(system_proxy),
@@ -340,23 +340,23 @@ impl Tray {
             logging!(debug, Type::Tray, "应用正在退出，跳过托盘局部更新");
             return Ok(());
         }
-        let verge = Config::verge().await.data_arc();
+        let orbit = Config::orbit().await.data_arc();
         let app_handle = handle::Handle::app_handle();
         self.update_menu_internal(app_handle, false).await?;
         AsyncHandler::spawn(|| async {
             logging_error!(Type::Tray, Self::global().update_menu().await);
         });
-        self.update_icon(&verge).await?;
+        self.update_icon(&orbit).await?;
         #[cfg(target_os = "macos")]
-        self.update_speed_task(verge.enable_tray_speed.unwrap_or(false));
+        self.update_speed_task(orbit.enable_tray_speed.unwrap_or(false));
         self.update_tooltip().await?;
         Ok(())
     }
 
     pub async fn update_menu_and_icon(&self) {
         logging_error!(Type::Tray, self.update_menu().await);
-        let verge = Config::verge().await.data_arc();
-        logging_error!(Type::Tray, self.update_icon(&verge).await);
+        let orbit = Config::orbit().await.data_arc();
+        logging_error!(Type::Tray, self.update_icon(&orbit).await);
     }
 
     async fn create_tray_from_handle(&self, app_handle: &AppHandle) -> Result<()> {
@@ -367,22 +367,22 @@ impl Tray {
 
         logging!(info, Type::Tray, "正在从AppHandle创建系统托盘");
 
-        let verge = Config::verge().await.data_arc();
+        let orbit = Config::orbit().await.data_arc();
 
-        let icon_bytes = TrayState::get_tray_icon(&verge).await.1;
+        let icon_bytes = TrayState::get_tray_icon(&orbit).await.1;
         let icon = tauri::image::Image::from_bytes(&icon_bytes)?;
 
         #[cfg(target_os = "linux")]
         let builder = TrayIconBuilder::with_id(TRAY_ID).icon(icon).icon_as_template(false);
 
         #[cfg(any(target_os = "macos", target_os = "windows"))]
-        let show_menu_on_left_click = verge.tray_event.as_ref().is_some_and(|v| v == "tray_menu");
+        let show_menu_on_left_click = orbit.tray_event.as_ref().is_some_and(|v| v == "tray_menu");
 
         #[cfg(not(target_os = "linux"))]
         let mut builder = TrayIconBuilder::with_id(TRAY_ID).icon(icon).icon_as_template(false);
         #[cfg(target_os = "macos")]
         {
-            let is_monochrome = verge.tray_icon.as_ref().is_none_or(|v| v == "monochrome");
+            let is_monochrome = orbit.tray_icon.as_ref().is_none_or(|v| v == "monochrome");
             builder = builder.icon_as_template(is_monochrome);
         }
 
@@ -596,9 +596,9 @@ async fn create_tray_menu(
 ) -> Result<tauri::menu::Menu<Wry>> {
     let current_proxy_mode = mode.unwrap_or("");
 
-    let mut verge_settings = Config::verge().await.latest_arc();
+    let mut orbit_settings = Config::orbit().await.latest_arc();
     let fetch_proxy_groups =
-        options.include_proxy_groups && verge_settings.tray_proxy_groups_display_mode.as_deref() != Some("disable");
+        options.include_proxy_groups && orbit_settings.tray_proxy_groups_display_mode.as_deref() != Some("disable");
 
     // TODO: should update tray menu again when it was timeout error
     let (proxy_nodes_data, runtime_proxy_groups_order) = if fetch_proxy_groups {
@@ -630,10 +630,10 @@ async fn create_tray_menu(
     };
 
     if fetch_proxy_groups {
-        verge_settings = Config::verge().await.latest_arc();
+        orbit_settings = Config::orbit().await.latest_arc();
     }
 
-    let tray_proxy_groups_display_mode = verge_settings
+    let tray_proxy_groups_display_mode = orbit_settings
         .tray_proxy_groups_display_mode
         .as_deref()
         .unwrap_or("default");
@@ -641,11 +641,11 @@ async fn create_tray_menu(
 
     let proxy_group_order_map = runtime_proxy_groups_order;
 
-    let show_outbound_modes_inline = verge_settings.tray_inline_outbound_modes.unwrap_or(false);
+    let show_outbound_modes_inline = orbit_settings.tray_inline_outbound_modes.unwrap_or(false);
 
     let version = env!("CARGO_PKG_VERSION");
 
-    let hotkeys = create_hotkeys(&verge_settings.hotkeys);
+    let hotkeys = create_hotkeys(&orbit_settings.hotkeys);
 
     let profile_menu_items: Vec<CheckMenuItem<Wry>> = create_profile_menu_item(app_handle, profiles_preview)?;
 
@@ -694,9 +694,9 @@ async fn create_tray_menu(
         None
     } else {
         let current_mode_text = match current_proxy_mode {
-            "global" => clash_verge_i18n::t!("tray.global"),
-            "direct" => clash_verge_i18n::t!("tray.direct"),
-            _ => clash_verge_i18n::t!("tray.rule"),
+            "global" => clash_orbit_i18n::t!("tray.global"),
+            "direct" => clash_orbit_i18n::t!("tray.direct"),
+            _ => clash_orbit_i18n::t!("tray.rule"),
         };
         let outbound_modes_label = format!("{} ({})", texts.outbound_modes, current_mode_text);
         Some(Submenu::with_id_and_items(
@@ -800,8 +800,8 @@ async fn create_tray_menu(
 
     let app_version = &MenuItem::with_id(
         app_handle,
-        MenuIds::VERGE_VERSION,
-        format!("{} {version}", texts.verge_version),
+        MenuIds::ORBIT_VERSION,
+        format!("{} {version}", texts.orbit_version),
         true,
         None::<&str>,
     )?;
@@ -889,11 +889,11 @@ fn on_tray_icon_event(_tray_icon: &TrayIcon, tray_event: TrayIconEvent) {
         }
 
         AsyncHandler::spawn(|| async move {
-            let verge = Config::verge().await.data_arc();
-            let verge_tray_event = verge.tray_event.clone().unwrap_or_else(|| "main_window".into());
-            let verge_tray_action = TrayAction::from(verge_tray_event.as_str());
-            logging!(debug, Type::Tray, "tray event: {verge_tray_action:?}");
-            match verge_tray_action {
+            let orbit = Config::orbit().await.data_arc();
+            let orbit_tray_event = orbit.tray_event.clone().unwrap_or_else(|| "main_window".into());
+            let orbit_tray_action = TrayAction::from(orbit_tray_event.as_str());
+            logging!(debug, Type::Tray, "tray event: {orbit_tray_action:?}");
+            match orbit_tray_action {
                 TrayAction::SystemProxy => {
                     let _ = feat::toggle_system_proxy().await;
                 }
@@ -909,7 +909,7 @@ fn on_tray_icon_event(_tray_icon: &TrayIcon, tray_event: TrayIconEvent) {
                 // 左键点击事件无需额外处理
                 TrayAction::TrayMenu => {}
                 TrayAction::Unknown => {
-                    logging!(warn, Type::Tray, "invalid tray event: {}", verge_tray_event);
+                    logging!(warn, Type::Tray, "invalid tray event: {}", orbit_tray_event);
                 }
             };
         });

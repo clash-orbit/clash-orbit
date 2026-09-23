@@ -5,7 +5,7 @@ use crate::{
     utils::help::{mask_err, mask_url},
 };
 use anyhow::{Result, bail};
-use clash_verge_logging::{Type, logging, logging_error};
+use clash_orbit_logging::{Type, logging, logging_error};
 use smartstring::alias::String;
 
 /// Toggle proxy profile

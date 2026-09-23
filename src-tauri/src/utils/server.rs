@@ -6,7 +6,7 @@ use crate::{
     utils::{dirs, window_manager::WindowManager},
 };
 use anyhow::{Context as _, Result, bail};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use once_cell::sync::OnceCell;
 use parking_lot::Mutex;
 use reqwest::ClientBuilder;
@@ -39,7 +39,7 @@ static INSTANCE_LOCK: OnceCell<std::fs::File> = OnceCell::new();
 const PAC_INITIAL_AVAILABLE: bool = false;
 static PAC_AVAILABLE: AtomicBool = AtomicBool::new(PAC_INITIAL_AVAILABLE);
 static COMMANDS_READY: AtomicBool = AtomicBool::new(false);
-#[cfg(feature = "verge-dev")]
+#[cfg(feature = "orbit-dev")]
 static DEV_QUIT_REQUESTED: AtomicBool = AtomicBool::new(false);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -152,7 +152,7 @@ fn instance_auth(token: String) -> impl warp::Filter<Extract = (), Error = warp:
         .untuple_one()
 }
 
-#[cfg(feature = "verge-dev")]
+#[cfg(feature = "orbit-dev")]
 fn dev_quit_route<F>(
     token: String,
     commands_ready: &'static AtomicBool,
@@ -188,9 +188,9 @@ where
         })
 }
 
-#[cfg(feature = "verge-dev")]
-fn release_dev_quit_latch(quit_requested: &AtomicBool, outcome: clash_verge_signal::ShutdownOutcome) {
-    if matches!(outcome, clash_verge_signal::ShutdownOutcome::Canceled) {
+#[cfg(feature = "orbit-dev")]
+fn release_dev_quit_latch(quit_requested: &AtomicBool, outcome: clash_orbit_signal::ShutdownOutcome) {
+    if matches!(outcome, clash_orbit_signal::ShutdownOutcome::Canceled) {
         quit_requested.store(false, Ordering::Release);
     }
 }
@@ -199,9 +199,9 @@ fn start_embedded_server(listener: tokio::net::TcpListener, token: String) {
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
     let _ = SHUTDOWN_SENDER.set(Mutex::new(Some(shutdown_tx)));
 
-    #[cfg(feature = "verge-dev")]
+    #[cfg(feature = "orbit-dev")]
     let auth = instance_auth(token.clone());
-    #[cfg(not(feature = "verge-dev"))]
+    #[cfg(not(feature = "orbit-dev"))]
     let auth = instance_auth(token);
 
     let visible = warp::path!("commands" / "visible").and_then(|| async {
@@ -231,9 +231,9 @@ fn start_embedded_server(listener: tokio::net::TcpListener, token: String) {
                     .unwrap_or_default(),
             );
         }
-        let verge_config = Config::verge().await;
-        let verge_data = verge_config.data_arc();
-        let pac_content = verge_data.pac_file_content.as_deref().unwrap_or(DEFAULT_PAC);
+        let orbit_config = Config::orbit().await;
+        let orbit_data = orbit_config.data_arc();
+        let pac_content = orbit_data.pac_file_content.as_deref().unwrap_or(DEFAULT_PAC);
         // Served per browser request, so this stays a configuration read rather than a
         // round-trip to the Core. It reads the draft layer, which is only correct because
         // whoever stages a listener port closes this endpoint across the change — see
@@ -264,7 +264,7 @@ fn start_embedded_server(listener: tokio::net::TcpListener, token: String) {
         });
 
     let commands = auth.clone().and(visible).or(auth.and(scheme)).or(pac);
-    #[cfg(feature = "verge-dev")]
+    #[cfg(feature = "orbit-dev")]
     let commands = commands.or(dev_quit_route(token, &COMMANDS_READY, &DEV_QUIT_REQUESTED, || {
         AsyncHandler::spawn(|| async {
             release_dev_quit_latch(&DEV_QUIT_REQUESTED, crate::feat::quit().await);
@@ -446,11 +446,11 @@ mod tests {
     #[cfg(unix)]
     use super::{open_instance_lock, try_lock_instance};
 
-    #[cfg(feature = "verge-dev")]
+    #[cfg(feature = "orbit-dev")]
     use super::{INSTANCE_TOKEN_HEADER, dev_quit_route, release_dev_quit_latch};
-    #[cfg(feature = "verge-dev")]
+    #[cfg(feature = "orbit-dev")]
     use std::sync::atomic::Ordering;
-    #[cfg(feature = "verge-dev")]
+    #[cfg(feature = "orbit-dev")]
     use std::sync::{
         Arc,
         atomic::{AtomicBool, AtomicUsize},
@@ -464,7 +464,7 @@ mod tests {
         const { assert!(!PAC_INITIAL_AVAILABLE) }
     }
 
-    #[cfg(feature = "verge-dev")]
+    #[cfg(feature = "orbit-dev")]
     #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
     async fn dev_quit_route_requires_private_auth_ready_state_and_dispatches_once() -> anyhow::Result<()> {
         static READY: AtomicBool = AtomicBool::new(false);
@@ -534,7 +534,7 @@ mod tests {
         }
         assert_eq!(dispatches.load(Ordering::Acquire), 1);
 
-        release_dev_quit_latch(&REQUESTED, clash_verge_signal::ShutdownOutcome::Canceled);
+        release_dev_quit_latch(&REQUESTED, clash_orbit_signal::ShutdownOutcome::Canceled);
         assert!(!REQUESTED.load(Ordering::Acquire));
         let retry = warp::test::request()
             .method("POST")

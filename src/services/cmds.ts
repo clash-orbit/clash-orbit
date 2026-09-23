@@ -164,12 +164,12 @@ export async function getClashLogs() {
   }, [])
 }
 
-export async function getVergeConfig() {
-  return invoke<IVergeConfig>('get_verge_config')
+export async function getOrbitConfig() {
+  return invoke<IOrbitConfig>('get_orbit_config')
 }
 
-export async function patchVergeConfig(payload: IVergeConfig) {
-  return invoke<void>('patch_verge_config', { payload })
+export async function patchOrbitConfig(payload: IOrbitConfig) {
+  return invoke<void>('patch_orbit_config', { payload })
 }
 
 export async function setDnsOverride(

@@ -85,7 +85,7 @@ pub(crate) fn current_user_pipe_sddl() -> Result<String> {
 #[cfg(windows)]
 mod windows_owner {
     use anyhow::{Context as _, Result, bail};
-    use clash_verge_logging::{Type, logging};
+    use clash_orbit_logging::{Type, logging};
     use clash_verge_service_ipc::OWNER_TOKEN_FILE_NAME;
     use std::ffi::c_void;
     use std::io::{Read as _, Write as _};

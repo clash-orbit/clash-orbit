@@ -3,7 +3,7 @@ use crate::{config::Config, process::AsyncHandler, utils::dirs};
 use anyhow::Error;
 use arc_swap::{ArcSwap, ArcSwapOption};
 use backon::{ConstantBuilder, Retryable as _};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use once_cell::sync::OnceCell;
 use reqwest_dav::list_cmd::{ListEntity, ListFile, ListMultiStatus};
 use smartstring::alias::String;
@@ -79,22 +79,22 @@ impl WebDavClient {
             if let Some(cfg_arc) = existing_config.clone() {
                 (*cfg_arc).clone()
             } else {
-                let verge = Config::verge().await.data_arc();
-                if verge.webdav_url.is_none() || verge.webdav_username.is_none() || verge.webdav_password.is_none() {
+                let orbit = Config::orbit().await.data_arc();
+                if orbit.webdav_url.is_none() || orbit.webdav_username.is_none() || orbit.webdav_password.is_none() {
                     let msg: String =
                         "Unable to create web dav client, please make sure the webdav config is correct".into();
                     return Err(anyhow::Error::msg(msg));
                 }
 
                 let config = WebDavConfig {
-                    url: verge
+                    url: orbit
                         .webdav_url
                         .clone()
                         .unwrap_or_default()
                         .trim_end_matches('/')
                         .into(),
-                    username: verge.webdav_username.clone().unwrap_or_default(),
-                    password: verge.webdav_password.clone().unwrap_or_default(),
+                    username: orbit.webdav_username.clone().unwrap_or_default(),
+                    password: orbit.webdav_password.clone().unwrap_or_default(),
                 };
 
                 self.config.store(Some(Arc::new(config.clone())));
@@ -108,7 +108,7 @@ impl WebDavClient {
                     .use_rustls_tls()
                     .danger_accept_invalid_certs(true)
                     .timeout(Duration::from_secs(op.timeout()))
-                    .user_agent(format!("clash-verge/{APP_VERSION} ({OS} WebDAV-Client)"))
+                    .user_agent(format!("clash-orbit/{APP_VERSION} ({OS} WebDAV-Client)"))
                     .redirect(reqwest::redirect::Policy::custom(|attempt| {
                         if attempt.previous().len() >= 5 {
                             attempt.error("重定向次数过多")
@@ -298,15 +298,15 @@ pub async fn create_backup() -> Result<(String, PathBuf), Error> {
     zip.start_file(dirs::CLASH_CONFIG, options)?;
     zip.write_all(fs::read(dirs::clash_path()?).await?.as_slice())?;
 
-    let verge_text = fs::read_to_string(dirs::verge_path()?).await?;
-    let mut verge_config: serde_json::Value = serde_yaml_ng::from_str(&verge_text)?;
-    if let Some(obj) = verge_config.as_object_mut() {
+    let orbit_text = fs::read_to_string(dirs::orbit_path()?).await?;
+    let mut orbit_config: serde_json::Value = serde_yaml_ng::from_str(&orbit_text)?;
+    if let Some(obj) = orbit_config.as_object_mut() {
         obj.remove("webdav_username");
         obj.remove("webdav_password");
         obj.remove("webdav_url");
     }
-    zip.start_file(dirs::VERGE_CONFIG, options)?;
-    zip.write_all(serde_yaml_ng::to_string(&verge_config)?.as_bytes())?;
+    zip.start_file(dirs::ORBIT_CONFIG, options)?;
+    zip.write_all(serde_yaml_ng::to_string(&orbit_config)?.as_bytes())?;
 
     let dns_config_path = dirs::app_home_dir()?.join(DNS_CONFIG);
     if dns_config_path.exists() {

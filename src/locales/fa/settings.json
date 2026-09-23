@@ -155,7 +155,7 @@
     }
   },
   "components": {
-    "verge": {
+    "orbit": {
       "basic": {
         "title": "تنظیمات پایه Clash Orbit",
         "actions": {
@@ -204,7 +204,7 @@
           "liteModeSettings": "LightWeight Mode Settings",
           "exit": "خروج",
           "exportDiagnostics": "Export Diagnostic Info",
-          "vergeVersion": "نسخه Clash Orbit"
+          "orbitVersion": "نسخه Clash Orbit"
         }
       },
       "theme": {

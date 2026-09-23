@@ -10,8 +10,8 @@ use crate::{
     },
 };
 use anyhow::{Context as _, Result, bail};
-use clash_verge_draft::Draft;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_draft::Draft;
+use clash_orbit_logging::{Type, logging};
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 use serde_yaml_ng::Mapping;
@@ -142,7 +142,7 @@ impl IProfiles {
     }
 
     pub async fn save_file(&self) -> Result<()> {
-        help::save_yaml(&dirs::profiles_path()?, self, Some("# Profiles Config for Clash Verge")).await
+        help::save_yaml(&dirs::profiles_path()?, self, Some("# Profiles Config for Clash Orbit")).await
     }
 
     /// 只修改current，valid和chain

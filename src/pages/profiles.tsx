@@ -50,7 +50,7 @@ import {
   reorderProfile,
   updateProfile,
 } from '@/services/cmds'
-import { subscribeVergeEvents } from '@/services/events'
+import { subscribeOrbitEvents } from '@/services/events'
 import { errorDetail, showNotice } from '@/services/notice-service'
 import { revalidateQuery, useQuery } from '@/services/query-client'
 import {
@@ -534,7 +534,7 @@ const ProfilePage = () => {
 
   useEffect(
     () =>
-      subscribeVergeEvents({
+      subscribeOrbitEvents({
         'profile-update-started': ({ uid }) => {
           if (uid) setLoadingProfiles([uid], true)
         },
@@ -548,7 +548,7 @@ const ProfilePage = () => {
           })
           void mutateProfiles()
         },
-        'verge://timer-updated': (uid) => {
+        'orbit://timer-updated': (uid) => {
           setTimerUpdateRevisions((current) => {
             const next = new Map(current)
             next.set(uid, (next.get(uid) ?? 0) + 1)

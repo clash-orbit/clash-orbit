@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 
 import { BasePage } from '@/components/base'
 import SettingClash from '@/components/setting/setting-clash'
+import SettingOrbitAdvanced from '@/components/setting/setting-orbit-advanced'
+import SettingOrbitBasic from '@/components/setting/setting-orbit-basic'
 import SettingSystem from '@/components/setting/setting-system'
-import SettingVergeAdvanced from '@/components/setting/setting-verge-advanced'
-import SettingVergeBasic from '@/components/setting/setting-verge-basic'
 import { showNotice } from '@/services/notice-service'
 import { useThemeMode } from '@/services/states'
 import { openExternalUrl } from '@/utils/open-external-url'
@@ -102,7 +102,7 @@ const SettingPage = () => {
               backgroundColor: isDark ? '#282a36' : '#ffffff',
             }}
           >
-            <SettingVergeBasic onError={onError} />
+            <SettingOrbitBasic onError={onError} />
           </Box>
           <Box
             sx={{
@@ -110,7 +110,7 @@ const SettingPage = () => {
               backgroundColor: isDark ? '#282a36' : '#ffffff',
             }}
           >
-            <SettingVergeAdvanced onError={onError} />
+            <SettingOrbitAdvanced onError={onError} />
           </Box>
         </Grid>
       </Grid>

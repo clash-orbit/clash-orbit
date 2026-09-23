@@ -38,9 +38,9 @@ import { useNavigate } from 'react-router'
 import { EnhancedCard } from '@/components/home/enhanced-card'
 import type { ProxySortType } from '@/components/proxy/use-filter-sort'
 import { useGroupDelays } from '@/hooks/use-group-delays'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useProfiles } from '@/hooks/use-profiles'
 import { useProxySelection } from '@/hooks/use-proxy-selection'
-import { useVerge } from '@/hooks/use-verge'
 import {
   useAppRefreshers,
   useClashConfigData,
@@ -541,18 +541,18 @@ export const CurrentProxyCard = () => {
   const { clashConfig } = useClashConfigData()
   const { refreshProxy } = useAppRefreshers()
   const { isCoreDataPending } = useCoreDataStatus()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const { current: currentProfile } = useProfiles()
-  const autoDelayEnabled = verge?.enable_auto_delay_detection ?? false
-  const defaultLatencyTimeout = verge?.default_latency_timeout
+  const autoDelayEnabled = orbit?.enable_auto_delay_detection ?? false
+  const defaultLatencyTimeout = orbit?.default_latency_timeout
   const autoDelayIntervalMs = useMemo(() => {
-    const rawInterval = verge?.auto_delay_detection_interval_minutes
+    const rawInterval = orbit?.auto_delay_detection_interval_minutes
     const intervalMinutes =
       typeof rawInterval === 'number' && rawInterval > 0
         ? rawInterval
         : AUTO_CHECK_DEFAULT_INTERVAL_MINUTES
     return Math.max(1, Math.round(intervalMinutes)) * 60 * 1000
-  }, [verge?.auto_delay_detection_interval_minutes])
+  }, [orbit?.auto_delay_detection_interval_minutes])
   const currentProfileId = currentProfile?.uid || null
 
   const getProfileStorageKey = useCallback(
@@ -627,13 +627,13 @@ export const CurrentProxyCard = () => {
 
   const autoCheckInProgressRef = useRef(false)
   const latestTimeoutRef = useRef<number>(
-    verge?.default_latency_timeout || 10000,
+    orbit?.default_latency_timeout || 10000,
   )
   const latestProxyMemberRef = useRef<ResolvedProxyMember | null>(null)
 
   useEffect(() => {
-    latestTimeoutRef.current = verge?.default_latency_timeout || 10000
-  }, [verge?.default_latency_timeout])
+    latestTimeoutRef.current = orbit?.default_latency_timeout || 10000
+  }, [orbit?.default_latency_timeout])
 
   const selectableGroups = useMemo(() => {
     if (!proxyView) return []
@@ -884,7 +884,7 @@ export const CurrentProxyCard = () => {
 
     debugLog(`[CurrentProxyCard] 开始测试所有延迟，组: ${groupName}`)
 
-    const timeout = verge?.default_latency_timeout || 10000
+    const timeout = orbit?.default_latency_timeout || 10000
 
     const interactable = unsortedProxyOptions
       .map(({ member }) => member)

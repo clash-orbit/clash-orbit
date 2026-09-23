@@ -6,11 +6,11 @@ import {
   unfixedProxy,
 } from 'tauri-plugin-mihomo-api'
 
+import { useOrbit } from '@/hooks/use-orbit'
 import {
   useForgetSelection,
   useRecordSelection,
 } from '@/hooks/use-record-selection'
-import { useVerge } from '@/hooks/use-verge'
 import { syncTrayProxySelection } from '@/services/cmds'
 import { debugLog } from '@/utils/debug'
 
@@ -48,13 +48,13 @@ interface ProxyChangeRequest {
 export const useProxySelection = (options: ProxySelectionOptions = {}) => {
   const recordSelection = useRecordSelection()
   const forgetSelection = useForgetSelection()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const pendingRequestRef = useRef<ProxyChangeRequest | null>(null)
   const isProcessingRef = useRef(false)
 
   const { onSuccess, onError, enableConnectionCleanup = true } = options
 
-  const autoCloseConnection = verge?.auto_close_connection ?? false
+  const autoCloseConnection = orbit?.auto_close_connection ?? false
 
   // 切换节点
   const syncTraySelection = useCallback(() => {

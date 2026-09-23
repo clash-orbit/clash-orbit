@@ -1,4 +1,4 @@
-import { getVergeConfig } from './cmds'
+import { getOrbitConfig } from './cmds'
 import {
   cacheLanguage,
   getCachedLanguage,
@@ -6,7 +6,7 @@ import {
   resolveLanguage,
 } from './i18n'
 
-let vergeConfigCache: IVergeConfig | null | undefined
+let orbitConfigCache: IOrbitConfig | null | undefined
 
 const detectSystemTheme = (): 'light' | 'dark' => {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function')
@@ -16,13 +16,13 @@ const detectSystemTheme = (): 'light' | 'dark' => {
     : 'light'
 }
 
-const getThemeModeFromWindow = (): IVergeConfig['theme_mode'] | undefined => {
+const getThemeModeFromWindow = (): IOrbitConfig['theme_mode'] | undefined => {
   if (typeof window === 'undefined') return undefined
   const mode = (
     window as typeof window & {
-      __VERGE_INITIAL_THEME_MODE?: unknown
+      __ORBIT_INITIAL_THEME_MODE?: unknown
     }
-  ).__VERGE_INITIAL_THEME_MODE
+  ).__ORBIT_INITIAL_THEME_MODE
   if (mode === 'light' || mode === 'dark' || mode === 'system') {
     return mode
   }
@@ -30,50 +30,50 @@ const getThemeModeFromWindow = (): IVergeConfig['theme_mode'] | undefined => {
 }
 
 export const resolveThemeMode = (
-  vergeConfig?: IVergeConfig | null,
+  orbitConfig?: IOrbitConfig | null,
 ): 'light' | 'dark' => {
-  const initialMode = vergeConfig?.theme_mode ?? getThemeModeFromWindow()
+  const initialMode = orbitConfig?.theme_mode ?? getThemeModeFromWindow()
   if (initialMode === 'dark' || initialMode === 'light') {
     return initialMode
   }
   return detectSystemTheme()
 }
 
-export const setPreloadConfig = (config: IVergeConfig | null) => {
-  vergeConfigCache = config
+export const setPreloadConfig = (config: IOrbitConfig | null) => {
+  orbitConfigCache = config
 }
 
-export const getPreloadConfig = () => vergeConfigCache
+export const getPreloadConfig = () => orbitConfigCache
 
 const preloadConfig = async () => {
   try {
-    const config = await getVergeConfig()
+    const config = await getOrbitConfig()
     setPreloadConfig(config)
     return config
   } catch (error) {
-    console.warn('[preload.ts] Failed to read Verge config:', error)
+    console.warn('[preload.ts] Failed to read Orbit config:', error)
     setPreloadConfig(null)
     return null
   }
 }
 
 const preloadLanguage = async (
-  vergeConfig?: IVergeConfig | null,
-  loadConfig: () => Promise<IVergeConfig | null> = preloadConfig,
+  orbitConfig?: IOrbitConfig | null,
+  loadConfig: () => Promise<IOrbitConfig | null> = preloadConfig,
 ) => {
   const cachedLanguage = getCachedLanguage()
   if (cachedLanguage) {
     return cachedLanguage
   }
 
-  let resolvedConfig = vergeConfig
+  let resolvedConfig = orbitConfig
 
   if (resolvedConfig === undefined) {
     try {
       resolvedConfig = await loadConfig()
     } catch (error) {
       console.warn(
-        '[preload.ts] Failed to read language from Verge config:',
+        '[preload.ts] Failed to read language from Orbit config:',
         error,
       )
       resolvedConfig = null

@@ -15,14 +15,14 @@ use crate::config::Config;
 use crate::core::handle;
 use crate::singleton;
 use crate::utils::{dirs, help};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 
 const SYNTAX_CHECK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
 
 static LAST_VALIDATED: LazyLock<parking_lot::Mutex<Option<u64>>> = LazyLock::new(|| parking_lot::Mutex::new(None));
 
 async fn validation_fingerprint(yaml: &str) -> u64 {
-    let core = Config::verge().await.latest_arc().get_valid_clash_core();
+    let core = Config::orbit().await.latest_arc().get_valid_clash_core();
     let mut hasher = DefaultHasher::new();
     yaml.hash(&mut hasher);
     core.as_str().hash(&mut hasher);
@@ -350,7 +350,7 @@ impl CoreConfigValidator {
 
         logging!(info, Type::Validate, "开始验证配置文件: {}", config_path);
 
-        let clash_core = Config::verge().await.latest_arc().get_valid_clash_core();
+        let clash_core = Config::orbit().await.latest_arc().get_valid_clash_core();
         logging!(info, Type::Validate, "使用内核: {}", clash_core);
 
         let app_handle = handle::Handle::app_handle();

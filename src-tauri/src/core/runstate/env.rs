@@ -37,7 +37,7 @@ impl RunStateEnv for RealEnv {
             }) {
             let name = format!(
                 "{}{}",
-                crate::config::Config::verge().await.latest_arc().get_valid_clash_core(),
+                crate::config::Config::orbit().await.latest_arc().get_valid_clash_core(),
                 std::env::consts::EXE_SUFFIX
             );
             let status = clash_verge_service_ipc::inspect_installation(&[clash_verge_service_ipc::CoreRequirement {
@@ -71,7 +71,7 @@ impl RunStateEnv for RealEnv {
         // Startup may read Run State before the app handle exists; fail closed instead of panicking.
         crate::APP_HANDLE
             .get()
-            .is_some_and(tauri_plugin_clash_verge_sysinfo::is_current_app_handle_admin)
+            .is_some_and(tauri_plugin_clash_orbit_sysinfo::is_current_app_handle_admin)
     }
 
     fn set_pac_available(&self, available: bool) {
@@ -87,7 +87,7 @@ impl RunStateEnv for RealEnv {
         let Some(app_handle) = crate::APP_HANDLE.get() else {
             return;
         };
-        tauri_plugin_clash_verge_sysinfo::set_app_core_mode(app_handle, state.mode.to_string());
+        tauri_plugin_clash_orbit_sysinfo::set_app_core_mode(app_handle, state.mode.to_string());
         crate::core::handle::Handle::notify_run_state(&state.to_view());
     }
 

@@ -1,7 +1,7 @@
 use super::CmdResult;
 use crate::{
     cmd::StringifyErr as _,
-    config::{Config, IVerge},
+    config::{Config, IOrbit},
     core, feat,
 };
 use reqwest_dav::list_cmd::ListFile;
@@ -9,17 +9,17 @@ use smartstring::alias::String;
 
 #[tauri::command]
 pub async fn save_webdav_config(url: String, username: String, password: String) -> CmdResult<()> {
-    let patch = IVerge {
+    let patch = IOrbit {
         webdav_url: Some(url),
         webdav_username: Some(username),
         webdav_password: Some(password),
-        ..IVerge::default()
+        ..IOrbit::default()
     };
-    Config::verge().await.edit_draft(|e| e.patch_config(&patch));
-    Config::verge().await.apply();
+    Config::orbit().await.edit_draft(|e| e.patch_config(&patch));
+    Config::orbit().await.apply();
 
-    let verge_data = Config::verge().await.data_arc();
-    verge_data.save_file().await.stringify_err()?;
+    let orbit_data = Config::orbit().await.data_arc();
+    orbit_data.save_file().await.stringify_err()?;
     core::backup::WebDavClient::global().reset();
     Ok(())
 }

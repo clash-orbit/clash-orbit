@@ -16,7 +16,7 @@ import { log_debug, log_error, log_info, log_success } from './utils.mjs'
 /** Prepares platform resources, caching versions and unchanged files unless `--force` is used. */
 
 const cwd = process.cwd()
-const TEMP_DIR = path.join(cwd, 'node_modules/.verge')
+const TEMP_DIR = path.join(cwd, 'node_modules/.orbit')
 const FORCE = process.argv.includes('--force') || process.argv.includes('-f')
 const VERSION_CACHE_FILE = path.join(TEMP_DIR, '.version_cache.json')
 const HASH_CACHE_FILE = path.join(TEMP_DIR, '.hash_cache.json')

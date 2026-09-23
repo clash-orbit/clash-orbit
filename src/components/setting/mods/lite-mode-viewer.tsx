@@ -12,13 +12,13 @@ import { useImperativeHandle, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BaseDialog, DialogRef, Switch, TooltipIcon } from '@/components/base'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { entry_lightweight_mode } from '@/services/cmds'
 import { showNotice } from '@/services/notice-service'
 
 export function LiteModeViewer({ ref }: { ref?: Ref<DialogRef> }) {
   const { t } = useTranslation()
-  const { verge, patchVerge } = useVerge()
+  const { orbit, patchOrbit } = useOrbit()
 
   const [open, setOpen] = useState(false)
   const [values, setValues] = useState({
@@ -30,8 +30,8 @@ export function LiteModeViewer({ ref }: { ref?: Ref<DialogRef> }) {
     open: () => {
       setOpen(true)
       setValues({
-        autoEnterLiteMode: verge?.enable_auto_light_weight_mode ?? false,
-        autoEnterLiteModeDelay: verge?.auto_light_weight_minutes ?? 10,
+        autoEnterLiteMode: orbit?.enable_auto_light_weight_mode ?? false,
+        autoEnterLiteModeDelay: orbit?.auto_light_weight_minutes ?? 10,
       })
     },
     close: () => setOpen(false),
@@ -39,7 +39,7 @@ export function LiteModeViewer({ ref }: { ref?: Ref<DialogRef> }) {
 
   const onSave = useLockFn(async () => {
     try {
-      await patchVerge({
+      await patchOrbit({
         enable_auto_light_weight_mode: values.autoEnterLiteMode,
         auto_light_weight_minutes: values.autoEnterLiteModeDelay,
       })

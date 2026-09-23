@@ -3,7 +3,7 @@ use crate::core::{CoreManager, handle};
 use crate::module::lightweight;
 use crate::utils;
 use crate::utils::window_manager::WindowManager;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use parking_lot::Mutex;
 use tokio::time::Duration;
 #[cfg(target_os = "macos")]
@@ -110,7 +110,7 @@ pub async fn open_or_close_dashboard() {
     logging!(info, Type::Window, "Window toggle result: {result:?}");
 }
 
-pub async fn quit() -> clash_verge_signal::ShutdownOutcome {
+pub async fn quit() -> clash_orbit_signal::ShutdownOutcome {
     logging!(debug, Type::System, "启动退出流程");
     // 设置退出标志
     handle::Handle::global().set_is_exiting();
@@ -132,13 +132,13 @@ pub async fn quit() -> clash_verge_signal::ShutdownOutcome {
             "app_quit::core_stop_failed",
             cleanup_result.stop_error.unwrap_or_default(),
         );
-        return clash_verge_signal::ShutdownOutcome::Canceled;
+        return clash_orbit_signal::ShutdownOutcome::Canceled;
     }
 
     utils::server::shutdown_embedded_server();
     let app_handle = handle::Handle::app_handle();
     app_handle.exit(if cleanup_result.all_success { 0 } else { 1 });
-    clash_verge_signal::ShutdownOutcome::Committed
+    clash_orbit_signal::ShutdownOutcome::Committed
 }
 
 pub async fn clean_async() -> CleanupResult {
@@ -232,7 +232,7 @@ pub async fn clean_session_ending_best_effort() -> CleanupResult {
 pub async fn hide() {
     use crate::module::lightweight::add_light_weight_timer;
 
-    let enable_auto_light_weight_mode = Config::verge()
+    let enable_auto_light_weight_mode = Config::orbit()
         .await
         .data_arc()
         .enable_auto_light_weight_mode

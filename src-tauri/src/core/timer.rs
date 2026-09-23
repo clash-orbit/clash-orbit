@@ -6,7 +6,7 @@ use crate::{
     utils::resolve::is_resolve_done,
 };
 use anyhow::Result;
-use clash_verge_logging::{Type, logging, logging_error};
+use clash_orbit_logging::{Type, logging, logging_error};
 use parking_lot::{Mutex, RwLock};
 use smartstring::alias::String;
 use std::{

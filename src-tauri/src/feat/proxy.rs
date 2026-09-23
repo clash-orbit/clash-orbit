@@ -1,5 +1,5 @@
 use crate::{
-    config::{Config, IVerge, MixedPort},
+    config::{Config, IOrbit, MixedPort},
     core::{
         handle,
         notification::{self, FailedOperation},
@@ -10,14 +10,14 @@ use crate::{
         window_manager::WindowManager,
     },
 };
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use std::env;
 use tauri_plugin_clipboard_manager::ClipboardExt as _;
 
 pub async fn toggle_system_proxy() -> Option<bool> {
-    let verge = Config::verge().await;
-    let current = verge.latest_arc().enable_system_proxy.unwrap_or(false);
-    let auto_close_connection = verge.latest_arc().auto_close_connection.unwrap_or(false);
+    let orbit = Config::orbit().await;
+    let current = orbit.latest_arc().enable_system_proxy.unwrap_or(false);
+    let auto_close_connection = orbit.latest_arc().auto_close_connection.unwrap_or(false);
 
     if current
         && auto_close_connection
@@ -33,10 +33,10 @@ pub async fn toggle_system_proxy() -> Option<bool> {
     let requested = !current;
     let patch_result = notification::asking_for(
         toggle_operation(requested),
-        Box::pin(super::patch_verge(
-            &IVerge {
+        Box::pin(super::patch_orbit(
+            &IOrbit {
                 enable_system_proxy: Some(requested),
-                ..IVerge::default()
+                ..IOrbit::default()
             },
             false,
         )),
@@ -70,22 +70,22 @@ const fn toggle_operation(requested: bool) -> FailedOperation {
 }
 
 pub async fn toggle_tun_mode(not_save_file: Option<bool>) -> bool {
-    let current = Config::verge().await.latest_arc().enable_tun_mode.unwrap_or(false);
+    let current = Config::orbit().await.latest_arc().enable_tun_mode.unwrap_or(false);
     let enable = !current;
 
-    match super::patch_verge(
-        &IVerge {
+    match super::patch_orbit(
+        &IOrbit {
             enable_tun_mode: Some(enable),
-            ..IVerge::default()
+            ..IOrbit::default()
         },
         not_save_file.unwrap_or(false),
     )
     .await
     {
         Ok(_) => {
-            handle::Handle::refresh_verge();
+            handle::Handle::refresh_orbit();
             // Reconciliation may immediately disable unavailable TUN; report the resulting state.
-            Config::verge().await.latest_arc().enable_tun_mode.unwrap_or(false)
+            Config::orbit().await.latest_arc().enable_tun_mode.unwrap_or(false)
         }
         Err(err) => {
             logging!(error, Type::ProxyMode, "toggle tun mode failed: {err:#}");
@@ -96,10 +96,10 @@ pub async fn toggle_tun_mode(not_save_file: Option<bool>) -> bool {
 
 pub async fn copy_clash_env() {
     let env_ip = env::var("CLASH_VERGE_REV_IP").ok();
-    let verge_cfg = Config::verge().await.latest_arc();
+    let orbit_cfg = Config::orbit().await.latest_arc();
     let ip = env_ip
         .as_deref()
-        .unwrap_or_else(|| verge_cfg.proxy_host.as_deref().unwrap_or("127.0.0.1"));
+        .unwrap_or_else(|| orbit_cfg.proxy_host.as_deref().unwrap_or("127.0.0.1"));
 
     let app_handle = handle::Handle::app_handle();
     // Clipboard output must use the core's live port, including merge-config overrides.
@@ -119,7 +119,7 @@ pub async fn copy_clash_env() {
             "powershell"
         }
     };
-    let env_type = verge_cfg.env_type.as_deref().unwrap_or(default_env);
+    let env_type = orbit_cfg.env_type.as_deref().unwrap_or(default_env);
 
     let export_text = match env_type {
         "bash" => format!("export https_proxy={http_proxy} http_proxy={http_proxy} all_proxy={socks5_proxy}"),

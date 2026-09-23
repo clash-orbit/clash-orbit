@@ -1,5 +1,5 @@
 use anyhow::Context as _;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 #[cfg(target_os = "macos")]
 use std::path::Path;
 use std::path::PathBuf;

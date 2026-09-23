@@ -3,7 +3,7 @@ use crate::{process::AsyncHandler, utils::tmpl};
 use super::field::{use_lowercase, use_lowercase_owned};
 use anyhow::{Error, Result};
 use boa_engine::{Context, JsString, JsValue, Source, js_string, native_function::NativeFunction, property::Attribute};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use parking_lot::Mutex;
 use serde_yaml_ng::Mapping;
 use smartstring::alias::String;
@@ -81,7 +81,7 @@ fn eval_script(script: &str, config_json: &str, name: &String) -> EvalOutcome {
 
     let bail = |reason: std::string::String| (Err(reason), outputs.lock().to_vec());
 
-    let _ = context.register_global_builtin_callable("__verge_log__".into(), 2, unsafe {
+    let _ = context.register_global_builtin_callable("__orbit_log__".into(), 2, unsafe {
         NativeFunction::from_closure(move |_: &JsValue, args: &[JsValue], context: &mut Context| {
             let level = args
                 .first()
@@ -122,18 +122,18 @@ fn eval_script(script: &str, config_json: &str, name: &String) -> EvalOutcome {
 
     let _ = context.eval(Source::from_bytes(
         r#"var console = Object.freeze({
-        log(data){__verge_log__("log",JSON.stringify(data, null, 2))},
-        info(data){__verge_log__("info",JSON.stringify(data, null, 2))},
-        error(data){__verge_log__("error",JSON.stringify(data, null, 2))},
-        debug(data){__verge_log__("debug",JSON.stringify(data, null, 2))},
-        warn(data){__verge_log__("warn",JSON.stringify(data, null, 2))},
-        table(data){__verge_log__("table",JSON.stringify(data, null, 2))},
+        log(data){__orbit_log__("log",JSON.stringify(data, null, 2))},
+        info(data){__orbit_log__("info",JSON.stringify(data, null, 2))},
+        error(data){__orbit_log__("error",JSON.stringify(data, null, 2))},
+        debug(data){__orbit_log__("debug",JSON.stringify(data, null, 2))},
+        warn(data){__orbit_log__("warn",JSON.stringify(data, null, 2))},
+        table(data){__orbit_log__("table",JSON.stringify(data, null, 2))},
       });"#,
     ));
 
     // Bind the JSON instead of embedding it in program source; Boa's parser never chews it.
     if let Err(err) = context.register_global_property(
-        js_string!("__verge_config__"),
+        js_string!("__orbit_config__"),
         JsValue::from(JsString::from(config_json)),
         Attribute::all(),
     ) {
@@ -149,7 +149,7 @@ fn eval_script(script: &str, config_json: &str, name: &String) -> EvalOutcome {
     let code = format!(
         r"try{{
         {script};
-        JSON.stringify(main(JSON.parse(globalThis.__verge_config__),'{safe_name}')||'')
+        JSON.stringify(main(JSON.parse(globalThis.__orbit_config__),'{safe_name}')||'')
       }} catch(err) {{
         `__error_flag__ ${{err.toString()}}`
       }}"

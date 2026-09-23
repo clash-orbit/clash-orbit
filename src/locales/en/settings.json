@@ -155,7 +155,7 @@
     }
   },
   "components": {
-    "verge": {
+    "orbit": {
       "basic": {
         "title": "Clash Orbit Basic Setting",
         "actions": {
@@ -204,7 +204,7 @@
           "liteModeSettings": "LightWeight Mode Settings",
           "exit": "Exit",
           "exportDiagnostics": "Export Diagnostic Info",
-          "vergeVersion": "Clash Orbit Version"
+          "orbitVersion": "Clash Orbit Version"
         }
       },
       "theme": {

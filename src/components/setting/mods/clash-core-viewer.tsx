@@ -19,7 +19,7 @@ import { closeAllConnections } from 'tauri-plugin-mihomo-api'
 
 import { BaseDialog, DialogRef } from '@/components/base'
 import { useClash, useClashInfo } from '@/hooks/use-clash'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { changeClashCore, restartCore, upgradeClashCore } from '@/services/cmds'
 import { showNotice } from '@/services/notice-service'
 
@@ -39,7 +39,7 @@ const VALID_CORE = [
 export function ClashCoreViewer({ ref }: { ref?: Ref<DialogRef> }) {
   const { t } = useTranslation()
 
-  const { verge, mutateVerge } = useVerge()
+  const { orbit, mutateOrbit } = useOrbit()
   const { mutateVersion } = useClash()
   const { invalidateClashConfig } = useClashInfo()
 
@@ -53,7 +53,7 @@ export function ClashCoreViewer({ ref }: { ref?: Ref<DialogRef> }) {
     close: () => setOpen(false),
   }))
 
-  const { clash_core = 'verge-mihomo' } = verge ?? {}
+  const { clash_core = 'verge-mihomo' } = orbit ?? {}
 
   const onCoreChange = useLockFn(async (core: string) => {
     if (core === clash_core) return
@@ -69,7 +69,7 @@ export function ClashCoreViewer({ ref }: { ref?: Ref<DialogRef> }) {
         return
       }
 
-      mutateVerge()
+      mutateOrbit()
       await new Promise((resolve) => setTimeout(resolve, 500))
       invalidateClashConfig()
       mutateVersion()

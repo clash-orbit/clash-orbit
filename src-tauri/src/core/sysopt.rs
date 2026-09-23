@@ -5,7 +5,7 @@ use crate::{
     utils::server,
 };
 use anyhow::Result;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use parking_lot::RwLock;
 use scopeguard::defer;
 use smartstring::alias::String;
@@ -283,9 +283,9 @@ fn format_bypass(use_default: bool, custom_bypass: &str) -> String {
 }
 
 async fn get_bypass() -> String {
-    let verge = Config::verge().await.latest_arc();
-    let use_default = verge.use_default_bypass.unwrap_or(true);
-    let custom_bypass = verge.system_proxy_bypass.as_deref().unwrap_or("");
+    let orbit = Config::orbit().await.latest_arc();
+    let use_default = orbit.use_default_bypass.unwrap_or(true);
+    let custom_bypass = orbit.system_proxy_bypass.as_deref().unwrap_or("");
 
     format_bypass(use_default, custom_bypass)
 }
@@ -325,14 +325,14 @@ impl Sysopt {
     /// Reconcile guard state with configuration and report success.
     pub(super) async fn refresh_guard(&self) -> bool {
         logging!(info, Type::Core, "Refreshing system proxy guard...");
-        let verge = Config::verge().await.latest_arc();
+        let orbit = Config::orbit().await.latest_arc();
         let _operation = self.guard_operation_lock.lock().await;
-        if !verge.enable_system_proxy.unwrap_or_default() {
+        if !orbit.enable_system_proxy.unwrap_or_default() {
             logging!(info, Type::Core, "System proxy is disabled.");
             let _drained = self.stop_proxy_guard_locked().await;
             return true;
         }
-        if !verge.enable_proxy_guard.unwrap_or_default() {
+        if !orbit.enable_proxy_guard.unwrap_or_default() {
             logging!(info, Type::Core, "System proxy guard is disabled.");
             let _drained = self.stop_proxy_guard_locked().await;
             return true;
@@ -341,13 +341,13 @@ impl Sysopt {
             info,
             Type::Core,
             "Updating system proxy with duration: {} seconds",
-            verge.proxy_guard_duration.unwrap_or(30)
+            orbit.proxy_guard_duration.unwrap_or(30)
         );
         {
             let guard = self.access_guard();
             guard
                 .write()
-                .set_interval(Duration::from_secs(verge.proxy_guard_duration.unwrap_or(30)));
+                .set_interval(Duration::from_secs(orbit.proxy_guard_duration.unwrap_or(30)));
         }
         logging!(info, Type::Core, "Starting system proxy guard...");
         {
@@ -415,7 +415,7 @@ impl Sysopt {
     /// init the sysproxy
     pub(super) async fn update_sysproxy(&self) -> Result<()> {
         let _lock = self.update_lock.lock().await;
-        let verge = Config::verge().await.latest_arc();
+        let orbit = Config::orbit().await.latest_arc();
         // Configured, not live: this runs while the Core is being started or restarted, and
         // asking a Core that is not up yet would only fall back here anyway.
         let port = MixedPort::desired().await;
@@ -424,10 +424,10 @@ impl Sysopt {
         let bypass = get_bypass().await;
 
         let (sys_enable, pac_enable, proxy_host, proxy_guard) = (
-            verge.enable_system_proxy.unwrap_or_default(),
-            verge.proxy_auto_config.unwrap_or_default(),
-            verge.proxy_host.as_deref().unwrap_or("127.0.0.1"),
-            verge.enable_proxy_guard.unwrap_or_default(),
+            orbit.enable_system_proxy.unwrap_or_default(),
+            orbit.proxy_auto_config.unwrap_or_default(),
+            orbit.proxy_host.as_deref().unwrap_or("127.0.0.1"),
+            orbit.enable_proxy_guard.unwrap_or_default(),
         );
 
         let (sys, auto, guard_type) = {

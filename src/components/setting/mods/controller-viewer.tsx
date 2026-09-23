@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 
 import { BaseDialog, DialogRef, Switch } from '@/components/base'
 import { useClashInfo } from '@/hooks/use-clash'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { showNotice } from '@/services/notice-service'
 
 export function ControllerViewer({ ref }: { ref?: Ref<DialogRef> }) {
@@ -27,11 +27,11 @@ export function ControllerViewer({ ref }: { ref?: Ref<DialogRef> }) {
   const [isSaving, setIsSaving] = useState(false)
 
   const { clashInfo, patchInfo } = useClashInfo()
-  const { verge, patchVerge } = useVerge()
+  const { orbit, patchOrbit } = useOrbit()
   const [controller, setController] = useState(clashInfo?.server || '')
   const [secret, setSecret] = useState(clashInfo?.secret || '')
   const [enableController, setEnableController] = useState(
-    verge?.enable_external_controller ?? false,
+    orbit?.enable_external_controller ?? false,
   )
 
   // 对话框打开时初始化配置
@@ -40,7 +40,7 @@ export function ControllerViewer({ ref }: { ref?: Ref<DialogRef> }) {
       setOpen(true)
       setController(clashInfo?.server || '')
       setSecret(clashInfo?.secret || '')
-      setEnableController(verge?.enable_external_controller ?? false)
+      setEnableController(orbit?.enable_external_controller ?? false)
     },
     close: () => setOpen(false),
   }))
@@ -51,7 +51,7 @@ export function ControllerViewer({ ref }: { ref?: Ref<DialogRef> }) {
       setIsSaving(true)
 
       // 先保存 enable_external_controller 设置
-      await patchVerge({ enable_external_controller: enableController })
+      await patchOrbit({ enable_external_controller: enableController })
 
       // 如果启用了外部控制器，则保存控制器地址和密钥
       if (enableController) {

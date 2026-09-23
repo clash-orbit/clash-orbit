@@ -5,7 +5,7 @@ use crate::utils::window_manager::WindowManager;
 use crate::{config::Config, core::handle, feat, module::lightweight::entry_lightweight_mode};
 use anyhow::{Result, bail};
 use arc_swap::ArcSwap;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use smartstring::alias::String;
 use std::{
     collections::HashMap,
@@ -276,7 +276,7 @@ impl Hotkey {
                         logging!(debug, Type::Hotkey, "Executing function directly");
 
                         let is_enable_global_hotkey =
-                            Config::verge().await.data_arc().enable_global_hotkey.unwrap_or(true);
+                            Config::orbit().await.data_arc().enable_global_hotkey.unwrap_or(true);
 
                         if is_enable_global_hotkey {
                             Self::execute_function(function);
@@ -314,8 +314,8 @@ impl Hotkey {
             logging!(debug, Type::Hotkey, "skip register all hotkeys");
             return Ok(());
         }
-        let verge = Config::verge().await;
-        let enable_global_hotkey = verge.latest_arc().enable_global_hotkey.unwrap_or(true);
+        let orbit = Config::orbit().await;
+        let enable_global_hotkey = orbit.latest_arc().enable_global_hotkey.unwrap_or(true);
 
         logging!(
             debug,
@@ -325,7 +325,7 @@ impl Hotkey {
         );
 
         // Extract hotkeys data before async operations
-        let hotkeys = verge.latest_arc().hotkeys.clone();
+        let hotkeys = orbit.latest_arc().hotkeys.clone();
 
         if let Some(hotkeys) = hotkeys {
             logging!(debug, Type::Hotkey, "Has {} hotkeys need to register", hotkeys.len());

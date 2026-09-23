@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 
 import { BaseDialog, DialogRef } from '@/components/base'
 import { EditorViewer } from '@/components/profile/editor-viewer'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { defaultDarkTheme, defaultTheme } from '@/pages/_theme'
 import { showNotice } from '@/services/notice-service'
 
@@ -32,8 +32,8 @@ export function ThemeViewer(props: { ref?: React.Ref<DialogRef> }) {
   const [editorOpen, setEditorOpen] = useState(false)
   const [cssEditorValue, setCssEditorValue] = useState('')
   const [cssEditorSavedValue, setCssEditorSavedValue] = useState('')
-  const { verge, patchVerge } = useVerge()
-  const { theme_setting } = verge ?? {}
+  const { orbit, patchOrbit } = useOrbit()
+  const { theme_setting } = orbit ?? {}
   const [theme, setTheme] = useState(theme_setting || {})
   // Latest theme ref to avoid stale closures when saving CSS
   const themeRef = useRef(theme)
@@ -61,7 +61,7 @@ export function ThemeViewer(props: { ref?: React.Ref<DialogRef> }) {
 
   const onSave = useLockFn(async () => {
     try {
-      await patchVerge({ theme_setting: theme })
+      await patchOrbit({ theme_setting: theme })
       setOpen(false)
     } catch (err) {
       showNotice.error(err)
@@ -77,35 +77,35 @@ export function ThemeViewer(props: { ref?: React.Ref<DialogRef> }) {
   const fieldDefinitions: Array<{ labelKey: string; key: ThemeKey }> = useMemo(
     () => [
       {
-        labelKey: 'settings.components.verge.theme.fields.primaryColor',
+        labelKey: 'settings.components.orbit.theme.fields.primaryColor',
         key: 'primary_color',
       },
       {
-        labelKey: 'settings.components.verge.theme.fields.secondaryColor',
+        labelKey: 'settings.components.orbit.theme.fields.secondaryColor',
         key: 'secondary_color',
       },
       {
-        labelKey: 'settings.components.verge.theme.fields.primaryText',
+        labelKey: 'settings.components.orbit.theme.fields.primaryText',
         key: 'primary_text',
       },
       {
-        labelKey: 'settings.components.verge.theme.fields.secondaryText',
+        labelKey: 'settings.components.orbit.theme.fields.secondaryText',
         key: 'secondary_text',
       },
       {
-        labelKey: 'settings.components.verge.theme.fields.infoColor',
+        labelKey: 'settings.components.orbit.theme.fields.infoColor',
         key: 'info_color',
       },
       {
-        labelKey: 'settings.components.verge.theme.fields.warningColor',
+        labelKey: 'settings.components.orbit.theme.fields.warningColor',
         key: 'warning_color',
       },
       {
-        labelKey: 'settings.components.verge.theme.fields.errorColor',
+        labelKey: 'settings.components.orbit.theme.fields.errorColor',
         key: 'error_color',
       },
       {
-        labelKey: 'settings.components.verge.theme.fields.successColor',
+        labelKey: 'settings.components.orbit.theme.fields.successColor',
         key: 'success_color',
       },
     ],
@@ -145,7 +145,7 @@ export function ThemeViewer(props: { ref?: React.Ref<DialogRef> }) {
   return (
     <BaseDialog
       open={open}
-      title={t('settings.components.verge.theme.title')}
+      title={t('settings.components.orbit.theme.title')}
       okBtn={t('shared.actions.save')}
       cancelBtn={t('shared.actions.cancel')}
       contentSx={{ width: 400, maxHeight: 505, overflow: 'auto', pb: 0 }}
@@ -158,7 +158,7 @@ export function ThemeViewer(props: { ref?: React.Ref<DialogRef> }) {
 
         <Item>
           <ListItemText
-            primary={t('settings.components.verge.theme.fields.fontFamily')}
+            primary={t('settings.components.orbit.theme.fields.fontFamily')}
           />
           <TextField
             {...textProps}
@@ -169,19 +169,19 @@ export function ThemeViewer(props: { ref?: React.Ref<DialogRef> }) {
         </Item>
         <Item>
           <ListItemText
-            primary={t('settings.components.verge.theme.fields.cssInjection')}
+            primary={t('settings.components.orbit.theme.fields.cssInjection')}
           />
           <Button
             startIcon={<EditRounded />}
             variant="outlined"
             onClick={openCssEditor}
           >
-            {t('settings.components.verge.theme.actions.editCss')}
+            {t('settings.components.orbit.theme.actions.editCss')}
           </Button>
           {editorOpen && (
             <EditorViewer
               open={true}
-              title={t('settings.components.verge.theme.dialogs.editCssTitle')}
+              title={t('settings.components.orbit.theme.dialogs.editCssTitle')}
               value={cssEditorValue}
               language="css"
               path="theme-css.css"

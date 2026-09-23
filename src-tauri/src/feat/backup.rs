@@ -1,15 +1,15 @@
 use crate::{
-    config::{Config, IClashTemp, IProfiles, IVerge},
+    config::{Config, IClashTemp, IOrbit, IProfiles},
     core::{CoreManager, backup, proxy_control, proxy_control::SystemProxyStateUnknown},
     process::AsyncHandler,
     utils::{
-        dirs::{PathBufExec as _, app_home_dir, local_backup_dir, verge_path},
+        dirs::{PathBufExec as _, app_home_dir, local_backup_dir, orbit_path},
         help,
     },
 };
 use anyhow::{Result, anyhow};
 use chrono::Utc;
-use clash_verge_logging::{Type, logging, logging_error};
+use clash_orbit_logging::{Type, logging, logging_error};
 use reqwest_dav::list_cmd::ListFile;
 use serde::Serialize;
 use smartstring::alias::String;
@@ -25,13 +25,13 @@ pub struct LocalBackupFile {
 }
 
 /// Reloads restored configs into memory while preserving WebDAV credentials.
-async fn finalize_restored_verge_config(
+async fn finalize_restored_orbit_config(
     webdav_url: Option<String>,
     webdav_username: Option<String>,
     webdav_password: Option<String>,
 ) -> Result<()> {
-    // A broken restored `verge.yaml` is a restore failure, not a reason to load defaults.
-    let mut restored = help::read_yaml::<IVerge>(&verge_path()?).await?;
+    // A broken restored `orbit.yaml` is a restore failure, not a reason to load defaults.
+    let mut restored = help::read_yaml::<IOrbit>(&orbit_path()?).await?;
     restored.webdav_url = webdav_url;
     restored.webdav_username = webdav_username;
     restored.webdav_password = webdav_password;
@@ -51,14 +51,14 @@ async fn finalize_restored_verge_config(
     });
     profiles_draft.apply();
 
-    let verge_draft = Config::verge().await;
+    let orbit_draft = Config::orbit().await;
     {
         // Hold the write lock so a concurrent patch cannot stage a draft the proxy write reads.
         let _config_write = Config::lock_config_write().await;
-        verge_draft.edit_draft(|d| {
+        orbit_draft.edit_draft(|d| {
             *d = restored.clone();
         });
-        verge_draft.apply();
+        orbit_draft.apply();
 
         // Turn it off here; a failing core side effect below would otherwise skip this step.
         if !restored.enable_system_proxy.unwrap_or_default() {
@@ -78,8 +78,8 @@ async fn finalize_restored_verge_config(
     }
 
     // Run configuration side effects without rewriting the already-restored file.
-    if let Err(err) = super::patch_verge(&restored, true).await {
-        logging!(error, Type::Backup, "Failed to apply restored verge config: {err:#}");
+    if let Err(err) = super::patch_orbit(&restored, true).await {
+        logging!(error, Type::Backup, "Failed to apply restored orbit config: {err:#}");
         // Propagate unknown proxy state; ordinary side-effect failures stay logged.
         if SystemProxyStateUnknown::is_in(&err) {
             return Err(err);
@@ -133,11 +133,11 @@ pub async fn delete_webdav_backup(filename: String) -> Result<()> {
 
 #[tracing::instrument(skip_all, level = "info", fields(filename = %filename))]
 pub async fn restore_webdav_backup(filename: String) -> Result<()> {
-    let verge = Config::verge().await;
-    let verge_data = verge.latest_arc();
-    let webdav_url = verge_data.webdav_url.clone();
-    let webdav_username = verge_data.webdav_username.clone();
-    let webdav_password = verge_data.webdav_password.clone();
+    let orbit = Config::orbit().await;
+    let orbit_data = orbit.latest_arc();
+    let webdav_url = orbit_data.webdav_url.clone();
+    let webdav_username = orbit_data.webdav_username.clone();
+    let webdav_password = orbit_data.webdav_password.clone();
 
     let backup_storage_path = app_home_dir()
         .map_err(|e| anyhow::anyhow!("Failed to get app home dir: {e}"))?
@@ -160,7 +160,7 @@ pub async fn restore_webdav_backup(filename: String) -> Result<()> {
     let mut zip = zip::ZipArchive::new(file)?;
     let _profile_write = crate::config::profiles::PROFILE_WRITE_LOCK.lock().await;
     zip.extract(app_home_dir()?)?;
-    let res = finalize_restored_verge_config(webdav_url, webdav_username, webdav_password).await;
+    let res = finalize_restored_orbit_config(webdav_url, webdav_username, webdav_password).await;
     let _ = backup_storage_path.remove_if_exists().await;
     res
 }
@@ -330,12 +330,12 @@ pub async fn restore_local_backup(filename: String) -> Result<()> {
     }
 
     let (webdav_url, webdav_username, webdav_password) = {
-        let verge = Config::verge().await;
-        let verge = verge.latest_arc();
+        let orbit = Config::orbit().await;
+        let orbit = orbit.latest_arc();
         (
-            verge.webdav_url.clone(),
-            verge.webdav_username.clone(),
-            verge.webdav_password.clone(),
+            orbit.webdav_url.clone(),
+            orbit.webdav_username.clone(),
+            orbit.webdav_password.clone(),
         )
     };
 
@@ -343,7 +343,7 @@ pub async fn restore_local_backup(filename: String) -> Result<()> {
     let mut zip = zip::ZipArchive::new(file)?;
     let _profile_write = crate::config::profiles::PROFILE_WRITE_LOCK.lock().await;
     zip.extract(app_home_dir()?)?;
-    finalize_restored_verge_config(webdav_url, webdav_username, webdav_password).await?;
+    finalize_restored_orbit_config(webdav_url, webdav_username, webdav_password).await?;
     Ok(())
 }
 

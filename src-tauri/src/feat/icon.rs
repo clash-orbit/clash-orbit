@@ -2,7 +2,7 @@ use crate::{
     cmd::{CmdResult, StringifyErr as _},
     utils::dirs::{self, PathBufExec as _},
 };
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use smartstring::alias::String;
 use std::path::{Component, Path, PathBuf};
 use tokio::fs;

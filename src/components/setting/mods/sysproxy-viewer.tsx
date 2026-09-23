@@ -32,8 +32,8 @@ import {
 } from '@/components/base'
 import { EditorViewer } from '@/components/profile/editor-viewer'
 import { useDisplayedMixedPort } from '@/hooks/use-displayed-mixed-port'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useSystemProxyState } from '@/hooks/use-system-proxy-state'
-import { useVerge } from '@/hooks/use-verge'
 import { useSystemData } from '@/providers/app-data-context'
 import {
   getAutotemProxy,
@@ -41,7 +41,7 @@ import {
   getNetworkInterfacesInfo,
   getSystemHostname,
   getSystemProxy,
-  patchVergeConfig,
+  patchOrbitConfig,
 } from '@/services/cmds'
 import { showNotice } from '@/services/notice-service'
 import { debugLog } from '@/utils/debug'
@@ -106,7 +106,7 @@ export const SysproxyViewer = forwardRef<DialogRef>((props, ref) => {
   const [pacEditorValue, setPacEditorValue] = useState(DEFAULT_PAC)
   const [pacEditorSavedValue, setPacEditorSavedValue] = useState(DEFAULT_PAC)
   const [saving, setSaving] = useState(false)
-  const { verge, patchVerge, mutateVerge } = useVerge()
+  const { orbit, patchOrbit, mutateOrbit } = useOrbit()
   const [hostOptions, setHostOptions] = useState<string[]>([])
 
   const { indicator: isProxyReallyEnabled, invalidateProxyState } =
@@ -122,7 +122,7 @@ export const SysproxyViewer = forwardRef<DialogRef>((props, ref) => {
     system_proxy_bypass,
     proxy_guard_duration,
     proxy_host,
-  } = verge ?? {}
+  } = orbit ?? {}
 
   const [value, setValue] = useState({
     guard: enable_proxy_guard,
@@ -299,7 +299,7 @@ export const SysproxyViewer = forwardRef<DialogRef>((props, ref) => {
     setSaving(true)
     setOpen(false)
     setSaving(false)
-    const patch: Partial<IVergeConfig> = {}
+    const patch: Partial<IOrbitConfig> = {}
 
     if (value.guard !== enable_proxy_guard) {
       patch.enable_proxy_guard = value.guard
@@ -354,10 +354,10 @@ export const SysproxyViewer = forwardRef<DialogRef>((props, ref) => {
     Promise.resolve().then(async () => {
       try {
         if (Object.keys(patch).length > 0) {
-          mutateVerge({ ...verge, ...patch }, false)
+          mutateOrbit({ ...orbit, ...patch }, false)
         }
         if (Object.keys(patch).length > 0) {
-          await patchVerge(patch)
+          await patchOrbit(patch)
         }
         setTimeout(async () => {
           try {
@@ -374,9 +374,9 @@ export const SysproxyViewer = forwardRef<DialogRef>((props, ref) => {
                 : currentSysProxy?.enable
 
               if (isProxyActive) {
-                await patchVergeConfig({ enable_system_proxy: false })
+                await patchOrbitConfig({ enable_system_proxy: false })
                 await sleep(50)
-                await patchVergeConfig({ enable_system_proxy: true })
+                await patchOrbitConfig({ enable_system_proxy: true })
                 await invalidateProxyState()
               }
             }
@@ -386,7 +386,7 @@ export const SysproxyViewer = forwardRef<DialogRef>((props, ref) => {
         }, 50)
       } catch (err) {
         console.error('配置保存失败:', err)
-        mutateVerge()
+        mutateOrbit()
         showNotice.error(err)
       }
     })

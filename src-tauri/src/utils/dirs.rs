@@ -1,25 +1,25 @@
 use crate::core::{CoreManager, handle, manager::RunningMode};
 use anyhow::Result;
 use async_trait::async_trait;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use std::{
     fs,
     path::{Path, PathBuf},
 };
 use tauri::Manager as _;
 
-#[cfg(not(feature = "verge-dev"))]
+#[cfg(not(feature = "orbit-dev"))]
 pub static APP_ID: &str = "io.github.clash-orbit.clash-orbit";
-#[cfg(not(feature = "verge-dev"))]
+#[cfg(not(feature = "orbit-dev"))]
 pub static BACKUP_DIR: &str = "clash-orbit-backup";
 
-#[cfg(feature = "verge-dev")]
+#[cfg(feature = "orbit-dev")]
 pub static APP_ID: &str = "io.github.clash-orbit.clash-orbit.dev";
-#[cfg(feature = "verge-dev")]
+#[cfg(feature = "orbit-dev")]
 pub static BACKUP_DIR: &str = "clash-orbit-backup-dev";
 
 pub static CLASH_CONFIG: &str = "config.yaml";
-pub static VERGE_CONFIG: &str = "verge.yaml";
+pub static ORBIT_CONFIG: &str = "orbit.yaml";
 pub static PROFILE_YAML: &str = "profiles.yaml";
 /// Marks that the one-shot raise of too-short auto-update intervals has already run.
 pub static UPDATE_INTERVAL_MIGRATED: &str = ".update-interval-migrated";
@@ -102,8 +102,8 @@ pub fn clash_path() -> Result<PathBuf> {
     Ok(app_home_dir()?.join(CLASH_CONFIG))
 }
 
-pub fn verge_path() -> Result<PathBuf> {
-    Ok(app_home_dir()?.join(VERGE_CONFIG))
+pub fn orbit_path() -> Result<PathBuf> {
+    Ok(app_home_dir()?.join(ORBIT_CONFIG))
 }
 
 pub fn profiles_path() -> Result<PathBuf> {
@@ -219,9 +219,9 @@ fn sidecar_ipc_path_for(
 
     let root = std::ffi::CStr::from_bytes_until_nul(&buffer)
         .map_err(|_| anyhow::anyhow!("macOS per-user temporary directory is not NUL-terminated"))?;
-    #[cfg(feature = "verge-dev")]
+    #[cfg(feature = "orbit-dev")]
     let filename = "verge-mihomo-dev.sock";
-    #[cfg(not(feature = "verge-dev"))]
+    #[cfg(not(feature = "orbit-dev"))]
     let filename = "verge-mihomo.sock";
     let path = PathBuf::from(OsStr::from_bytes(root.to_bytes())).join(filename);
 
@@ -238,7 +238,7 @@ fn sidecar_ipc_path_for(
 
 #[cfg(windows)]
 fn sidecar_ipc_path_for(_app_root: &std::path::Path, identity: &clash_verge_service_ipc::OwnerIdentity) -> PathBuf {
-    PathBuf::from(sidecar_pipe_name(identity, cfg!(feature = "verge-dev")))
+    PathBuf::from(sidecar_pipe_name(identity, cfg!(feature = "orbit-dev")))
 }
 
 #[cfg(any(windows, test))]
@@ -284,9 +284,9 @@ mod ipc_tests {
 
         assert!(!path.starts_with(app_root));
         assert!(path.as_os_str().as_bytes().len() < 104);
-        #[cfg(feature = "verge-dev")]
+        #[cfg(feature = "orbit-dev")]
         assert_eq!(path.file_name(), Some(OsStr::new("verge-mihomo-dev.sock")));
-        #[cfg(not(feature = "verge-dev"))]
+        #[cfg(not(feature = "orbit-dev"))]
         assert_eq!(path.file_name(), Some(OsStr::new("verge-mihomo.sock")));
         assert_eq!(path, sidecar_ipc_path_for(Path::new("/different/root"), &identity)?);
         assert!(path.parent().is_some_and(Path::is_dir));
@@ -311,7 +311,7 @@ mod ipc_tests {
             path,
             Path::new(&format!(
                 r"\\.\pipe\verge-mihomo-sidecar-{}-{}",
-                if cfg!(feature = "verge-dev") { "dev" } else { "release" },
+                if cfg!(feature = "orbit-dev") { "dev" } else { "release" },
                 clash_verge_service_ipc::owner_key(&identity)
             ))
         );

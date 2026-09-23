@@ -13,7 +13,7 @@ import { useCallback, useImperativeHandle, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BaseDialog, DialogRef } from '@/components/base'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import {
   createLocalBackup,
   createWebdavBackup,
@@ -30,7 +30,7 @@ type BackupSource = 'local' | 'webdav'
 
 export function BackupViewer({ ref }: { ref?: Ref<DialogRef> }) {
   const { t } = useTranslation()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const [open, setOpen] = useState(false)
   const [busyAction, setBusyAction] = useState<BackupSource | null>(null)
   const [localImporting, setLocalImporting] = useState(false)
@@ -38,7 +38,7 @@ export function BackupViewer({ ref }: { ref?: Ref<DialogRef> }) {
   const [historySource, setHistorySource] = useState<BackupSource>('local')
   const [historyPage, setHistoryPage] = useState(0)
   const [webdavDialogOpen, setWebdavDialogOpen] = useState(false)
-  const webdavSignature = buildWebdavSignature(verge)
+  const webdavSignature = buildWebdavSignature(orbit)
 
   useImperativeHandle(ref, () => ({
     open: () => setOpen(true),

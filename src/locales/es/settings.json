@@ -155,7 +155,7 @@
     }
   },
   "components": {
-    "verge": {
+    "orbit": {
       "basic": {
         "title": "Ajustes básicos de Clash Orbit",
         "actions": {
@@ -204,7 +204,7 @@
           "liteModeSettings": "Configuración del modo ligero",
           "exit": "Salir",
           "exportDiagnostics": "Exportar información de diagnóstico",
-          "vergeVersion": "Versión de Clash Orbit"
+          "orbitVersion": "Versión de Clash Orbit"
         }
       },
       "theme": {

@@ -17,12 +17,12 @@ use crate::config::dns::{DnsOverrideState, dns_override_source};
 use crate::core::handle::Handle;
 use crate::utils::dirs;
 use crate::{
-    config::{Config, IProfiles, IVerge, PrfItem},
+    config::{Config, IOrbit, IProfiles, PrfItem},
     constants,
     utils::tmpl,
 };
 use anyhow::{Context as _, Result};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use parking_lot::Mutex;
 use serde_yaml_ng::{Mapping, Value};
 use smartstring::alias::String;
@@ -112,38 +112,38 @@ async fn get_config_values(profile_uid: &str) -> ConfigValues {
     drop(clash_arc);
     drop(clash);
 
-    let verge = Config::verge().await;
+    let orbit = Config::orbit().await;
 
-    let verge_arc = verge.latest_arc();
-    let IVerge {
+    let orbit_arc = orbit.latest_arc();
+    let IOrbit {
         ref enable_tun_mode,
         ref enable_builtin_enhanced,
-        ref verge_socks_enabled,
-        ref verge_http_enabled,
+        ref orbit_socks_enabled,
+        ref orbit_http_enabled,
         ref enable_external_controller,
         ..
-    } = **verge_arc;
+    } = **orbit_arc;
     let enable_external_controller = enable_external_controller.unwrap_or(false);
-    let dns_settings = verge_arc.dns_settings_for(profile_uid);
+    let dns_settings = orbit_arc.dns_settings_for(profile_uid);
     let dns_override_confirmation = dns_settings.confirmation;
 
     let (clash_core, enable_tun, enable_builtin, socks_enabled, http_enabled, enable_dns_settings) = (
-        Some(verge_arc.get_valid_clash_core()),
+        Some(orbit_arc.get_valid_clash_core()),
         enable_tun_mode.unwrap_or(false),
         enable_builtin_enhanced.unwrap_or(true),
-        verge_socks_enabled.unwrap_or(false),
-        verge_http_enabled.unwrap_or(false),
+        orbit_socks_enabled.unwrap_or(false),
+        orbit_http_enabled.unwrap_or(false),
         dns_settings.enabled,
     );
 
     #[cfg(not(target_os = "windows"))]
-    let redir_enabled = verge_arc.verge_redir_enabled.unwrap_or(false);
+    let redir_enabled = orbit_arc.orbit_redir_enabled.unwrap_or(false);
 
     #[cfg(target_os = "linux")]
-    let tproxy_enabled = verge_arc.verge_tproxy_enabled.unwrap_or(false);
+    let tproxy_enabled = orbit_arc.orbit_tproxy_enabled.unwrap_or(false);
 
-    drop(verge_arc);
-    drop(verge);
+    drop(orbit_arc);
+    drop(orbit);
 
     ConfigValues {
         clash_config,
@@ -464,7 +464,7 @@ fn enforce_control_plane(mut config: Mapping, snapshot: Mapping) -> Mapping {
     config
 }
 
-/// Only saved GUI fields and the verge switch override profile settings.
+/// Only saved GUI fields and the orbit switch override profile settings.
 fn gui_tun_keys(clash_config: &Mapping) -> Vec<Value> {
     let mut keys = vec![Value::from("enable")];
     if let Some(Value::Mapping(tun)) = clash_config.get("tun") {
@@ -670,8 +670,8 @@ fn apply_builtin_scripts(mut config: Mapping, clash_core: Option<String>, enable
             for item in items {
                 logging!(debug, Type::Core, "run builtin script {}", item.uid);
                 config = match item.uid.as_str() {
-                    "verge_hy_alpn" => builtin_hy_alpn(config),
-                    "verge_meta_guard" => builtin_meta_guard(config),
+                    "orbit_hy_alpn" => builtin_hy_alpn(config),
+                    "orbit_meta_guard" => builtin_meta_guard(config),
                     _ => config,
                 };
             }

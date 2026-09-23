@@ -19,7 +19,7 @@ import youtube from '@/assets/image/test/youtube.svg?raw'
 import { SortableItem } from '@/components/base'
 import { TestItem } from '@/components/test/test-item'
 import { TestViewer, type TestViewerRef } from '@/components/test/test-viewer'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 
 import { EnhancedCard } from './enhanced-card'
 
@@ -67,19 +67,19 @@ const DEFAULT_TEST_LIST = [
 
 export const TestCard = () => {
   const { t } = useTranslation()
-  const { verge, mutateVerge, patchVerge } = useVerge()
+  const { orbit, mutateOrbit, patchOrbit } = useOrbit()
   const viewerRef = useRef<TestViewerRef>(null)
 
   // 使用useMemo优化测试列表，避免每次渲染重新计算
   const testList = useMemo(() => {
-    return verge?.test_list ?? DEFAULT_TEST_LIST
-  }, [verge?.test_list])
+    return orbit?.test_list ?? DEFAULT_TEST_LIST
+  }, [orbit?.test_list])
 
   // 使用useCallback优化函数引用，避免不必要的重新渲染
   const onTestListItemChange = useCallback(
-    (uid: string, patch?: Partial<IVergeTestItem>) => {
+    (uid: string, patch?: Partial<IOrbitTestItem>) => {
       if (!patch) {
-        mutateVerge()
+        mutateOrbit()
         return
       }
 
@@ -87,18 +87,18 @@ export const TestCard = () => {
         x.uid === uid ? { ...x, ...patch } : x,
       )
 
-      mutateVerge({ ...verge, test_list: newList }, false)
+      mutateOrbit({ ...orbit, test_list: newList }, false)
     },
-    [testList, verge, mutateVerge],
+    [testList, orbit, mutateOrbit],
   )
 
   const onDeleteTestListItem = useCallback(
     (uid: string) => {
       const newList = testList.filter((x) => x.uid !== uid)
-      patchVerge({ test_list: newList })
-      mutateVerge({ ...verge, test_list: newList }, false)
+      patchOrbit({ test_list: newList })
+      mutateOrbit({ ...orbit, test_list: newList }, false)
     },
-    [testList, verge, patchVerge, mutateVerge],
+    [testList, orbit, patchOrbit, mutateOrbit],
   )
 
   const onDragEnd = useCallback(
@@ -129,10 +129,10 @@ export const TestCard = () => {
       newList.splice(newIndex, 0, removed)
 
       // 优化：先本地更新，再异步 patch，避免UI卡死
-      mutateVerge({ ...verge, test_list: newList }, false)
+      mutateOrbit({ ...orbit, test_list: newList }, false)
       const patchFn = () => {
         try {
-          patchVerge({ test_list: newList })
+          patchOrbit({ test_list: newList })
         } catch {}
       }
       if (window.requestIdleCallback) {
@@ -141,15 +141,15 @@ export const TestCard = () => {
         setTimeout(patchFn, 0)
       }
     },
-    [testList, verge, mutateVerge, patchVerge],
+    [testList, orbit, mutateOrbit, patchOrbit],
   )
 
-  // 仅在verge首次加载时初始化测试列表
+  // 仅在orbit首次加载时初始化测试列表
   useEffect(() => {
-    if (verge && !verge.test_list) {
-      patchVerge({ test_list: DEFAULT_TEST_LIST })
+    if (orbit && !orbit.test_list) {
+      patchOrbit({ test_list: DEFAULT_TEST_LIST })
     }
-  }, [verge, patchVerge])
+  }, [orbit, patchOrbit])
 
   // 使用useMemo优化UI内容，减少渲染计算
   const renderTestItems = useMemo(
@@ -178,7 +178,7 @@ export const TestCard = () => {
   )
 
   const handleTestAll = useCallback(() => {
-    emit('verge://test-all')
+    emit('orbit://test-all')
   }, [])
 
   const handleCreateTest = useCallback(() => {

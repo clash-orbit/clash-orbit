@@ -26,7 +26,7 @@ export function buildTauriInvocation(
   platform = process.platform,
 ) {
   const env = { ...environment, RUST_BACKTRACE: 'full' }
-  const features = mode === 'sidecar' ? 'verge-dev,dev-sidecar' : 'verge-dev'
+  const features = mode === 'sidecar' ? 'orbit-dev,dev-sidecar' : 'orbit-dev'
   const args = ['exec', 'tauri', 'dev', '-f', features]
   if (mode === 'trace') {
     env.RUSTFLAGS = '--cfg tokio_unstable'

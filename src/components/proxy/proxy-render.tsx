@@ -17,7 +17,7 @@ import { memo, useId, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useIconCache } from '@/hooks/use-icon-cache'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useThemeMode } from '@/services/states'
 import type { ResolvedProxyMember } from '@/types/proxy-view'
 
@@ -56,9 +56,9 @@ export const ProxyRender = memo(function ProxyRender(props: RenderProps) {
     isChainMode: _ = false,
   } = props
   const { type, group, headState, member, memberCol } = item
-  const { verge } = useVerge()
-  const enable_group_icon = verge?.enable_group_icon ?? true
-  const toolsOnLeft = verge?.proxy_group_tools_position === 'left'
+  const { orbit } = useOrbit()
+  const enable_group_icon = orbit?.enable_group_icon ?? true
+  const toolsOnLeft = orbit?.proxy_group_tools_position === 'left'
   const headerId = useId()
   const mode = useThemeMode()
   const isDark = mode === 'dark'

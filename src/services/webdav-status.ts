@@ -9,14 +9,14 @@ interface WebdavStatusCache {
 const WEBDAV_STATUS_KEY = 'webdav_status_cache'
 
 export const buildWebdavSignature = (
-  verge?: Pick<
-    IVergeConfig,
+  orbit?: Pick<
+    IOrbitConfig,
     'webdav_url' | 'webdav_username' | 'webdav_password'
   > | null,
 ) => {
-  const url = verge?.webdav_url?.trim() ?? ''
-  const username = verge?.webdav_username?.trim() ?? ''
-  const password = verge?.webdav_password ?? ''
+  const url = orbit?.webdav_url?.trim() ?? ''
+  const username = orbit?.webdav_username?.trim() ?? ''
+  const password = orbit?.webdav_password ?? ''
 
   if (!url && !username && !password) return ''
 

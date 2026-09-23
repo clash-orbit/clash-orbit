@@ -6,7 +6,7 @@ use gethostname::gethostname;
 use network_interface::NetworkInterface;
 use serde_yaml_ng::Mapping;
 use sysproxy::{Autoproxy, Sysproxy};
-use tauri_plugin_clash_verge_sysinfo;
+use tauri_plugin_clash_orbit_sysinfo;
 
 #[tauri::command]
 pub async fn get_sys_proxy() -> CmdResult<Mapping> {
@@ -63,7 +63,7 @@ pub fn get_system_hostname() -> String {
 
 #[tauri::command]
 pub fn get_network_interfaces() -> Vec<String> {
-    tauri_plugin_clash_verge_sysinfo::list_network_interfaces()
+    tauri_plugin_clash_orbit_sysinfo::list_network_interfaces()
 }
 
 #[tauri::command]

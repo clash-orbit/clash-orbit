@@ -18,9 +18,9 @@ import { useState, useMemo, memo, FC } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import ProxyControlSwitches from '@/components/shared/proxy-control-switches'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useSystemProxyState } from '@/hooks/use-system-proxy-state'
 import { useSystemState } from '@/hooks/use-system-state'
-import { useVerge } from '@/hooks/use-verge'
 import { showNotice } from '@/services/notice-service'
 
 const LOCAL_STORAGE_TAB_KEY = 'clash-verge-proxy-active-tab'
@@ -141,12 +141,12 @@ export const ProxyTunCard: FC = () => {
     () => localStorage.getItem(LOCAL_STORAGE_TAB_KEY) || 'system',
   )
 
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const { isTunModeAvailable } = useSystemState()
   // Display the observed OS state, not the requested configuration.
   const { indicator: systemProxyIndicator } = useSystemProxyState()
 
-  const { enable_tun_mode } = verge ?? {}
+  const { enable_tun_mode } = orbit ?? {}
 
   const handleError = (err: unknown) => {
     showNotice.error(err)

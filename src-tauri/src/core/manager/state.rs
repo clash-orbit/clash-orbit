@@ -9,7 +9,7 @@ use crate::{
     utils::dirs,
 };
 use anyhow::{Context as _, Result};
-use clash_verge_logging::Type;
+use clash_orbit_logging::Type;
 use log::Level;
 use std::path::Path;
 use tauri_plugin_mihomo::MihomoExt as _;
@@ -171,13 +171,13 @@ impl CoreManager {
         #[cfg(not(target_os = "windows"))]
         let config_file = Config::generate_file().await?;
         let app_handle = handle::Handle::app_handle();
-        let clash_core = Config::verge().await.latest_arc().get_valid_clash_core();
+        let clash_core = Config::orbit().await.latest_arc().get_valid_clash_core();
         let config_dir = dirs::app_home_dir()?;
         #[cfg(unix)]
         discard_unwritable_core_cache(&config_dir);
 
         #[cfg(unix)]
-        let previous_mask = unsafe { tauri_plugin_clash_verge_sysinfo::libc::umask(0o077) };
+        let previous_mask = unsafe { tauri_plugin_clash_orbit_sysinfo::libc::umask(0o077) };
         let command = app_handle
             .shell()
             .sidecar(clash_core.as_str())
@@ -231,7 +231,7 @@ impl CoreManager {
 
         #[cfg(unix)]
         unsafe {
-            tauri_plugin_clash_verge_sysinfo::libc::umask(previous_mask)
+            tauri_plugin_clash_orbit_sysinfo::libc::umask(previous_mask)
         };
 
         let pid = child.pid();
@@ -452,7 +452,7 @@ mod core_cache_tests {
     #[test]
     fn an_unwritable_cache_is_discarded() -> anyhow::Result<()> {
         // root ignores the permission bits, so the probe cannot fail there.
-        if unsafe { tauri_plugin_clash_verge_sysinfo::libc::geteuid() } == 0 {
+        if unsafe { tauri_plugin_clash_orbit_sysinfo::libc::geteuid() } == 0 {
             return Ok(());
         }
         let root = scratch("unwritable")?;

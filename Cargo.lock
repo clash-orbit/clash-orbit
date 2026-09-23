@@ -1078,7 +1078,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
-name = "clash-verge"
+name = "clash-orbit"
 version = "2.5.5"
 dependencies = [
  "aes-gcm",
@@ -1091,12 +1091,12 @@ dependencies = [
  "boa_engine",
  "bytes",
  "chrono",
- "clash-verge-draft",
- "clash-verge-i18n",
- "clash-verge-limiter",
- "clash-verge-logging",
- "clash-verge-media-unlock",
- "clash-verge-signal",
+ "clash-orbit-draft",
+ "clash-orbit-i18n",
+ "clash-orbit-limiter",
+ "clash-orbit-logging",
+ "clash-orbit-media-unlock",
+ "clash-orbit-signal",
  "clash_verge_service_ipc",
  "criterion",
  "dark-light",
@@ -1135,7 +1135,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-autostart",
- "tauri-plugin-clash-verge-sysinfo",
+ "tauri-plugin-clash-orbit-sysinfo",
  "tauri-plugin-clipboard-manager",
  "tauri-plugin-deep-link",
  "tauri-plugin-devtools",
@@ -1166,7 +1166,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "clash-verge-draft"
+name = "clash-orbit-draft"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -1176,7 +1176,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "clash-verge-i18n"
+name = "clash-orbit-i18n"
 version = "0.1.0"
 dependencies = [
  "rust-i18n",
@@ -1184,11 +1184,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "clash-verge-limiter"
+name = "clash-orbit-limiter"
 version = "0.1.0"
 
 [[package]]
-name = "clash-verge-logging"
+name = "clash-orbit-logging"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -1199,11 +1199,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "clash-verge-media-unlock"
+name = "clash-orbit-media-unlock"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "clash-verge-logging",
+ "clash-orbit-logging",
  "log",
  "reqwest 0.13.5",
  "rust_iso3166",
@@ -1213,10 +1213,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "clash-verge-signal"
+name = "clash-orbit-signal"
 version = "0.1.0"
 dependencies = [
- "clash-verge-logging",
+ "clash-orbit-logging",
  "log",
  "tokio",
 ]
@@ -7216,7 +7216,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tauri-plugin-clash-verge-sysinfo"
+name = "tauri-plugin-clash-orbit-sysinfo"
 version = "0.1.0"
 dependencies = [
  "deelevate",

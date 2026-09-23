@@ -1,4 +1,4 @@
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use serde_json::json;
@@ -13,7 +13,7 @@ use tauri::{AppHandle, Emitter as _, Manager as _, WebviewWindow};
 #[derive(Debug)]
 pub enum FrontendEvent<'a> {
     RefreshClash,
-    RefreshVerge,
+    RefreshOrbit,
     RefreshProfiles,
     RefreshProxyConfig,
     NoticeMessage {
@@ -279,19 +279,19 @@ impl NotificationSystem {
 
     fn serialize_event(event: FrontendEvent) -> (&'static str, Result<serde_json::Value, serde_json::Error>) {
         match event {
-            FrontendEvent::RefreshClash => ("verge://refresh-clash-config", Ok(json!("yes"))),
-            FrontendEvent::RefreshVerge => ("verge://refresh-verge-config", Ok(json!("yes"))),
-            FrontendEvent::RefreshProfiles => ("verge://refresh-profiles", Ok(json!("yes"))),
-            FrontendEvent::RefreshProxyConfig => ("verge://refresh-proxy-config", Ok(serde_json::Value::Null)),
+            FrontendEvent::RefreshClash => ("orbit://refresh-clash-config", Ok(json!("yes"))),
+            FrontendEvent::RefreshOrbit => ("orbit://refresh-verge-config", Ok(json!("yes"))),
+            FrontendEvent::RefreshProfiles => ("orbit://refresh-profiles", Ok(json!("yes"))),
+            FrontendEvent::RefreshProxyConfig => ("orbit://refresh-proxy-config", Ok(serde_json::Value::Null)),
             FrontendEvent::NoticeMessage { status, message } => {
-                ("verge://notice-message", serde_json::to_value((status, message)))
+                ("orbit://notice-message", serde_json::to_value((status, message)))
             }
             FrontendEvent::ProfileChanged { current_profile_id } => ("profile-changed", Ok(json!(current_profile_id))),
-            FrontendEvent::TimerUpdated { profile_index } => ("verge://timer-updated", Ok(json!(profile_index))),
+            FrontendEvent::TimerUpdated { profile_index } => ("orbit://timer-updated", Ok(json!(profile_index))),
             FrontendEvent::ProfileUpdateStarted { uid } => ("profile-update-started", Ok(json!({ "uid": uid }))),
             FrontendEvent::ProfileUpdateCompleted { uid } => ("profile-update-completed", Ok(json!({ "uid": uid }))),
-            FrontendEvent::RunStateChanged { state } => ("verge://run-state-changed", Ok(state)),
-            FrontendEvent::PendingFailuresChanged => ("verge://pending-failures-changed", Ok(serde_json::Value::Null)),
+            FrontendEvent::RunStateChanged { state } => ("orbit://run-state-changed", Ok(state)),
+            FrontendEvent::PendingFailuresChanged => ("orbit://pending-failures-changed", Ok(serde_json::Value::Null)),
             #[cfg(target_os = "linux")]
             FrontendEvent::ThemeChanged { theme } => ("tauri://theme-changed", serde_json::to_value(theme)),
         }

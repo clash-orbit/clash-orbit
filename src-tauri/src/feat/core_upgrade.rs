@@ -2,7 +2,7 @@
 //!
 //! The core replaces itself by truncating its own running executable in place, which macOS
 //! kills under Hardened Runtime and which leaves a 0-byte core behind when interrupted
-//! (clash-verge-rev#6834). Verge downloads the release itself instead, stages a verified
+//! (clash-verge-rev#6834). Orbit downloads the release itself instead, stages a verified
 //! copy beside the managed core and renames it into place: `rename` never touches the inode
 //! the running core is executing from, so no page validation can fail.
 
@@ -12,7 +12,7 @@ use crate::{
     utils::network::{NetworkManager, ProxyType},
 };
 use anyhow::{Context as _, Result, anyhow, bail};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use std::{
     env::current_exe,
     ffi::OsStr,
@@ -44,7 +44,7 @@ pub struct CoreUpgradeReport {
 
 pub async fn upgrade_core(force: bool) -> Result<CoreUpgradeReport> {
     let _serialized = UPGRADE_LOCK.lock().await;
-    let core = Config::verge().await.latest_arc().get_valid_clash_core();
+    let core = Config::orbit().await.latest_arc().get_valid_clash_core();
     tracing::Span::current().record("core", tracing::field::display(&core));
     let alpha = core.ends_with("-alpha");
     let target = managed_core_path(&core)?;

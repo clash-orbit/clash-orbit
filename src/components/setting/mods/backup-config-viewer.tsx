@@ -13,7 +13,7 @@ import { useState, useRef, memo, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { saveWebdavConfig, createWebdavBackup } from '@/services/cmds'
 import { errorDetail, showNotice } from '@/services/notice-service'
 import {
@@ -40,8 +40,8 @@ export const BackupConfigViewer = memo(
     setLoading,
   }: BackupConfigViewerProps) => {
     const { t } = useTranslation()
-    const { verge, mutateVerge } = useVerge()
-    const { webdav_url, webdav_username, webdav_password } = verge || {}
+    const { orbit, mutateOrbit } = useOrbit()
+    const { webdav_url, webdav_username, webdav_password } = orbit || {}
     const [showPassword, setShowPassword] = useState(false)
     const usernameRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
@@ -63,7 +63,7 @@ export const BackupConfigViewer = memo(
       webdav_username !== username ||
       webdav_password !== password
 
-    const webdavSignature = buildWebdavSignature(verge)
+    const webdavSignature = buildWebdavSignature(orbit)
     const webdavStatus = getWebdavStatus(webdavSignature)
     const shouldAutoInit = webdavStatus !== 'failed'
 
@@ -120,7 +120,7 @@ export const BackupConfigViewer = memo(
       try {
         setLoading(true)
         await saveWebdavConfig(trimmedUrl, trimmedUsername, data.password)
-        await mutateVerge(
+        await mutateOrbit(
           (current) =>
             current
               ? {

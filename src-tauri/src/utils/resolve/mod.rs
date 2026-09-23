@@ -17,8 +17,8 @@ use crate::{
     process::AsyncHandler,
     utils::{init, server, window_manager::WindowManager},
 };
-use clash_verge_logging::{Type, logging, logging_error};
-use clash_verge_signal;
+use clash_orbit_logging::{Type, logging, logging_error};
+use clash_orbit_signal;
 
 pub mod dns;
 mod scheme;
@@ -51,7 +51,7 @@ pub(crate) fn resolve_setup_async() {
 
 #[tracing::instrument(skip_all, level = "info")]
 async fn resolve_setup() {
-    logging!(info, Type::ClashVergeRev, "Version: {}", env!("CARGO_PKG_VERSION"));
+    logging!(info, Type::ClashOrbit, "Version: {}", env!("CARGO_PKG_VERSION"));
 
     // Migrate before windows or timers can change the loaded config.
     logging_error!(Type::Setup, init::migrate_short_update_intervals().await);
@@ -60,7 +60,7 @@ async fn resolve_setup() {
     resolve_dock_show().await;
     init_startup_script().await;
     init_service_manager().await;
-    let config_initialized = init_verge_config_before_window().await;
+    let config_initialized = init_orbit_config_before_window().await;
     init_window().await;
     feat::reconcile_startup_tun_availability().await;
     init_resources().await;
@@ -68,7 +68,7 @@ async fn resolve_setup() {
         logging!(warn, Type::Setup, "DNS config initialization failed: {}", e);
     }
     if config_initialized {
-        init_verge_config().await;
+        init_orbit_config().await;
     }
     Config::verify_config_initialization().await;
 
@@ -152,7 +152,7 @@ async fn init_timer() {
 }
 
 async fn init_hotkey() {
-    let skip_register_hotkeys = !Config::verge().await.latest_arc().enable_global_hotkey.unwrap_or(true);
+    let skip_register_hotkeys = !Config::orbit().await.latest_arc().enable_global_hotkey.unwrap_or(true);
     logging_error!(Type::Setup, Hotkey::global().init(skip_register_hotkeys).await);
 }
 
@@ -188,7 +188,7 @@ async fn init_silent_updater() {
 
 pub(crate) fn init_signal() {
     logging!(debug, Type::Setup, "Initializing signal handlers...");
-    clash_verge_signal::register(feat::quit);
+    clash_orbit_signal::register(feat::quit);
 }
 
 async fn init_work_config() {
@@ -199,11 +199,11 @@ async fn init_tray() {
     logging_error!(Type::Setup, Tray::global().init().await);
 }
 
-async fn init_verge_config() {
+async fn init_orbit_config() {
     logging_error!(Type::Setup, Config::init_runtime_config().await);
 }
 
-async fn init_verge_config_before_window() -> bool {
+async fn init_orbit_config_before_window() -> bool {
     let result = Config::init_config_before_window().await;
     let success = result.is_ok();
     logging_error!(Type::Setup, result);
@@ -231,13 +231,13 @@ async fn refresh_tray_menu() {
 }
 
 async fn init_window() {
-    let is_silent_start = Config::verge().await.data_arc().enable_silent_start.unwrap_or(false);
+    let is_silent_start = Config::orbit().await.data_arc().enable_silent_start.unwrap_or(false);
     WindowManager::create_window(!is_silent_start).await;
 }
 
 #[cfg(target_os = "macos")]
 async fn resolve_dock_show() {
-    let is_silent_start = Config::verge().await.data_arc().enable_silent_start.unwrap_or(false);
+    let is_silent_start = Config::orbit().await.data_arc().enable_silent_start.unwrap_or(false);
     if is_silent_start {
         Handle::global().set_activation_policy_accessory();
     }

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import iconDark from '@/assets/image/icon_dark.svg?react'
 import iconLight from '@/assets/image/icon_light.svg?react'
 import LogoSvg from '@/assets/image/logo.svg?react'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useNavMenuOrder } from '@/pages/_layout/hooks'
 import { navItems } from '@/pages/_navigation'
 
@@ -28,24 +28,24 @@ const SENSORS = [PointerSensor, KeyboardSensor]
 export const LayoutSidebar = (props: LayoutSidebarProps) => {
   const { isDark, isCollapsed } = props
   const { t } = useTranslation()
-  const { verge, mutateVerge, patchVerge } = useVerge()
+  const { orbit, mutateOrbit, patchOrbit } = useOrbit()
   const [menuUnlocked, setMenuUnlocked] = useState(false)
   const [menuContextPosition, setMenuContextPosition] =
     useState<MenuContextPosition | null>(null)
 
   const handleMenuOrderOptimisticUpdate = useCallback(
     (order: string[]) => {
-      mutateVerge(
+      mutateOrbit(
         (prev) => (prev ? { ...prev, menu_order: order } : prev),
         false,
       )
     },
-    [mutateVerge],
+    [mutateOrbit],
   )
 
   const handleMenuOrderPersist = useCallback(
-    (order: string[]) => patchVerge({ menu_order: order }),
-    [patchVerge],
+    (order: string[]) => patchOrbit({ menu_order: order }),
+    [patchOrbit],
   )
 
   const {
@@ -57,7 +57,7 @@ export const LayoutSidebar = (props: LayoutSidebarProps) => {
   } = useNavMenuOrder({
     enabled: menuUnlocked,
     items: navItems,
-    storedOrder: verge?.menu_order,
+    storedOrder: orbit?.menu_order,
     onOptimisticUpdate: handleMenuOrderOptimisticUpdate,
     onPersist: handleMenuOrderPersist,
   })
@@ -92,8 +92,8 @@ export const LayoutSidebar = (props: LayoutSidebarProps) => {
 
   const handleToggleNavCollapsed = useCallback(() => {
     setMenuContextPosition(null)
-    void patchVerge({ collapse_navbar: !isCollapsed })
-  }, [isCollapsed, patchVerge])
+    void patchOrbit({ collapse_navbar: !isCollapsed })
+  }, [isCollapsed, patchOrbit])
 
   // Navigation menu items
   const navMenuItems = menuOrder.map((path, index) => {

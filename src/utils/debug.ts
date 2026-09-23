@@ -2,8 +2,8 @@
  * Debug logging is enabled when:
  * - dev build (`import.meta.env.DEV`)
  * - env flag `VITE_ENABLE_DEBUG_LOGS` is truthy (1/true/yes)
- * - page sets `window.__VERGE_ENABLE_DEBUG_LOGS__ = true`
- * - localStorage item `VERGE_DEBUG_LOGS` is truthy (1/true/yes)
+ * - page sets `window.__ORBIT_ENABLE_DEBUG_LOGS__ = true`
+ * - localStorage item `ORBIT_DEBUG_LOGS` is truthy (1/true/yes)
  */
 let cachedDebugEnabled: boolean | undefined
 
@@ -17,14 +17,14 @@ const parseStringFlag = (value: unknown) => {
 
 const readGlobalFlag = (): boolean | null => {
   if (typeof window === 'undefined') return null
-  const flag = (window as any).__VERGE_ENABLE_DEBUG_LOGS__
+  const flag = (window as any).__ORBIT_ENABLE_DEBUG_LOGS__
   return typeof flag === 'boolean' ? flag : null
 }
 
 const readStoredFlag = (): boolean | null => {
   if (typeof window === 'undefined') return null
   try {
-    const stored = window.localStorage?.getItem('VERGE_DEBUG_LOGS')
+    const stored = window.localStorage?.getItem('ORBIT_DEBUG_LOGS')
     return stored ? parseStringFlag(stored) : null
   } catch {
     return null

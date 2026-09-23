@@ -37,7 +37,7 @@ export const ConfigViewer = forwardRef<DialogRef>((_, ref) => {
       open={true}
       title={
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {t('settings.components.verge.advanced.fields.runtimeConfig')}
+          {t('settings.components.orbit.advanced.fields.runtimeConfig')}
           <Chip label={t('shared.labels.readOnly')} size="small" />
         </Box>
       }

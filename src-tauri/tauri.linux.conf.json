@@ -6,20 +6,20 @@
     "linux": {
       "deb": {
         "depends": ["openssl", "libayatana-appindicator3-1"],
-        "desktopTemplate": "./packages/linux/clash-verge.desktop",
-        "provides": ["clash-verge"],
-        "conflicts": ["clash-verge"],
-        "replaces": ["clash-verge"],
+        "desktopTemplate": "./packages/linux/clash-orbit.desktop",
+        "provides": ["clash-orbit"],
+        "conflicts": ["clash-orbit"],
+        "replaces": ["clash-orbit"],
         "postInstallScript": "./packages/linux/post-install.sh",
         "preRemoveScript": "./packages/linux/pre-remove.sh"
       },
       "rpm": {
         "depends": ["openssl", "libayatana-appindicator-gtk3"],
         "recommends": ["policycoreutils", "policycoreutils-python-utils"],
-        "desktopTemplate": "./packages/linux/clash-verge.desktop",
-        "provides": ["clash-verge"],
-        "conflicts": ["clash-verge"],
-        "obsoletes": ["clash-verge"],
+        "desktopTemplate": "./packages/linux/clash-orbit.desktop",
+        "provides": ["clash-orbit"],
+        "conflicts": ["clash-orbit"],
+        "obsoletes": ["clash-orbit"],
         "postInstallScript": "./packages/linux/post-install-rpm.sh",
         "preRemoveScript": "./packages/linux/pre-remove.sh"
       }

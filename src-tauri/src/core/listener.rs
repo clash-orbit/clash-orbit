@@ -1,5 +1,5 @@
 use anyhow::{Context as _, Result, anyhow, bail};
-use clash_verge_logging::{Type as LogType, logging};
+use clash_orbit_logging::{Type as LogType, logging};
 #[cfg(target_os = "macos")]
 use network_interface::{NetworkInterface, NetworkInterfaceConfig as _};
 use serde::{Deserialize, Serialize};

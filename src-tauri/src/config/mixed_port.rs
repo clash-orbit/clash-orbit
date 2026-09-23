@@ -31,7 +31,7 @@ impl MixedPort {
 
     /// Returns the configured port. Paths staging it must close PAC until the Core catches up.
     pub async fn desired() -> u16 {
-        let selected = Config::verge().await.latest_arc().verge_mixed_port;
+        let selected = Config::orbit().await.latest_arc().orbit_mixed_port;
         // `get_mixed_port` already falls back to the default when the Merge Config is silent.
         let merged = Config::clash().await.latest_arc().get_mixed_port();
         resolve_desired(Self::session_fallback(), selected, merged)

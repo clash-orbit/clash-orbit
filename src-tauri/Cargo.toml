@@ -1,11 +1,11 @@
 [package]
-name = "clash-verge"
+name = "clash-orbit"
 version = "2.5.5"
-description = "clash verge"
+description = "Clash Orbit"
 authors = ["zzzgydi", "Tunglies", "wonfen", "MystiPanda"]
 license = "GPL-3.0-only"
 repository = "https://github.com/clash-orbit/clash-orbit.git"
-default-run = "clash-verge"
+default-run = "clash-orbit"
 build = "build.rs"
 edition = "2024"
 rust-version = "1.95"
@@ -17,11 +17,11 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
-verge-dev = ["clash-verge-logging/color", "clash_verge_service_ipc/development-channel"]
-dev-sidecar = ["verge-dev"]
+orbit-dev = ["clash-orbit-logging/color", "clash_verge_service_ipc/development-channel"]
+dev-sidecar = ["orbit-dev"]
 tauri-dev = ["dep:tauri-plugin-devtools"]
-tokio-trace = ["clash-verge-logging/tokio-trace"]
-chrome-trace = ["clash-verge-logging/chrome-trace"]
+tokio-trace = ["clash-orbit-logging/tokio-trace"]
+chrome-trace = ["clash-orbit-logging/chrome-trace"]
 clippy = ["tauri/test"]
 perf-harness = ["dep:tauri-plugin-wdio-webdriver"]
 
@@ -32,13 +32,13 @@ identifier = "io.github.clash-orbit.clash-orbit"
 tauri-build = { version = "2.6.3", features = [] }
 
 [dependencies]
-clash-verge-draft = { workspace = true }
-clash-verge-media-unlock = { workspace = true }
-clash-verge-logging = { workspace = true }
-clash-verge-signal = { workspace = true }
-clash-verge-i18n = { workspace = true }
-clash-verge-limiter = { workspace = true }
-tauri-plugin-clash-verge-sysinfo = { workspace = true }
+clash-orbit-draft = { workspace = true }
+clash-orbit-media-unlock = { workspace = true }
+clash-orbit-logging = { workspace = true }
+clash-orbit-signal = { workspace = true }
+clash-orbit-i18n = { workspace = true }
+clash-orbit-limiter = { workspace = true }
+tauri-plugin-clash-orbit-sysinfo = { workspace = true }
 tauri-plugin-clipboard-manager = { workspace = true }
 tauri = { workspace = true, features = [
   "protocol-asset",

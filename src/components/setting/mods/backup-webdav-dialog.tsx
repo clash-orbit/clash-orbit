@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BaseDialog, BaseLoadingOverlay } from '@/components/base'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { listWebDavBackup } from '@/services/cmds'
 import { errorDetail, showNotice } from '@/services/notice-service'
 import { buildWebdavSignature, setWebdavStatus } from '@/services/webdav-status'
@@ -24,9 +24,9 @@ export const BackupWebdavDialog = ({
   setBusy,
 }: BackupWebdavDialogProps) => {
   const { t } = useTranslation()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const [loading, setLoading] = useState(false)
-  const webdavSignature = buildWebdavSignature(verge)
+  const webdavSignature = buildWebdavSignature(orbit)
 
   const handleLoading = useCallback(
     (value: boolean) => {

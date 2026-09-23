@@ -18,8 +18,8 @@ use crate::{
     process::AsyncHandler,
 };
 use anyhow::{Context as _, Result, anyhow, bail};
-use clash_verge_draft::Draft;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_draft::Draft;
+use clash_orbit_logging::{Type, logging};
 use clash_verge_service_ipc::{
     MacosProxyConfig, OwnerCredentials, OwnerSessionProof, ProtocolInfo, ProxyApplyOutcome, RuntimeBundle,
     RuntimeFileOutcome, RuntimeFileRequest, ServiceErrorCode, StageRuntimeOutcome, StartClashRequest, WriterConfig,
@@ -209,10 +209,10 @@ fn macos_service_install_markers() -> Vec<String> {
             "/Library/PrivilegedHelperTools/{}.bundle",
             clash_verge_service_ipc::MACOS_SERVICE_ID
         ),
-        #[cfg(not(feature = "verge-dev"))]
-        "/Library/LaunchDaemons/io.github.clashverge.helper.plist".to_owned(),
-        #[cfg(not(feature = "verge-dev"))]
-        "/Library/PrivilegedHelperTools/io.github.clashverge.helper".to_owned(),
+        #[cfg(not(feature = "orbit-dev"))]
+        "/Library/LaunchDaemons/io.github.clashORBIT.helper.plist".to_owned(),
+        #[cfg(not(feature = "orbit-dev"))]
+        "/Library/PrivilegedHelperTools/io.github.clashORBIT.helper".to_owned(),
     ]
 }
 
@@ -275,10 +275,10 @@ pub(crate) fn trusted_service_evidence() -> Result<bool> {
 /// Stateless legacy façade over [`RUN_STATE`] retained for existing call sites.
 pub struct ServiceManager;
 
-#[cfg(any(all(target_os = "macos", feature = "verge-dev"), test))]
+#[cfg(any(all(target_os = "macos", feature = "orbit-dev"), test))]
 static SERVICE_CORE_STAGING_GENERATION: AtomicU64 = AtomicU64::new(0);
 
-#[cfg(any(all(target_os = "macos", feature = "verge-dev"), test))]
+#[cfg(any(all(target_os = "macos", feature = "orbit-dev"), test))]
 fn create_service_core_staging_file(directory: &Path, core_name: &std::ffi::OsStr) -> Result<(PathBuf, std::fs::File)> {
     for _ in 0..32 {
         let generation = SERVICE_CORE_STAGING_GENERATION.fetch_add(1, Ordering::Relaxed);
@@ -312,7 +312,7 @@ fn create_service_core_staging_file(directory: &Path, core_name: &std::ffi::OsSt
     )
 }
 
-#[cfg(any(all(target_os = "macos", feature = "verge-dev"), test))]
+#[cfg(any(all(target_os = "macos", feature = "orbit-dev"), test))]
 fn service_core_path_for(source: &Path, home: Option<&Path>, stage_for_macos_dev: bool) -> Result<PathBuf> {
     service_core_path_for_with_publisher(
         source,
@@ -331,7 +331,7 @@ fn service_core_path_for(source: &Path, home: Option<&Path>, stage_for_macos_dev
     )
 }
 
-#[cfg(any(all(target_os = "macos", feature = "verge-dev"), all(test, unix)))]
+#[cfg(any(all(target_os = "macos", feature = "orbit-dev"), all(test, unix)))]
 fn service_tool_path_for(source: &Path, home: Option<&Path>, stage_for_macos_dev: bool) -> Result<PathBuf> {
     service_core_path_for_with_publisher(
         source,
@@ -350,7 +350,7 @@ fn service_tool_path_for(source: &Path, home: Option<&Path>, stage_for_macos_dev
     )
 }
 
-#[cfg(any(all(target_os = "macos", feature = "verge-dev"), test))]
+#[cfg(any(all(target_os = "macos", feature = "orbit-dev"), test))]
 #[cfg_attr(not(unix), allow(unreachable_code, unused_assignments, unused_variables))]
 fn service_core_path_for_with_publisher<F>(
     source: &Path,
@@ -449,9 +449,9 @@ where
 }
 
 #[cfg(target_os = "macos")]
-#[cfg_attr(not(feature = "verge-dev"), allow(clippy::unnecessary_wraps))]
+#[cfg_attr(not(feature = "orbit-dev"), allow(clippy::unnecessary_wraps))]
 fn macos_service_tool_path(source: &Path) -> Result<PathBuf> {
-    #[cfg(feature = "verge-dev")]
+    #[cfg(feature = "orbit-dev")]
     {
         let home = std::env::var_os("HOME")
             .filter(|value| !value.is_empty())
@@ -459,7 +459,7 @@ fn macos_service_tool_path(source: &Path) -> Result<PathBuf> {
         service_tool_path_for(source, home.as_deref(), true)
     }
 
-    #[cfg(not(feature = "verge-dev"))]
+    #[cfg(not(feature = "orbit-dev"))]
     Ok(source.to_path_buf())
 }
 
@@ -472,7 +472,7 @@ fn service_core_path(clash_core: &str, bin_ext: &str) -> Result<PathBuf> {
         })?
         .with_file_name(format!("{clash_core}{bin_ext}"));
 
-    #[cfg(all(target_os = "macos", feature = "verge-dev"))]
+    #[cfg(all(target_os = "macos", feature = "orbit-dev"))]
     {
         let home = std::env::var_os("HOME")
             .filter(|value| !value.is_empty())
@@ -480,7 +480,7 @@ fn service_core_path(clash_core: &str, bin_ext: &str) -> Result<PathBuf> {
         service_core_path_for(&sibling, home.as_deref(), true)
     }
 
-    #[cfg(not(all(target_os = "macos", feature = "verge-dev")))]
+    #[cfg(not(all(target_os = "macos", feature = "orbit-dev")))]
     Ok(sibling)
 }
 
@@ -495,19 +495,19 @@ fn shell_single_quote(value: &str) -> String {
 }
 
 fn packaged_service_tool_path(file_name: &str, packaged_path: impl FnOnce() -> Result<PathBuf>) -> Result<PathBuf> {
-    #[cfg(feature = "verge-dev")]
+    #[cfg(feature = "orbit-dev")]
     {
         drop(packaged_path);
-        let directory = std::env::var_os("CLASH_VERGE_DEV_SERVICE_DIR")
-            .context("CLASH_VERGE_DEV_SERVICE_DIR is missing from the development session")?;
+        let directory = std::env::var_os("CLASH_ORBIT_DEV_SERVICE_DIR")
+            .context("CLASH_ORBIT_DEV_SERVICE_DIR is missing from the development session")?;
         let directory = PathBuf::from(directory);
         if !directory.is_absolute() {
-            bail!("CLASH_VERGE_DEV_SERVICE_DIR must be an absolute path");
+            bail!("CLASH_ORBIT_DEV_SERVICE_DIR must be an absolute path");
         }
         Ok(directory.join(file_name))
     }
 
-    #[cfg(not(feature = "verge-dev"))]
+    #[cfg(not(feature = "orbit-dev"))]
     {
         let _ = file_name;
         packaged_path()
@@ -601,7 +601,7 @@ fn uninstall_service() -> Result<()> {
 #[cfg(target_os = "linux")]
 fn linux_running_as_root() -> bool {
     use crate::core::handle;
-    use tauri_plugin_clash_verge_sysinfo::is_current_app_handle_admin;
+    use tauri_plugin_clash_orbit_sysinfo::is_current_app_handle_admin;
     let app_handle = handle::Handle::app_handle();
     is_current_app_handle_admin(app_handle)
 }
@@ -621,9 +621,9 @@ fn uninstall_service() -> Result<()> {
     let uninstall_path = macos_service_tool_path(&uninstall_path)?;
     let uninstall_shell: String = uninstall_path.to_string_lossy().into_owned();
 
-    // clash_verge_i18n::sync_locale(Config::verge().await.latest_arc().language.as_deref());
+    // clash_orbit_i18n::sync_locale(Config::orbit().await.latest_arc().language.as_deref());
 
-    let prompt = clash_verge_i18n::t!("service.adminUninstallPrompt");
+    let prompt = clash_orbit_i18n::t!("service.adminUninstallPrompt");
     let uninstall_quoted = shell_single_quote(&uninstall_shell);
     let shell = format!("cd /; {uninstall_quoted}");
     let shell = escape_osascript_double_quoted_string(&shell);
@@ -645,7 +645,7 @@ fn uninstall_service() -> Result<()> {
 
 fn install_service() -> Result<()> {
     let executable = current_exe()?;
-    let cores = crate::config::IVerge::VALID_CLASH_CORES
+    let cores = crate::config::IOrbit::VALID_CLASH_CORES
         .iter()
         .map(|core| {
             let name = format!("{core}{}", std::env::consts::EXE_SUFFIX);
@@ -668,7 +668,7 @@ fn invoke_service_install(cores: &[clash_verge_service_ipc::management::CoreSour
         Ok(executable.with_file_name(&name))
     })?;
     #[cfg(unix)]
-    let gid = Some(tauri_plugin_clash_verge_sysinfo::current_gid());
+    let gid = Some(tauri_plugin_clash_orbit_sysinfo::current_gid());
     #[cfg(windows)]
     let gid = None;
     clash_verge_service_ipc::management::install(
@@ -676,7 +676,7 @@ fn invoke_service_install(cores: &[clash_verge_service_ipc::management::CoreSour
         cores,
         core_only,
         gid,
-        &clash_verge_i18n::t!("service.adminInstallPrompt"),
+        &clash_orbit_i18n::t!("service.adminInstallPrompt"),
     )
 }
 
@@ -731,9 +731,9 @@ pub(crate) fn run_privileged_service_action(action: PendingAction) -> Result<()>
 
 /// Builds the same runtime bundle description for both service start and staging.
 async fn collect_service_runtime_bundle(config_file: &Path) -> Result<RuntimeBundle> {
-    let verge_config = Config::verge().await;
-    let clash_core = verge_config.latest_arc().get_valid_clash_core();
-    drop(verge_config);
+    let orbit_config = Config::orbit().await;
+    let clash_core = orbit_config.latest_arc().get_valid_clash_core();
+    drop(orbit_config);
 
     let bin_ext = if cfg!(windows) { ".exe" } else { "" };
     let bin_path = service_core_path(&clash_core, bin_ext)?;
@@ -761,7 +761,7 @@ pub(super) async fn stage_runtime_by_service(config_file: &Path) -> Result<Stage
 
     let response = clash_verge_service_ipc::stage_runtime(&credentials, &session, &runtime)
         .await
-        .context("无法连接到Clash Verge Service")?;
+        .context("无法连接到系统服务")?;
     if response.code > 0 {
         return Ok(StageRequest::Refused {
             code: response.code,
@@ -771,7 +771,7 @@ pub(super) async fn stage_runtime_by_service(config_file: &Path) -> Result<Stage
     response
         .data
         .map(StageRequest::Answered)
-        .context("Clash Verge Service 未返回运行时暂存结果")
+        .context("系统服务未返回运行时暂存结果")
 }
 
 #[derive(Debug)]
@@ -822,7 +822,7 @@ pub(super) async fn start_with_existing_service(config_file: &Path) -> Result<()
         Err(error) => {
             tracing::Span::current().record("outcome", "ipc-unreachable");
             start_owner_monitor();
-            return Err(error).context("无法连接到Clash Verge Service");
+            return Err(error).context("无法连接到系统服务");
         }
     };
 
@@ -853,7 +853,7 @@ pub(super) async fn start_with_existing_service(config_file: &Path) -> Result<()
         ));
     }
 
-    let result = response.data.context("Clash Verge Service 未返回会话信息")?;
+    let result = response.data.context("系统服务未返回会话信息")?;
     tracing::Span::current().record("generation", result.session.generation);
     let capabilities = probe_service_capabilities().await;
     tracing::Span::current().record("staging", capabilities.runtime_staging);
@@ -909,7 +909,7 @@ pub(super) async fn get_clash_logs_by_service() -> Result<Vec<String>> {
         clash_verge_service_ipc::get_clash_logs(&credentials)
     })
     .await;
-    let response = response.context("无法连接到Clash Verge Service")?;
+    let response = response.context("无法连接到系统服务")?;
 
     if response.code > 0 {
         if response.code == clash_verge_service_ipc::ServiceErrorCode::NotActive as u16 {
@@ -928,7 +928,7 @@ pub(crate) async fn get_clash_log_snapshot_by_service() -> Result<String> {
         clash_verge_service_ipc::get_clash_log_snapshot(&credentials)
     })
     .await;
-    let response = response.context("无法连接到Clash Verge Service")?;
+    let response = response.context("无法连接到系统服务")?;
     if response.code > 0 {
         if response.code == clash_verge_service_ipc::ServiceErrorCode::NotActive as u16 {
             recover_after_owner_loss(generation, OwnerRecoveryReason::Displaced).await;
@@ -1230,7 +1230,7 @@ async fn read_chunk(
     };
     let response = clash_verge_service_ipc::read_runtime_file(credentials, session, &request)
         .await
-        .context("无法连接到Clash Verge Service")?;
+        .context("无法连接到系统服务")?;
     if response.code == ServiceErrorCode::NotActive as u16
         || response.code == ServiceErrorCode::StaleOwnerSession as u16
     {
@@ -1381,7 +1381,7 @@ pub(super) async fn stop_core_by_service() -> Result<()> {
         Ok(response) => response,
         Err(error) => {
             start_owner_monitor();
-            return Err(error).context("无法连接到Clash Verge Service");
+            return Err(error).context("无法连接到系统服务");
         }
     };
 
@@ -1419,7 +1419,7 @@ pub(crate) async fn update_writer_by_service(writer: &WriterConfig) -> Result<()
     let session = active_service_session()?;
     let response = clash_verge_service_ipc::update_writer(&credentials, &session, writer)
         .await
-        .context("无法连接到Clash Verge Service")?;
+        .context("无法连接到系统服务")?;
     if response.code > 0 {
         logging!(
             warn,
@@ -1445,7 +1445,7 @@ pub(super) async fn set_system_proxy_by_service_with_session(
     let credentials = current_owner_credentials()?;
     let response = clash_verge_service_ipc::set_system_proxy(&credentials, session, proxy)
         .await
-        .context("无法连接到Clash Verge Service")?;
+        .context("无法连接到系统服务")?;
     if response.code > 0 {
         logging!(
             warn,
@@ -1456,7 +1456,7 @@ pub(super) async fn set_system_proxy_by_service_with_session(
         );
         bail!(response.message);
     }
-    response.data.context("Clash Verge Service 未返回系统代理结果")
+    response.data.context("系统服务未返回系统代理结果")
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -2295,7 +2295,7 @@ mod tests {
         assert!(
             !super::macos_service_install_markers()
                 .iter()
-                .any(|marker| marker == "/tmp/verge/clash-verge-service.sock")
+                .any(|marker| marker == "/tmp/orbit/clash-verge-service.sock")
         );
     }
 

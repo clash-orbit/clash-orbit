@@ -15,7 +15,7 @@ import {
   WindowResizeHandles,
 } from '@/components/layout/window-controller'
 import { useI18n } from '@/hooks/use-i18n'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useWindowDecorations } from '@/hooks/use-window'
 import { useThemeMode } from '@/services/states'
 import getSystem from '@/utils/get-system'
@@ -40,9 +40,9 @@ const Layout = () => {
   const isDark = mode !== 'light'
   const { t } = useTranslation()
   const { theme } = useCustomTheme()
-  const { verge } = useVerge()
-  const { language } = verge ?? {}
-  const navCollapsed = verge?.collapse_navbar ?? false
+  const { orbit } = useOrbit()
+  const { language } = orbit ?? {}
+  const navCollapsed = orbit?.collapse_navbar ?? false
   const { switchLanguage } = useI18n()
   const navigate = useNavigate()
   const themeReady = useMemo(() => Boolean(theme), [theme])
@@ -107,7 +107,7 @@ const Layout = () => {
   return (
     <ThemeProvider theme={theme}>
       {/* 左侧底部窗口控制按钮 */}
-      <NoticeManager position={verge?.notice_position} />
+      <NoticeManager position={orbit?.notice_position} />
       <ServiceMigrationDialog />
       <SysproxyPrivilegeDialog />
       <div

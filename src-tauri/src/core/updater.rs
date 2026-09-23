@@ -1,7 +1,7 @@
 use crate::{config::Config, singleton, utils::dirs};
 use anyhow::{Context as _, Result};
 use chrono::Utc;
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -203,8 +203,8 @@ impl SilentUpdater {
         let updater_builder = app_handle.updater_builder();
         #[cfg(target_os = "windows")]
         let updater_builder = {
-            let verge_lang = Config::verge().await.latest_arc().language.clone();
-            let lang_id = nsis_language_id(&clash_verge_i18n::current_language(verge_lang.as_deref()));
+            let orbit_lang = Config::orbit().await.latest_arc().language.clone();
+            let lang_id = nsis_language_id(&clash_orbit_i18n::current_language(orbit_lang.as_deref()));
             updater_builder.installer_arg(format!("/LANG={lang_id}"))
         };
         let update = match updater_builder.build() {
@@ -307,10 +307,10 @@ impl SilentUpdater {
     async fn ask_user_to_install(app_handle: &tauri::AppHandle, version: &str) -> bool {
         use tauri_plugin_dialog::{DialogExt as _, MessageDialogButtons, MessageDialogKind};
 
-        let title = clash_verge_i18n::t!("notifications.updateReady.title");
-        let body = clash_verge_i18n::t!("notifications.updateReady.body").replace("{version}", version);
-        let install_now = clash_verge_i18n::t!("notifications.updateReady.installNow").into_owned();
-        let later = clash_verge_i18n::t!("notifications.updateReady.later").into_owned();
+        let title = clash_orbit_i18n::t!("notifications.updateReady.title");
+        let body = clash_orbit_i18n::t!("notifications.updateReady.body").replace("{version}", version);
+        let install_now = clash_orbit_i18n::t!("notifications.updateReady.installNow").into_owned();
+        let later = clash_orbit_i18n::t!("notifications.updateReady.later").into_owned();
 
         let (tx, rx) = tokio::sync::oneshot::channel();
 
@@ -334,7 +334,7 @@ impl SilentUpdater {
         use tauri::{WebviewUrl, WebviewWindowBuilder};
 
         let window = match WebviewWindowBuilder::new(app_handle, "update-splash", WebviewUrl::App("index.html".into()))
-            .title("Clash Verge - Updating")
+            .title("Clash Orbit - Updating")
             .inner_size(300.0, 180.0)
             .resizable(false)
             .maximizable(false)
@@ -410,7 +410,7 @@ impl SilentUpdater {
 
 impl SilentUpdater {
     async fn check_and_download(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        let auto_check = Config::verge().await.latest_arc().auto_check_update.unwrap_or(true);
+        let auto_check = Config::orbit().await.latest_arc().auto_check_update.unwrap_or(true);
         if !auto_check {
             logging!(debug, Type::System, "Silent update skipped: auto_check_update is false");
             return Ok(());

@@ -15,8 +15,8 @@ use crate::{
     feat,
     utils::{dirs, help},
 };
-use clash_verge_draft::{Draft, SharedDraft};
-use clash_verge_logging::{Type, logging, logging_error};
+use clash_orbit_draft::{Draft, SharedDraft};
+use clash_orbit_logging::{Type, logging, logging_error};
 use scopeguard::defer;
 use smartstring::alias::String;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -454,7 +454,7 @@ mod tests {
     use super::{commit_current_profile, run_profile_config_update_transition};
     use crate::config::{IProfiles, PrfItem};
     use crate::core::validate::ValidationOutcome;
-    use clash_verge_draft::Draft;
+    use clash_orbit_draft::Draft;
     use std::{
         sync::{
             Arc,

@@ -34,8 +34,8 @@ import {
   Switch,
 } from '@/components/base'
 import { useClash } from '@/hooks/use-clash'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useProfiles } from '@/hooks/use-profiles'
-import { useVerge } from '@/hooks/use-verge'
 import { showNotice } from '@/services/notice-service'
 import { useThemeMode } from '@/services/states'
 import type { MonacoEditorInstance } from '@/types/monaco'
@@ -187,11 +187,11 @@ const DEFAULT_DNS_CONFIG = {
 export function DnsViewer({ ref }: { ref?: Ref<DialogRef> }) {
   const { t } = useTranslation()
   const { mutateClash } = useClash()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const { current: currentProfile } = useProfiles()
   const dnsEnabled = currentProfile
-    ? (verge?.profile_dns_settings?.[currentProfile.uid]?.enabled ??
-      verge?.enable_dns_settings ??
+    ? (orbit?.profile_dns_settings?.[currentProfile.uid]?.enabled ??
+      orbit?.enable_dns_settings ??
       false)
     : false
   const themeMode = useThemeMode()

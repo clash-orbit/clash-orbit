@@ -24,7 +24,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BaseDialog, BaseLoadingOverlay } from '@/components/base'
-import { useVerge } from '@/hooks/use-verge'
+import { useOrbit } from '@/hooks/use-orbit'
 import {
   deleteLocalBackup,
   deleteWebdavBackup,
@@ -81,7 +81,7 @@ export const BackupHistoryViewer = ({
   onClose,
 }: BackupHistoryViewerProps) => {
   const { t } = useTranslation()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const [rows, setRows] = useState<BackupRow[]>([])
   const [loading, setLoading] = useState(false)
   const [isRestoring, setIsRestoring] = useState(false)
@@ -91,9 +91,9 @@ export const BackupHistoryViewer = ({
     useState<PendingConfirmation>(null)
   const isLocal = source === 'local'
   const isWebDavConfigured = Boolean(
-    verge?.webdav_url && verge?.webdav_username && verge?.webdav_password,
+    orbit?.webdav_url && orbit?.webdav_username && orbit?.webdav_password,
   )
-  const webdavSignature = buildWebdavSignature(verge)
+  const webdavSignature = buildWebdavSignature(orbit)
   const webdavStatus = getWebdavStatus(webdavSignature)
   const shouldSkipWebDav = !isLocal && !isWebDavConfigured
   const pageSize = 8

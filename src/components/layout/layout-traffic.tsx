@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next'
 
 import { LightweightTrafficErrorBoundary } from '@/components/shared/traffic-error-boundary'
 import { useMemoryData } from '@/hooks/use-memory-data'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useTrafficData } from '@/hooks/use-traffic-data'
-import { useVerge } from '@/hooks/use-verge'
 import { useVisibility } from '@/hooks/use-visibility'
 import parseTraffic from '@/utils/parse-traffic'
 
@@ -19,10 +19,10 @@ import { TrafficGraph, type TrafficRef } from './traffic-graph'
 
 export const LayoutTraffic = () => {
   const { t } = useTranslation()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
 
-  const trafficGraph = verge?.traffic_graph ?? true
-  const displayMemory = verge?.enable_memory_usage ?? true
+  const trafficGraph = orbit?.traffic_graph ?? true
+  const displayMemory = orbit?.enable_memory_usage ?? true
 
   const trafficRef = useRef<TrafficRef>(null)
   const pageVisible = useVisibility()

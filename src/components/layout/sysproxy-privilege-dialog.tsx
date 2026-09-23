@@ -7,7 +7,7 @@ import { useDialogFailure } from '@/pages/_layout/hooks'
 import {
   getRuntimeState,
   installService,
-  patchVergeConfig,
+  patchOrbitConfig,
   reinstallService,
   restartCore,
   type FailedOperation,
@@ -50,7 +50,7 @@ const TITLE = {
 
 const stateToRestore = (
   operation: FailedOperation,
-): Partial<IVergeConfig> | undefined => {
+): Partial<IOrbitConfig> | undefined => {
   switch (operation) {
     case 'systemProxyEnable':
       return { enable_system_proxy: true }
@@ -120,7 +120,7 @@ export const SysproxyPrivilegeDialog = () => {
       if (runState.mode === 'Service' || usingAdminFallback) {
         if (restoring !== undefined) {
           setStep('applying')
-          await patchVergeConfig(restoring)
+          await patchOrbitConfig(restoring)
         }
         if (!usingAdminFallback) {
           showNotice.success(

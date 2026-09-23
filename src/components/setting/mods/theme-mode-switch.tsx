@@ -1,7 +1,7 @@
 import { Button, ButtonGroup } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-type ThemeValue = IVergeConfig['theme_mode']
+type ThemeValue = IOrbitConfig['theme_mode']
 
 interface Props {
   value?: ThemeValue

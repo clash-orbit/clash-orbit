@@ -32,8 +32,8 @@ import { EnhancedCard } from '@/components/home/enhanced-card'
 import { EnhancedTrafficStats } from '@/components/home/enhanced-traffic-stats'
 import { HomeProfileCard } from '@/components/home/home-profile-card'
 import { ProxyTunCard } from '@/components/home/proxy-tun-card'
+import { useOrbit } from '@/hooks/use-orbit'
 import { useProfiles } from '@/hooks/use-profiles'
-import { useVerge } from '@/hooks/use-verge'
 import { entry_lightweight_mode } from '@/services/cmds'
 import { showNotice } from '@/services/notice-service'
 import { openExternalUrl } from '@/utils/open-external-url'
@@ -117,7 +117,7 @@ const HomeSettingsDialog = ({
 }: HomeSettingsDialogProps) => {
   const { t } = useTranslation()
   const [cards, setCards] = useState<HomeCardsSettings>(homeCards)
-  const { patchVerge } = useVerge()
+  const { patchOrbit } = useOrbit()
 
   const handleToggle = (key: string) => {
     setCards((prev: HomeCardsSettings) => ({
@@ -127,7 +127,7 @@ const HomeSettingsDialog = ({
   }
 
   const handleSave = async () => {
-    await patchVerge({ home_cards: cards })
+    await patchOrbit({ home_cards: cards })
     onClose()
   }
 
@@ -231,7 +231,7 @@ const HomeSettingsDialog = ({
 
 const HomePage = () => {
   const { t } = useTranslation()
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const { current, mutateProfiles } = useProfiles()
 
   // 设置弹窗的状态
@@ -239,7 +239,7 @@ const HomePage = () => {
 
   // 卡片显示状态
   const homeCards =
-    (verge?.home_cards as HomeCardsSettings | undefined) ?? DEFAULT_HOME_CARDS
+    (orbit?.home_cards as HomeCardsSettings | undefined) ?? DEFAULT_HOME_CARDS
 
   // 文档链接函数
   const toGithubDoc = useLockFn(() =>

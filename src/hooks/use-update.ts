@@ -1,7 +1,7 @@
 import { fetchCacheData, setCacheData, useQuery } from '@/services/query-client'
 import { checkUpdateSafe } from '@/services/update'
 
-import { useVerge } from './use-verge'
+import { useOrbit } from './use-orbit'
 
 const LAST_CHECK_KEY = 'last_check_update'
 
@@ -20,8 +20,8 @@ export const updateLastCheckTime = (timestamp?: number): number => {
 }
 
 export const useUpdate = (enabled: boolean = true) => {
-  const { verge } = useVerge()
-  const { auto_check_update } = verge || {}
+  const { orbit } = useOrbit()
+  const { auto_check_update } = orbit || {}
 
   const shouldCheck = enabled && auto_check_update !== false
 

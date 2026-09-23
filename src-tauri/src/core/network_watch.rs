@@ -4,7 +4,7 @@
 //! switch to another service leaves the proxy on the old one; both need the write repeated.
 
 use crate::{config::Config, core::CoreManager, core::proxy_control, process::AsyncHandler};
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 use parking_lot::Mutex;
 use sysproxy::NetworkServiceMonitor;
 
@@ -43,7 +43,7 @@ async fn reapply() {
     let manager = CoreManager::global();
     let _life = manager.lifecycle_lock.lock().await;
     // Checked under the locks: a task that queued behind a restart may be stale by now.
-    if !Config::verge()
+    if !Config::orbit()
         .await
         .latest_arc()
         .enable_system_proxy

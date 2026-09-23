@@ -8,7 +8,7 @@ export type ServiceRequestReason =
 export interface ServiceRequest {
   readonly reason: ServiceRequestReason
   /** Settings to apply after the core enters service mode. */
-  readonly restore?: Partial<IVergeConfig>
+  readonly restore?: Partial<IOrbitConfig>
 }
 
 type Subscriber = () => void

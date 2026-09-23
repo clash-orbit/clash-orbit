@@ -6,10 +6,10 @@ import {
 } from 'tauri-plugin-mihomo-api'
 
 import { useClashInfo, useRuntimeConfig } from '@/hooks/use-clash'
+import { useOrbit } from '@/hooks/use-orbit'
 import { runStateQueryKey } from '@/hooks/use-system-state'
-import { useVerge } from '@/hooks/use-verge'
 import { getProxyView, getRuntimeState, getSystemProxy } from '@/services/cmds'
-import { subscribeVergeEvents } from '@/services/events'
+import { subscribeOrbitEvents } from '@/services/events'
 import { useQuery } from '@/services/query-client'
 import { resolveDisplayedMixedPort } from '@/utils/mixed-port'
 
@@ -49,7 +49,7 @@ export const AppDataProvider = ({
 }: {
   children: React.ReactNode
 }) => {
-  const { verge } = useVerge()
+  const { orbit } = useOrbit()
   const { data: runtimeConfig } = useRuntimeConfig()
   const { clashInfo } = useClashInfo()
 
@@ -120,8 +120,8 @@ export const AppDataProvider = ({
       refreshProxy().catch(() => {})
     }
 
-    return subscribeVergeEvents({
-      'verge://refresh-proxy-config': handleRefreshProxy,
+    return subscribeOrbitEvents({
+      'orbit://refresh-proxy-config': handleRefreshProxy,
     })
   }, [refreshProxy])
 
@@ -171,19 +171,19 @@ export const AppDataProvider = ({
   const displayedMixedPort = resolveDisplayedMixedPort({
     live: clashConfig?.mixedPort,
     runtime: runtimeConfig?.['mixed-port'],
-    selected: verge?.verge_mixed_port,
+    selected: orbit?.orbit_mixed_port,
     merge: clashInfo?.mixed_port,
   })
 
   const systemValue = useMemo(() => {
     const calculateSystemProxyAddress = () => {
-      if (!verge) return '-'
+      if (!orbit) return '-'
 
-      const isPacMode = verge.proxy_auto_config ?? false
+      const isPacMode = orbit.proxy_auto_config ?? false
 
       if (isPacMode) {
         // PAC模式：显示我们期望设置的代理地址
-        const proxyHost = verge.proxy_host || '127.0.0.1'
+        const proxyHost = orbit.proxy_host || '127.0.0.1'
         return `${proxyHost}:${displayedMixedPort}`
       } else {
         // HTTP代理模式：优先使用系统地址，但如果格式不正确则使用期望地址
@@ -196,7 +196,7 @@ export const AppDataProvider = ({
           return systemServer
         } else {
           // 系统地址无效，返回期望的代理地址
-          const proxyHost = verge.proxy_host || '127.0.0.1'
+          const proxyHost = orbit.proxy_host || '127.0.0.1'
           return `${proxyHost}:${displayedMixedPort}`
         }
       }
@@ -208,7 +208,7 @@ export const AppDataProvider = ({
       isRunningModePending,
       systemProxyAddress: calculateSystemProxyAddress(),
     }
-  }, [sysproxy, runningMode, isRunningModePending, verge, displayedMixedPort])
+  }, [sysproxy, runningMode, isRunningModePending, orbit, displayedMixedPort])
 
   const coreDataStatusValue = useMemo(
     () => ({

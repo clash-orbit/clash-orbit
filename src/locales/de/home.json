@@ -57,7 +57,7 @@
         "autoLaunch": "Beim Start automatisch starten",
         "runningMode": "Betriebsmodus",
         "lastCheckUpdate": "Letzte Aktualitätsprüfung",
-        "vergeVersion": "Clash Orbit-Version"
+        "orbitVersion": "Clash Orbit-Version"
       },
       "actions": {
         "settings": "Einstellungen"

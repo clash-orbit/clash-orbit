@@ -4,7 +4,7 @@ use crate::{
     process::AsyncHandler,
 };
 
-use clash_verge_logging::{Type, logging};
+use clash_orbit_logging::{Type, logging};
 
 use crate::utils::window_manager::WindowManager;
 use anyhow::Result;
@@ -79,9 +79,9 @@ async fn refresh_lightweight_tray_state() {
 }
 
 pub async fn auto_lightweight_boot() -> Result<()> {
-    let verge_config = Config::verge().await;
-    let is_enable_auto = verge_config.data_arc().enable_auto_light_weight_mode.unwrap_or(false);
-    let is_silent_start = verge_config.data_arc().enable_silent_start.unwrap_or(false);
+    let orbit_config = Config::orbit().await;
+    let is_enable_auto = orbit_config.data_arc().enable_auto_light_weight_mode.unwrap_or(false);
+    let is_silent_start = orbit_config.data_arc().enable_silent_start.unwrap_or(false);
     if is_enable_auto {
         enable_auto_light_weight_mode().await;
     }
@@ -133,7 +133,7 @@ pub async fn exit_lightweight_mode() -> bool {
     }
     record_state_and_log(LightweightState::Exiting);
     WindowManager::show_main_window().await;
-    let enable_auto_light_weight_mode = Config::verge()
+    let enable_auto_light_weight_mode = Config::orbit()
         .await
         .data_arc()
         .enable_auto_light_weight_mode
@@ -206,7 +206,7 @@ fn cancel_webview_focus_listener() {
 }
 
 async fn setup_light_weight_timer() {
-    let once_by_minutes = Config::verge().await.data_arc().auto_light_weight_minutes.unwrap_or(10);
+    let once_by_minutes = Config::orbit().await.data_arc().auto_light_weight_minutes.unwrap_or(10);
 
     let mut cancel_tx_guard = CANCEL_TX.lock();
     if cancel_tx_guard.is_some() {
