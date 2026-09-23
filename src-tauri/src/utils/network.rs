@@ -249,11 +249,7 @@ impl NetworkManager {
         } else {
             headers.insert(
                 USER_AGENT,
-                // Subscription providers commonly choose the response format from the User-Agent
-                // and only serve a Clash config to recognised clients. Keep the Clash Verge form:
-                // a rebranded UA makes a remote profile resolve to a non-Clash body, which then
-                // yields a generated config whose proxy groups have no proxies.
-                HeaderValue::from_str(&format!("clash-verge/v{}", env!("CARGO_PKG_VERSION")))?,
+                HeaderValue::from_str(&format!("clash-orbit/v{}", env!("CARGO_PKG_VERSION")))?,
             );
         }
 
