@@ -323,7 +323,11 @@ jobs:
 
       - name: 'Setup for linux'
         run: |-
-          sudo ls -lR /etc/apt/
+          # Ubuntu 24.04+ runner images keep their own deb822 source file beside the list
+          # rewritten below. It carries no [arch=] restriction, so once a foreign
+          # architecture is added apt also queries it and aborts on indexes it does not
+          # publish (armhf on resolute is a 404), failing the step with exit code 100.
+          sudo rm -f /etc/apt/sources.list.d/ubuntu.sources
 
           cat > /tmp/sources.list << EOF
           deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu jammy main multiverse universe restricted
