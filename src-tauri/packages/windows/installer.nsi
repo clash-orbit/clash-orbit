@@ -550,19 +550,19 @@ FunctionEnd
 
 
 !macro CheckAllVergeProcesses
-  ; Check if clash-verge-service.exe is running
+  ; Check if clash-orbit-service.exe is running
   !if "${INSTALLMODE}" == "currentUser"
-    nsis_tauri_utils::FindProcessCurrentUser "clash-verge-service.exe"
+    nsis_tauri_utils::FindProcessCurrentUser "clash-orbit-service.exe"
   !else
-    nsis_tauri_utils::FindProcess "clash-verge-service.exe"
+    nsis_tauri_utils::FindProcess "clash-orbit-service.exe"
   !endif
   Pop $R0
   ${If} $R0 = 0
-    DetailPrint "Kill clash-verge-service.exe..."
+    DetailPrint "Kill clash-orbit-service.exe..."
     !if "${INSTALLMODE}" == "currentUser"
-      nsis_tauri_utils::KillProcessCurrentUser "clash-verge-service.exe"
+      nsis_tauri_utils::KillProcessCurrentUser "clash-orbit-service.exe"
     !else
-      nsis_tauri_utils::KillProcess "clash-verge-service.exe"
+      nsis_tauri_utils::KillProcess "clash-orbit-service.exe"
     !endif
   ${EndIf}
 
@@ -633,20 +633,20 @@ FunctionEnd
 
 !macro StartVergeService
   ; Check if the service exists
-  SimpleSC::ExistsService "clash_verge_service"
+  SimpleSC::ExistsService "clash_orbit_service"
   Pop $0  ; 0: service exists; other: service not exists
   ; Service exists
   ${If} $0 == 0
     Push $0
     ; Check if the service is running
-    SimpleSC::ServiceIsRunning "clash_verge_service"
+    SimpleSC::ServiceIsRunning "clash_orbit_service"
     Pop $0 ; returns an errorcode (<>0) otherwise success (0)
     Pop $1 ; returns 1 (service is running) - returns 0 (service is not running)
     ${If} $0 == 0
       Push $0
       ${If} $1 == 0
         DetailPrint "Restart ${PRODUCTNAME} Service..."
-        SimpleSC::StartService "clash_verge_service" "" 30
+        SimpleSC::StartService "clash_orbit_service" "" 30
       ${EndIf}
     ${ElseIf} $0 != 0
       Push $0
@@ -659,24 +659,24 @@ FunctionEnd
 
 !macro RemoveVergeService
   ; Check if the service exists
-  SimpleSC::ExistsService "clash_verge_service"
+  SimpleSC::ExistsService "clash_orbit_service"
   Pop $0  ; 0: service exists; other: service not exists
   ; Service exists
   ${If} $0 == 0
     Push $0
     ; Check if the service is running
-    SimpleSC::ServiceIsRunning "clash_verge_service"
+    SimpleSC::ServiceIsRunning "clash_orbit_service"
     Pop $0 ; returns an errorcode (<>0) otherwise success (0)
     Pop $1 ; returns 1 (service is running) - returns 0 (service is not running)
     ${If} $0 == 0
       Push $0
       ${If} $1 == 1
         DetailPrint "Stop ${PRODUCTNAME} Service..."
-        SimpleSC::StopService "clash_verge_service" 1 30
+        SimpleSC::StopService "clash_orbit_service" 1 30
         Pop $0 ; returns an errorcode (<>0) otherwise success (0)
         ${If} $0 == 0
           DetailPrint "Removing ${PRODUCTNAME} Service..."
-          SimpleSC::RemoveService "clash_verge_service"
+          SimpleSC::RemoveService "clash_orbit_service"
         ${ElseIf} $0 != 0
           Push $0
           SimpleSC::GetErrorMessage
@@ -685,7 +685,7 @@ FunctionEnd
         ${EndIf}
       ${ElseIf} $1 == 0
         DetailPrint "Removing ${PRODUCTNAME} Service..."
-        SimpleSC::RemoveService "clash_verge_service"
+        SimpleSC::RemoveService "clash_orbit_service"
       ${EndIf}
     ${ElseIf} $0 != 0
       Push $0
@@ -968,13 +968,13 @@ Section Install
   ; Not fatal on failure; a later elevated service install can stage the cores again.
   !ifdef MIHOMO_SHA256
     DetailPrint "Staging verge-mihomo for ${PRODUCTNAME} Service..."
-    nsExec::ExecToLog '"$INSTDIR\resources\clash-verge-service-install.exe" --install-core "$INSTDIR\verge-mihomo.exe" --sha256 "${MIHOMO_SHA256}"'
+    nsExec::ExecToLog '"$INSTDIR\resources\clash-orbit-service-install.exe" --install-core "$INSTDIR\verge-mihomo.exe" --sha256 "${MIHOMO_SHA256}"'
     Pop $0
     ${IfThen} $0 != 0 ${|} DetailPrint "Staging verge-mihomo returned $0" ${|}
   !endif
   !ifdef MIHOMO_ALPHA_SHA256
     DetailPrint "Staging verge-mihomo-alpha for ${PRODUCTNAME} Service..."
-    nsExec::ExecToLog '"$INSTDIR\resources\clash-verge-service-install.exe" --install-core "$INSTDIR\verge-mihomo-alpha.exe" --sha256 "${MIHOMO_ALPHA_SHA256}"'
+    nsExec::ExecToLog '"$INSTDIR\resources\clash-orbit-service-install.exe" --install-core "$INSTDIR\verge-mihomo-alpha.exe" --sha256 "${MIHOMO_ALPHA_SHA256}"'
     Pop $0
     ${IfThen} $0 != 0 ${|} DetailPrint "Staging verge-mihomo-alpha returned $0" ${|}
   !endif

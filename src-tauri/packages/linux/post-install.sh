@@ -1,7 +1,7 @@
 #!/bin/bash
-chmod +x /usr/bin/clash-verge-service-install
-chmod +x /usr/bin/clash-verge-service-uninstall
-chmod +x /usr/bin/clash-verge-service
+chmod +x /usr/bin/clash-orbit-service-install
+chmod +x /usr/bin/clash-orbit-service-uninstall
+chmod +x /usr/bin/clash-orbit-service
 
 . /etc/os-release
 

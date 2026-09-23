@@ -131,5 +131,5 @@ corepack pnpm format:check             # biome
   问题，与改名无关。其余 crate 的 lib 测试全部通过，且 `cargo check --all-targets`
   能证明测试代码本身可以编译。
 - 上游 CI 的三个来源仍指向上游，属预期：`tracing-estuary` 用上游作者仓库、
-  `clash-verge-service-ipc` 的 release 只有上游发过 `v2.7.3`（`scripts/service-release.mjs`
+  `clash-orbit-service-ipc` 的 release 只有上游发过 `v2.7.3`（`scripts/service-release.mjs`
   里保留了回退）、`docs` 链接仍指 `clash-verge-rev.github.io`。

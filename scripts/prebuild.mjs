@@ -511,9 +511,9 @@ const resolvePlugin = async () => {
 // Service executable permissions
 const resolveServicePermission = async () => {
   const serviceExecutables = [
-    'clash-verge-service*',
-    'clash-verge-service-install*',
-    'clash-verge-service-uninstall*',
+    'clash-orbit-service*',
+    'clash-orbit-service-install*',
+    'clash-orbit-service-uninstall*',
   ]
   const hashCache = await loadHashCache()
   let hasChanges = false
@@ -546,9 +546,9 @@ const resolveServicePermission = async () => {
 
 // Other resources
 const SERVICE_BINARIES = [
-  'clash-verge-service',
-  'clash-verge-service-install',
-  'clash-verge-service-uninstall',
+  'clash-orbit-service',
+  'clash-orbit-service-install',
+  'clash-orbit-service-uninstall',
 ]
 
 function serviceFileInfo(name) {
@@ -626,7 +626,7 @@ async function resolveServiceBundle() {
     SIDECAR_HOST,
     platform,
   )
-  const tempDir = path.join(TEMP_DIR, 'clash-verge-service-ipc')
+  const tempDir = path.join(TEMP_DIR, 'clash-orbit-service-ipc')
   const tempArchive = path.join(tempDir, archiveFile)
 
   await fsp.mkdir(tempDir, { recursive: true })
@@ -641,7 +641,7 @@ async function resolveServiceBundle() {
         .getEntries()
         .forEach(
           (entry) =>
-            void log_debug('"clash-verge-service-ipc" entry:', entry.entryName),
+            void log_debug('"clash-orbit-service-ipc" entry:', entry.entryName),
         )
       zip.extractAllTo(tempDir, true)
     } else {

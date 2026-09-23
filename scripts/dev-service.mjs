@@ -9,7 +9,7 @@ const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const serviceRepository = resolve(
   repositoryRoot,
   '..',
-  'clash-verge-service-ipc',
+  'clash-orbit-service-ipc',
 )
 const serviceManifest = join(serviceRepository, 'Cargo.toml')
 export const developmentServiceWatchPaths = [
@@ -78,9 +78,9 @@ export async function prepareDevelopmentService() {
     }
   }
   const executables = [
-    'clash-verge-service',
-    'clash-verge-service-install',
-    'clash-verge-service-uninstall',
+    'clash-orbit-service',
+    'clash-orbit-service-install',
+    'clash-orbit-service-uninstall',
     'service-integration-driver',
   ].map((name) => {
     const executable = artifacts.get(name)
@@ -107,7 +107,7 @@ export async function ensureDevelopmentService({
   const extension = platform === 'win32' ? '.exe' : ''
   const installer = join(
     serviceDirectory,
-    `clash-verge-service-install${extension}`,
+    `clash-orbit-service-install${extension}`,
   )
   const host = execFileSync('rustc', ['-vV'], { encoding: 'utf8' }).match(
     /^host: (.+)$/m,
