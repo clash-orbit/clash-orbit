@@ -47,12 +47,10 @@ pnpm tauri signer generate -w ~/.tauri/clash-orbit.key
 | `TAURI_PRIVATE_KEY` | **必需** | 给更新包签名 | `tauri-action` 生成不出 `.sig`，构建失败 |
 | `TAURI_KEY_PASSWORD` | **必需** | 上面私钥的口令 | 同上 |
 | `GITHUB_TOKEN` | 自动 | 建 Release、上传产物、生成 `update.json` | GitHub 内置，无需手工配置 |
-| `APPLE_CERTIFICATE` | macOS 需要 | Developer ID 证书（base64 的 p12） | macOS 包不签名，用户打开被 Gatekeeper 拦 |
-| `APPLE_CERTIFICATE_PASSWORD` | macOS 需要 | 上面 p12 的密码 | 同上 |
-| `APPLE_SIGNING_IDENTITY` | macOS 需要 | 形如 `Developer ID Application: Xxx (TEAMID)` | 同上 |
-| `APPLE_ID` / `APPLE_PASSWORD` / `APPLE_TEAM_ID` | macOS 需要 | 公证（notarization） | 同上 |
 | `TELEGRAM_BOT_TOKEN` | 可选 | 发布后发 TG 通知 | `notify-telegram` job 报错（制品已发布，不影响下载） |
 | `WINGET_TOKEN` | 可选 | 提交到 `microsoft/winget-pkgs` | 该 job 已注释停用，见下文 |
+
+macOS 支持已移除：不再构建 macOS 包，`APPLE_*` 系列 secret 也不再需要（历史上用于签名与公证）。
 
 AI 审查工作流（`pr-ai-slop-review` 等）另有 `COPILOT_GITHUB_TOKEN` / `GH_AW_*` /
 `WORKFLOW_AUDIT_TOKEN`，与发布无关。
@@ -85,7 +83,7 @@ AI 审查工作流（`pr-ai-slop-review` 等）另有 `COPILOT_GITHUB_TOKEN` / `
 | --- | --- |
 | `check_tag_version` | 校验 tag 来自 `main`，且与 `package.json` 版本一致 |
 | `prepare_release` | 先建一个 draft release |
-| `release` | 矩阵构建 Windows x64/arm64、macOS arm64/x64、Linux x64，上传产物 |
+| `release` | 矩阵构建 Windows x64/arm64、Linux x64，上传产物 |
 | `release-for-linux-arm` | Linux arm64 / armv7 |
 | `release-for-fixed-webview2` | 内置 WebView2 的 Windows 包 |
 | `update_tag` | 生成 Release 说明、把 draft 转正式 |
@@ -98,7 +96,6 @@ AI 审查工作流（`pr-ai-slop-review` 等）另有 `COPILOT_GITHUB_TOKEN` / `
 
 - Windows：`Clash.Orbit_2.5.5_x64-setup.exe`、`..._arm64-setup.exe`、
   `..._x64_fixed_webview2-setup.exe`
-- macOS：`Clash.Orbit_2.5.5_aarch64.dmg`、`..._x64.dmg`
 - Linux：`Clash.Orbit_2.5.5_amd64.deb`、`Clash.Orbit-2.5.5-1.x86_64.rpm`
 
 `release.yml` 里手写的下载链接和 `scripts/updater.mjs` 的资产匹配规则都依赖这些名字。

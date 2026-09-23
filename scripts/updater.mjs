@@ -86,11 +86,6 @@ async function processRelease(github, options, tag, isAlpha) {
         // platform format:
         //    standard: "{os}-{arch}-{installer}",
         //    fallback: "{os}-{arch}"
-        'darwin-x86_64': { signature: '', url: '' },
-        'darwin-x86_64-app': { signature: '', url: '' },
-        'darwin-aarch64': { signature: '', url: '' },
-        'darwin-aarch64-app': { signature: '', url: '' },
-
         'linux-x86': { signature: '', url: '' },
         'linux-x86-deb': { signature: '', url: '' },
         'linux-x86-rpm': { signature: '', url: '' },
@@ -149,25 +144,6 @@ async function processRelease(github, options, tag, isAlpha) {
         const sig = await getSignature(browser_download_url)
         updateData.platforms['windows-aarch64'].signature = sig
         updateData.platforms['windows-aarch64-nsis'].signature = sig
-      }
-
-      if (name.endsWith('.app.tar.gz') && !name.includes('aarch')) {
-        updateData.platforms['darwin-x86_64'].url = browser_download_url
-        updateData.platforms['darwin-x86_64-app'].url = browser_download_url
-      }
-      if (name.endsWith('.app.tar.gz.sig') && !name.includes('aarch')) {
-        const sig = await getSignature(browser_download_url)
-        updateData.platforms['darwin-x86_64'].signature = sig
-        updateData.platforms['darwin-x86_64-app'].signature = sig
-      }
-      if (name.endsWith('aarch64.app.tar.gz')) {
-        updateData.platforms['darwin-aarch64'].url = browser_download_url
-        updateData.platforms['darwin-aarch64-app'].url = browser_download_url
-      }
-      if (name.endsWith('aarch64.app.tar.gz.sig')) {
-        const sig = await getSignature(browser_download_url)
-        updateData.platforms['darwin-aarch64'].signature = sig
-        updateData.platforms['darwin-aarch64-app'].signature = sig
       }
 
       if (name.endsWith('i386.deb')) {

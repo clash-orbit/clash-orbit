@@ -87,9 +87,6 @@ jobs:
           #### 内置Webview2版(体积较大，仅在企业版系统或无法安装webview2时使用)
           - [64位](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_x64_fixed_webview2-setup.exe) | [ARM64](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_arm64_fixed_webview2-setup.exe)
 
-          ### macOS
-          - [Apple M芯片](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_aarch64.dmg) | [Intel芯片](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_x64.dmg)
-
           ### Linux
           #### DEB包(Debian系) 使用 apt ./路径 安装
           - [64位](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_amd64.deb) | [ARM64](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_arm64.deb) | [ARMv7](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_armhf.deb)
@@ -125,8 +122,8 @@ jobs:
       tag_name: autobuild
       dry_run: false
 
-  autobuild-x86-windows-macos-linux:
-    name: Autobuild x86 Windows, MacOS and Linux
+  autobuild-windows-linux:
+    name: Autobuild Windows and Linux
     needs: [check_commit, update_tag]
     if: ${{ needs.check_commit.outputs.should_run == 'true' }}
     strategy:
@@ -137,10 +134,6 @@ jobs:
             target: x86_64-pc-windows-msvc
           - os: windows-latest
             target: aarch64-pc-windows-msvc
-          - os: macos-latest
-            target: aarch64-apple-darwin
-          - os: macos-latest
-            target: x86_64-apple-darwin
           - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
     runs-on: ${{ matrix.os }}
@@ -207,19 +200,13 @@ jobs:
           rustup target list --installed
           echo "Rust target ${{ matrix.target }} installed."
 
-      - name: Tauri build for Windows-macOS-Linux
+      - name: Tauri build for Windows and Linux
         uses: tauri-apps/tauri-action@v1
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           releaseId: ${{ needs.update_tag.outputs.release_id }}
           tagName: ${{ env.TAG_NAME }}
@@ -502,7 +489,7 @@ jobs:
     needs:
       [
         update_tag,
-        autobuild-x86-windows-macos-linux,
+        autobuild-windows-linux,
         autobuild-arm-linux,
         autobuild-x86-arm-windows_webview2,
       ]
@@ -562,9 +549,6 @@ jobs:
 
           #### 内置Webview2版(体积较大，仅在企业版系统或无法安装webview2时使用)
           - [64位](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_x64_fixed_webview2-setup.exe) | [ARM64](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_arm64_fixed_webview2-setup.exe)
-
-          ### macOS
-          - [Apple M芯片](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_aarch64.dmg) | [Intel芯片](${{ env.DOWNLOAD_URL }}/Clash.Orbit_${{ env.VERSION }}_x64.dmg)
 
           ### Linux
           #### DEB包(Debian系) 使用 apt ./路径 安装

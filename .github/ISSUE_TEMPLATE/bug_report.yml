@@ -52,7 +52,6 @@ body:
       options:
         - label: Windows
         - label: Linux
-        - label: MacOS
     validations:
       required: true
   - type: input

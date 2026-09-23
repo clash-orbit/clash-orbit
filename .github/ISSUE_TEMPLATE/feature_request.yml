@@ -41,7 +41,6 @@ body:
       description: 请选择该功能适用的操作系统（至少选择一个） / Please select the operating system(s) for this feature request (select at least one)
       options:
         - label: windows
-        - label: macos
         - label: linux
     validations:
       required: true

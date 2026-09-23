@@ -30,7 +30,7 @@ A Clash Meta GUI based on <a href="https://github.com/tauri-apps/tauri">Tauri</a
 
 请到发布页面下载对应的安装包：[Release page](https://github.com/clash-orbit/clash-orbit/releases)<br>
 Go to the [Release page](https://github.com/clash-orbit/clash-orbit/releases) to download the corresponding installation package<br>
-Supports Windows (x64/x86), Linux (x64/arm64) and macOS 11+ (intel/apple).
+Supports Windows (x64/x86) and Linux (x64/arm64).
 
 #### 我应当怎样选择发行版
 

@@ -8,11 +8,6 @@ on:
         required: false
         type: boolean
         default: true
-      run_macos_aarch64:
-        description: '运行 macOS aarch64'
-        required: false
-        type: boolean
-        default: true
       run_windows_arm64:
         description: '运行 Windows ARM64'
         required: false
@@ -46,11 +41,6 @@ jobs:
             bundle: nsis
             id: windows
             input: run_windows
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            bundle: dmg
-            id: macos-aarch64
-            input: run_macos_aarch64
           - os: windows-latest
             target: aarch64-pc-windows-msvc
             bundle: nsis
@@ -141,23 +131,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tauriScript: pnpm
           args: --target ${{ matrix.target }} -b ${{ matrix.bundle }}
-
-      - name: Upload Artifacts (macOS)
-        if: matrix.os == 'macos-latest' && github.event.inputs[matrix.input] == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          archive: false
-          path: target/${{ matrix.target }}/release/bundle/dmg/*.dmg
-          if-no-files-found: error
 
       - name: Upload Artifacts (Windows)
         if: matrix.os == 'windows-latest' && github.event.inputs[matrix.input] == 'true'
