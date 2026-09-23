@@ -1,5 +1,5 @@
 {
-  "name": "Clash Verge Rev Development Environment",
+  "name": "Clash Orbit Development Environment",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
 
   "features": {
@@ -80,10 +80,10 @@
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 
   "mounts": [
-    "source=clash-verge-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
-    "source=clash-verge-pnpm-store,target=/home/vscode/.local/share/pnpm/store,type=volume",
-    "source=clash-verge-cargo-registry,target=/home/vscode/.cargo/registry,type=volume",
-    "source=clash-verge-cargo-git,target=/home/vscode/.cargo/git,type=volume"
+    "source=clash-orbit-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
+    "source=clash-orbit-pnpm-store,target=/home/vscode/.local/share/pnpm/store,type=volume",
+    "source=clash-orbit-cargo-registry,target=/home/vscode/.cargo/registry,type=volume",
+    "source=clash-orbit-cargo-git,target=/home/vscode/.cargo/git,type=volume"
   ],
 
   "containerEnv": {
@@ -94,6 +94,6 @@
 
   "containerUser": "vscode",
   "remoteUser": "vscode",
-  "workspaceFolder": "/workspaces/clash-verge-rev",
+  "workspaceFolder": "/workspaces/clash-orbit",
   "shutdownAction": "stopContainer"
 }

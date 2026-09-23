@@ -384,9 +384,7 @@ where
     let mut source_file = std::fs::File::open(source)
         .with_context(|| format!("failed to open development Service core source {}", source.display()))?;
 
-    let staging_directory = home
-        .join("Applications/.clash-verge-rev-dev")
-        .join(staging_directory_name);
+    let staging_directory = home.join("Applications/.clash-orbit-dev").join(staging_directory_name);
     std::fs::create_dir_all(&staging_directory).with_context(|| {
         format!(
             "failed to create development Service core staging directory {}",
@@ -1928,7 +1926,7 @@ mod tests {
         fn new(label: &str) -> anyhow::Result<Self> {
             let generation = TEST_DIRECTORY_GENERATION.fetch_add(1, Ordering::Relaxed);
             let path = std::env::temp_dir().join(format!(
-                "clash-verge-rev-service-{label}-{}-{generation}",
+                "clash-orbit-service-{label}-{}-{generation}",
                 std::process::id()
             ));
             std::fs::create_dir(&path)?;
@@ -1947,12 +1945,12 @@ mod tests {
     }
 
     fn staging_directory(home: &Path) -> PathBuf {
-        home.join("Applications/.clash-verge-rev-dev/service-core")
+        home.join("Applications/.clash-orbit-dev/service-core")
     }
 
     #[cfg(unix)]
     fn service_tools_staging_directory(home: &Path) -> PathBuf {
-        home.join("Applications/.clash-verge-rev-dev/service-tools")
+        home.join("Applications/.clash-orbit-dev/service-tools")
     }
 
     #[cfg(unix)]
@@ -1999,7 +1997,7 @@ mod tests {
 
         assert_eq!(
             selected,
-            home.join("Applications/.clash-verge-rev-dev/service-core/verge-mihomo")
+            home.join("Applications/.clash-orbit-dev/service-core/verge-mihomo")
         );
         assert_eq!(std::fs::read(&selected)?, b"development core");
         let metadata = std::fs::symlink_metadata(&selected)?;
@@ -2039,7 +2037,7 @@ mod tests {
         let selected = service_core_path_for(&source, Some(&home), true)?;
         assert_eq!(
             selected,
-            home.join("Applications/.clash-verge-rev-dev/service-core/verge-mihomo")
+            home.join("Applications/.clash-orbit-dev/service-core/verge-mihomo")
         );
 
         std::fs::write(&source, b"second core")?;
@@ -2096,7 +2094,7 @@ mod tests {
         let home = root.path().join("home");
         let source = root.path().join("verge-mihomo");
         std::fs::write(&source, b"selected core")?;
-        let final_path = home.join("Applications/.clash-verge-rev-dev/service-core/verge-mihomo");
+        let final_path = home.join("Applications/.clash-orbit-dev/service-core/verge-mihomo");
         std::fs::create_dir_all(final_path.parent().unwrap_or_else(|| Path::new(".")))?;
         let symlink_target = root.path().join("must-not-change");
         std::fs::write(&symlink_target, b"target bytes")?;

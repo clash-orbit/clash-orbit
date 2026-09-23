@@ -1,12 +1,12 @@
 # Privacy Policy
 
-**Applies to:** the Clash Verge Rev desktop application for Windows, macOS and
+**Applies to:** the Clash Orbit desktop application for Windows, macOS and
 Linux, distributed from
-<https://github.com/clash-verge-rev/clash-verge-rev/releases>.
+<https://github.com/clash-orbit/clash-orbit/releases>.
 
 **Last updated:** 2026-09-09
 
-Clash Verge Rev is a free and open-source graphical client for the
+Clash Orbit is a free and open-source graphical client for the
 [mihomo](https://github.com/MetaCubeX/mihomo) proxy core, maintained by
 volunteers. The project has no company behind it, no user accounts, and no
 server of its own that the application talks to.
@@ -30,8 +30,8 @@ server of its own that the application talks to.
 
 ## 2. Who is responsible
 
-The Clash Verge Rev maintainers, reachable through the project's issue tracker
-at <https://github.com/clash-verge-rev/clash-verge-rev/issues>. Because the
+The Clash Orbit maintainers, reachable through the project's issue tracker
+at <https://github.com/clash-orbit/clash-orbit/issues>. Because the
 application performs no data collection, there is no data controller
 relationship, no processing agreement, and no data to request or erase from us.
 
@@ -41,9 +41,9 @@ All application data lives in a single directory:
 
 | Platform | Location |
 | --- | --- |
-| Windows | `%APPDATA%\io.github.clash-verge-rev.clash-verge-rev` |
-| macOS | `~/Library/Application Support/io.github.clash-verge-rev.clash-verge-rev` |
-| Linux | `$XDG_DATA_HOME/io.github.clash-verge-rev.clash-verge-rev` (usually `~/.local/share/…`) |
+| Windows | `%APPDATA%\io.github.clash-orbit.clash-orbit` |
+| macOS | `~/Library/Application Support/io.github.clash-orbit.clash-orbit` |
+| Linux | `$XDG_DATA_HOME/io.github.clash-orbit.clash-orbit` (usually `~/.local/share/…`) |
 
 It contains:
 
@@ -96,7 +96,7 @@ On startup the application asks whether a newer release exists, in order, from:
 
 - `https://update.hwdns.net/…` and `https://gh-proxy.org/…` (third-party GitHub
   mirrors, used for reachability in restricted networks)
-- `https://github.com/clash-verge-rev/clash-verge-rev/releases/…`
+- `https://github.com/clash-orbit/clash-orbit/releases/…`
 
 The request carries only what any HTTP request carries: your IP address, the
 `User-Agent` and the requested file. No identifier is generated or sent, and no
@@ -204,5 +204,5 @@ history. The date at the top reflects the most recent change.
 ## 9. Contact
 
 Open an issue at
-<https://github.com/clash-verge-rev/clash-verge-rev/issues>. Please do not
+<https://github.com/clash-orbit/clash-orbit/issues>. Please do not
 include logs or configuration files containing credentials in public issues.

@@ -1,3 +1,9 @@
+// GitHub does not copy Releases when a repository is forked, so clash-orbit's
+// fork of clash-verge-service-ipc has the v2.7.3 tag but no release assets yet.
+// This stays on upstream until that release exists, otherwise `pnpm prebuild`
+// fails with a 404. Once the fork has a v2.7.3 release carrying the nine
+// clash-verge-service-ipc-v2.7.3-*.zip / *.tar.gz assets, switch this to:
+//   'https://github.com/clash-orbit/clash-orbit-service-ipc/releases/download'
 const SERVICE_URL_PREFIX =
   'https://github.com/clash-verge-rev/clash-verge-service-ipc/releases/download'
 

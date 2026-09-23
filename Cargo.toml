@@ -52,6 +52,15 @@ split-debuginfo = "unpacked"
 # https://github.com/tauri-apps/tray-icon/pull/365
 tray-icon = { git = "https://github.com/Tunglies/tray-icon.git", branch = "fix/macos-27-click-reentrancy" }
 
+[patch."https://github.com/clash-verge-rev/sysproxy-rs.git"]
+# sysproxy is reached from two directions: this manifest and the
+# clash-orbit-service-ipc crate, whose own Cargo.toml still names the upstream
+# repository. Without this patch both sources resolve as separate packages, so
+# the crate is compiled twice and the two copies become incompatible types the
+# moment either branch moves. Folding them onto one source keeps a single
+# `sysproxy` in the graph.
+sysproxy = { git = "https://github.com/clash-orbit/sysproxy-rs.git", branch = "main" }
+
 [workspace.dependencies]
 clash-verge-draft = { path = "crates/clash-verge-draft" }
 clash-verge-media-unlock = { path = "crates/clash-verge-media-unlock" }

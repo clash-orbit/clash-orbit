@@ -4,7 +4,7 @@ version = "2.5.5"
 description = "clash verge"
 authors = ["zzzgydi", "Tunglies", "wonfen", "MystiPanda"]
 license = "GPL-3.0-only"
-repository = "https://github.com/clash-verge-rev/clash-verge-rev.git"
+repository = "https://github.com/clash-orbit/clash-orbit.git"
 default-run = "clash-verge"
 build = "build.rs"
 edition = "2024"
@@ -26,7 +26,7 @@ clippy = ["tauri/test"]
 perf-harness = ["dep:tauri-plugin-wdio-webdriver"]
 
 [package.metadata.bundle]
-identifier = "io.github.clash-verge-rev.clash-verge-rev"
+identifier = "io.github.clash-orbit.clash-orbit"
 
 [build-dependencies]
 tauri-build = { version = "2.6.3", features = [] }
@@ -70,7 +70,7 @@ once_cell = { version = "1.21.4", features = ["parking_lot"] }
 percent-encoding = "2.3.2"
 reqwest = { workspace = true }
 regex = { workspace = true }
-sysproxy = { git = "https://github.com/clash-verge-rev/sysproxy-rs.git", branch = "main", features = [
+sysproxy = { git = "https://github.com/clash-orbit/sysproxy-rs.git", branch = "main", features = [
   "guard",
 ] }
 network-interface = { version = "2.0.5", features = ["serde"] }
@@ -97,9 +97,9 @@ backon = { version = "1.6.0", features = ["tokio-sleep"] }
 tauri-plugin-http = "2.6.1"
 tracing = { workspace = true }
 tauri-plugin-devtools = { version = "2.2.1", optional = true }
-tauri-plugin-mihomo = { git = "https://github.com/clash-verge-rev/tauri-plugin-mihomo", branch = "main" }
+tauri-plugin-mihomo = { git = "https://github.com/clash-orbit/tauri-plugin-mihomo", branch = "main" }
 async-trait = "0.1.92"
-clash_verge_service_ipc = { git = "https://github.com/clash-verge-rev/clash-verge-service-ipc.git", tag = "v2.7.3", version = "2.7.3", features = [
+clash_verge_service_ipc = { git = "https://github.com/clash-orbit/clash-orbit-service-ipc.git", tag = "v2.7.3", version = "2.7.3", features = [
   "client",
 ] }
 arc-swap = "1.9.2"

@@ -1224,7 +1224,7 @@ dependencies = [
 [[package]]
 name = "clash_verge_service_ipc"
 version = "2.7.3"
-source = "git+https://github.com/clash-verge-rev/clash-verge-service-ipc.git?tag=v2.7.3#29251d968e1a38fac1de0ebe9d6d69402bea83b4"
+source = "git+https://github.com/clash-orbit/clash-orbit-service-ipc.git?tag=v2.7.3#29251d968e1a38fac1de0ebe9d6d69402bea83b4"
 dependencies = [
  "anyhow",
  "kode-bridge",
@@ -6922,7 +6922,7 @@ dependencies = [
 [[package]]
 name = "sysproxy"
 version = "0.7.1"
-source = "git+https://github.com/clash-verge-rev/sysproxy-rs.git?branch=main#44aaf00ec9c6779e5a461a55d882eddff7841c98"
+source = "git+https://github.com/clash-orbit/sysproxy-rs.git?branch=main#44aaf00ec9c6779e5a461a55d882eddff7841c98"
 dependencies = [
  "iptools",
  "log",
@@ -7375,7 +7375,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-mihomo"
 version = "0.6.0"
-source = "git+https://github.com/clash-verge-rev/tauri-plugin-mihomo?branch=main#17c7757389ca73d29882753ecf7a160de29aabbe"
+source = "git+https://github.com/clash-orbit/tauri-plugin-mihomo?branch=main#17c7757389ca73d29882753ecf7a160de29aabbe"
 dependencies = [
  "arc-swap",
  "clashmap",
