@@ -156,30 +156,14 @@ async function updateCargoVersion(newVersion) {
   }
 }
 
-async function getCargoPackageName() {
-  const data = await fs.readFile(
-    path.join(process.cwd(), 'src-tauri', 'Cargo.toml'),
-    'utf8',
-  )
-  const name = data.match(/\[package\][\s\S]*?\nname\s*=\s*"([^"]+)"/)?.[1]
-  if (!name) {
-    throw new Error('package name was not found in src-tauri/Cargo.toml')
-  }
-  return name
-}
-
 async function updateCargoLockVersion(newVersion) {
   const _dirname = process.cwd()
   const cargoLockPath = path.join(_dirname, 'Cargo.lock')
   const versionWithoutV = newVersion.startsWith('v')
     ? newVersion.slice(1)
     : newVersion
-  const packageName = await getCargoPackageName()
-  // The workspace lock names the app package after its manifest, so build the pattern from
-  // that name: a hardcoded literal silently stops matching the moment the package is renamed.
-  const packageVersionPattern = new RegExp(
-    `(\\[\\[package\\]\\]\\r?\\nname = "${packageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"\\r?\\nversion = )"[^"]+"`,
-  )
+  const packageVersionPattern =
+    /(\[\[package\]\]\r?\nname = "clash-ORBIT"\r?\nversion = )"[^"]+"/
 
   try {
     const data = await fs.readFile(cargoLockPath, 'utf8')
@@ -187,8 +171,9 @@ async function updateCargoLockVersion(newVersion) {
       packageVersionPattern,
       `$1"${versionWithoutV}"`,
     )
+
     if (updatedData === data) {
-      throw new Error(`${packageName} package entry was not found in Cargo.lock`)
+      throw new Error('clash-ORBIT package entry was not found in Cargo.lock')
     }
 
     await fs.writeFile(cargoLockPath, updatedData, 'utf8')
