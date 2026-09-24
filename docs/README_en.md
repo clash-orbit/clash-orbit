@@ -41,11 +41,11 @@ We provide packages for Windows (x64/x86), Linux (x64/arm64), and macOS 10.15+ (
 
 #### Installation Guides & FAQ
 
-Read the [project documentation](https://clash-verge-rev.github.io/) for install steps, troubleshooting, and frequently asked questions.
+Read the [project documentation](https://clashorbit.kejizero.xyz/) for install steps, troubleshooting, and frequently asked questions.
 
 ### Telegram Channel
 
-Join [@clash_verge_rev](https://t.me/clash_verge_re) for update announcements.
+Join [@clash_verge_rev](https://t.me/clash_orbit) for update announcements.
 
 ---
 
@@ -61,7 +61,7 @@ Join [@clash_verge_rev](https://t.me/clash_verge_re) for update announcements.
 
 ### FAQ
 
-See the [FAQ page](https://clash-verge-rev.github.io/faq/windows.html) for platform-specific guidance.
+See the [FAQ page](https://clashorbit.kejizero.xyz/faq/windows.html) for platform-specific guidance.
 
 ### Donation
 

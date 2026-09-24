@@ -41,11 +41,11 @@ Windows (x64/x86), Linux (x64/arm64), macOS 10.15+ (Intel/Apple)을 지원합니
 
 #### 설치 가이드 및 FAQ
 
-설치 방법, 트러블슈팅, 자주 묻는 질문은 [프로젝트 문서](https://clash-verge-rev.github.io/)를 참고하세요.
+설치 방법, 트러블슈팅, 자주 묻는 질문은 [프로젝트 문서](https://clashorbit.kejizero.xyz/)를 참고하세요.
 
 ### 텔레그램 채널
 
-업데이트 공지는 [@clash_verge_rev](https://t.me/clash_verge_re)에서 확인하세요.
+업데이트 공지는 [@clash_verge_rev](https://t.me/clash_orbit)에서 확인하세요.
 
 ---
 
@@ -61,7 +61,7 @@ Windows (x64/x86), Linux (x64/arm64), macOS 10.15+ (Intel/Apple)을 지원합니
 
 ### FAQ
 
-플랫폼별 가이드는 [FAQ 페이지](https://clash-verge-rev.github.io/faq/windows.html)에서 확인하세요.
+플랫폼별 가이드는 [FAQ 페이지](https://clashorbit.kejizero.xyz/faq/windows.html)에서 확인하세요.
 
 ### 후원
 

@@ -39,9 +39,9 @@ Clash Meta GUI базируется на <a href="https://github.com/tauri-apps/
 | Alpha(неиспользуемый) | Тестирование процесса публикации.                                                                       | [Alpha](https://github.com/clash-orbit/clash-orbit/releases/tag/alpha)         |
 | AutoBuild             | Версия с постоянным обновлением, подходящая для тестирования и обратной связи. Может содержать дефекты. | [AutoBuild](https://github.com/clash-orbit/clash-orbit/releases/tag/autobuild) |
 
-#### Инструкции по установке и ответы на часто задаваемые вопросы можно найти на [странице документации](https://clash-verge-rev.github.io/)
+#### Инструкции по установке и ответы на часто задаваемые вопросы можно найти на [странице документации](https://clashorbit.kejizero.xyz/)
 
-### TG канал: [@clash_verge_rev](https://t.me/clash_verge_re)
+### TG канал: [@clash_verge_rev](https://t.me/clash_orbit)
 
 ---
 
@@ -57,7 +57,7 @@ Clash Meta GUI базируется на <a href="https://github.com/tauri-apps/
 
 ### FAQ
 
-Смотрите [Страница часто задаваемых вопросов](https://clash-verge-rev.github.io/faq/windows.html)
+Смотрите [Страница часто задаваемых вопросов](https://clashorbit.kejizero.xyz/faq/windows.html)
 
 ### Донат
 

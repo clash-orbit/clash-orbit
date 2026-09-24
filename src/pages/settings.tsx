@@ -26,13 +26,13 @@ const SettingPage = () => {
   )
 
   const toGithubDoc = useLockFn(() =>
-    openExternalUrl('https://clash-verge-rev.github.io/index.html').catch(
+    openExternalUrl('https://clashorbit.kejizero.xyz').catch(
       onError,
     ),
   )
 
   const toTelegramChannel = useLockFn(() =>
-    openExternalUrl('https://t.me/clash_verge_re').catch(onError),
+    openExternalUrl('https://t.me/clash_orbit').catch(onError),
   )
 
   const mode = useThemeMode()

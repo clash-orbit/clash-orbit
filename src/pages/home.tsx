@@ -243,7 +243,7 @@ const HomePage = () => {
 
   // 文档链接函数
   const toGithubDoc = useLockFn(() =>
-    openExternalUrl('https://clash-verge-rev.github.io/index.html').catch(
+    openExternalUrl('https://clashorbit.kejizero.xyz').catch(
       showNotice.error,
     ),
   )

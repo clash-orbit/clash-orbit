@@ -40,9 +40,9 @@ Supports Windows (x64/x86) and Linux (x64/arm64).
 | Alpha(废弃) | 测试发布流程。                           | [Alpha](https://github.com/clash-orbit/clash-orbit/releases/tag/alpha)         |
 | AutoBuild   | 滚动更新版，适合测试反馈，可能存在缺陷。 | [AutoBuild](https://github.com/clash-orbit/clash-orbit/releases/tag/autobuild) |
 
-#### 安装说明和常见问题，请到 [文档页](https://clash-verge-rev.github.io/) 查看
+#### 安装说明和常见问题，请到 [文档页](https://clashorbit.kejizero.xyz/) 查看
 
-### TG 频道: [@clash_verge_rev](https://t.me/clash_verge_re)
+### TG 频道: [@clash_verge_rev](https://t.me/clash_orbit)
 
 ---
 
@@ -58,7 +58,7 @@ Supports Windows (x64/x86) and Linux (x64/arm64).
 
 ### FAQ
 
-Refer to [Doc FAQ Page](https://clash-verge-rev.github.io/faq/windows.html)
+Refer to [Doc FAQ Page](https://clashorbit.kejizero.xyz/faq/windows.html)
 
 ### Donation
 

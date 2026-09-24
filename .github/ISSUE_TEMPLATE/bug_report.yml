@@ -10,7 +10,7 @@ body:
       value: |
         ## 在提交问题之前，请确认以下事项：
 
-        1. 请 **确保** 您已经查阅了 [Clash Orbit 官方文档](https://clash-verge-rev.github.io/guide/term.html)  以及 [常见问题](https://clash-verge-rev.github.io/faq/windows.html)
+        1. 请 **确保** 您已经查阅了 [Clash Orbit 官方文档](https://clashorbit.kejizero.xyz/guide/term.html)  以及 [常见问题](https://clashorbit.kejizero.xyz/faq/windows.html)
         2. 请 **确保** [已有的问题](https://github.com/clash-orbit/clash-orbit/issues?q=is%3Aissue) 中没有人提交过相似 issue，否则请在已有的 issue 下进行讨论
         3. 请 **务必** 给 issue 填写一个简洁明了的标题，以便他人快速检索
         4. 请 **务必** 查看 [AutoBuild](https://github.com/clash-orbit/clash-orbit/releases/tag/autobuild) 版本更新日志
@@ -19,7 +19,7 @@ body:
 
         ## Before submitting the issue, please make sure of the following checklist:
 
-        1. Please make sure you have read the [Clash Orbit official documentation](https://clash-verge-rev.github.io/guide/term.html) and [FAQ](https://clash-verge-rev.github.io/faq/windows.html)
+        1. Please make sure you have read the [Clash Orbit official documentation](https://clashorbit.kejizero.xyz/guide/term.html) and [FAQ](https://clashorbit.kejizero.xyz/faq/windows.html)
         2. Please make sure there is no similar issue in the [existing issues](https://github.com/clash-orbit/clash-orbit/issues?q=is%3Aissue), otherwise please discuss under the existing issue
         3. Please be sure to fill in a concise and clear title for the issue so that others can quickly search
         4. Please be sure to check out [AutoBuild](https://github.com/clash-orbit/clash-orbit/releases/tag/autobuild) version update log
