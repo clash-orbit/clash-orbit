@@ -12,7 +12,7 @@ permissions: {}
 jobs:
   gate:
     name: ai-slop-gate
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Fail while ai-slop:high is present
         if: contains(join(github.event.pull_request.labels.*.name, ','), 'ai-slop:high')
@@ -22,7 +22,7 @@ jobs:
 
   linked-issue:
     name: linked-issue-check
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Require an issue reference in title or body
         env:

@@ -17,7 +17,7 @@ concurrency:
 jobs:
   check_tag_version:
     name: Check Release Tag and package.json Version Consistency
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -61,7 +61,7 @@ jobs:
 
   prepare_release:
     name: Prepare Draft Release
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
     needs: [check_tag_version]
     outputs:
       release_id: ${{ steps.prepare_release.outputs.id }}
@@ -80,7 +80,7 @@ jobs:
 
   update_tag:
     name: Update tag
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
     needs:
       [
         prepare_release,
@@ -183,7 +183,7 @@ jobs:
             target: x86_64-pc-windows-msvc
           - os: windows-latest
             target: aarch64-pc-windows-msvc
-          - os: ubuntu-26.04
+          - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.os }}
@@ -212,7 +212,7 @@ jobs:
           cache-workspace-crates: true
 
       - name: Install dependencies (ubuntu only)
-        if: matrix.os == 'ubuntu-26.04'
+        if: matrix.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libxslt1.1 libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
@@ -261,7 +261,7 @@ jobs:
           subject-path: target/${{ matrix.target }}/release/bundle/nsis/*setup*
 
       - name: Attest Linux bundles
-        if: matrix.os == 'ubuntu-26.04'
+        if: matrix.os == 'ubuntu-22.04'
         uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
@@ -275,10 +275,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-26.04
+          - os: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             arch: arm64
-          - os: ubuntu-26.04
+          - os: ubuntu-22.04
             target: armv7-unknown-linux-gnueabihf
             arch: armhf
     runs-on: ${{ matrix.os }}
@@ -323,11 +323,6 @@ jobs:
 
       - name: 'Setup for linux'
         run: |-
-          # Ubuntu 24.04+ runner images keep their own deb822 source file beside the list
-          # rewritten below. It carries no [arch=] restriction, so once a foreign
-          # architecture is added apt also queries it and aborts on indexes it does not
-          # publish (armhf on resolute is a 404), failing the step with exit code 100.
-          sudo rm -f /etc/apt/sources.list.d/ubuntu.sources
 
           cat > /tmp/sources.list << EOF
           deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu jammy main multiverse universe restricted
@@ -345,9 +340,9 @@ jobs:
           sudo mv /tmp/sources.list /etc/apt/sources.list
 
           sudo dpkg --add-architecture ${{ matrix.arch }}
-          sudo apt update
+          sudo apt-get update
 
-          sudo apt install -y \
+          sudo apt-get install -y \
             libxslt1.1:${{ matrix.arch }} \
             libwebkit2gtk-4.1-dev:${{ matrix.arch }} \
             libayatana-appindicator3-dev:${{ matrix.arch }} \
@@ -358,14 +353,14 @@ jobs:
       - name: 'Install aarch64 tools'
         if: matrix.target == 'aarch64-unknown-linux-gnu'
         run: |
-          sudo apt install -y \
+          sudo apt-get install -y \
             gcc-aarch64-linux-gnu \
             g++-aarch64-linux-gnu
 
       - name: 'Install armv7 tools'
         if: matrix.target == 'armv7-unknown-linux-gnueabihf'
         run: |
-          sudo apt install -y \
+          sudo apt-get install -y \
             gcc-arm-linux-gnueabihf \
             g++-arm-linux-gnueabihf
 
@@ -520,7 +515,7 @@ jobs:
   release-update:
     if: ${{ !contains(github.ref_name, '-rc') }}
     name: Release Update
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
     needs: [update_tag]
     steps:
       - name: Checkout repository
@@ -546,7 +541,7 @@ jobs:
 
   release-update-for-fixed-webview2:
     if: ${{ !contains(github.ref_name, '-rc') }}
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
     needs: [update_tag]
     steps:
       - name: Checkout repository
@@ -580,7 +575,7 @@ jobs:
   # submit-to-winget:
   #   if: ${{ !contains(github.ref_name, '-rc') }}
   #   name: Submit to Winget
-  #   runs-on: ubuntu-26.04
+  #   runs-on: ubuntu-22.04
   #   needs: [update_tag, release-update]
   #   steps:
   #     - name: Checkout repository
@@ -604,7 +599,7 @@ jobs:
   notify-telegram:
     if: ${{ !contains(github.ref_name, '-rc') }}
     name: Notify Telegram
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
     needs:
       [
         update_tag,
