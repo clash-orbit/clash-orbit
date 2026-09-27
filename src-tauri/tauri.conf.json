@@ -32,7 +32,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDEyM0YzQTNCQkVBNDBGNkIKUldSckQ2UytPem8vRW1VWDVWdzdLSmFHU2pzNUtuMVAxems1Si8wWVlBeW4wZ3A4bWtpVThGYW0K",
       "endpoints": [
-        "https://update.hwdns.net/https://github.com/clash-orbit/clash-orbit/releases/download/updater/update-proxy.json",
+        "https://gh-proxy.kejizero.xyz/https://github.com/clash-orbit/clash-orbit/releases/download/updater/update-proxy.json",
         "https://gh-proxy.org/https://github.com/clash-orbit/clash-orbit/releases/download/updater/update-proxy.json",
         "https://github.com/clash-orbit/clash-orbit/releases/download/updater/update.json"
       ],

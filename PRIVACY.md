@@ -94,7 +94,7 @@ application's own proxy port, as configured per profile.
 
 On startup the application asks whether a newer release exists, in order, from:
 
-- `https://update.hwdns.net/…` and `https://gh-proxy.org/…` (third-party GitHub
+- `https://gh-proxy.kejizero.xyz/…` and `https://gh-proxy.org/…` (third-party GitHub
   mirrors, used for reachability in restricted networks)
 - `https://github.com/clash-orbit/clash-orbit/releases/…`
 
