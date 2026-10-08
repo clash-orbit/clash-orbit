@@ -1079,7 +1079,7 @@ checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
 name = "clash-orbit"
-version = "2.5.6"
+version = "2.5.7"
 dependencies = [
  "aes-gcm",
  "anyhow",
@@ -1223,8 +1223,8 @@ dependencies = [
 
 [[package]]
 name = "clash_orbit_service_ipc"
-version = "2.7.4"
-source = "git+https://github.com/clash-orbit/clash-orbit-service-ipc.git?tag=v2.7.4#8d8d378f954d13a09c37838624a147f056c2072e"
+version = "2.7.6"
+source = "git+https://github.com/clash-orbit/clash-orbit-service-ipc.git?tag=v2.7.6#d10b398d21eba50a88d9639a7d3a52ea30496d66"
 dependencies = [
  "anyhow",
  "kode-bridge",
@@ -6922,7 +6922,7 @@ dependencies = [
 [[package]]
 name = "sysproxy"
 version = "0.7.1"
-source = "git+https://github.com/clash-orbit/sysproxy-rs.git?branch=main#44aaf00ec9c6779e5a461a55d882eddff7841c98"
+source = "git+https://github.com/clash-orbit/sysproxy-rs.git?branch=main#c37a60e1fc9079cc0f074200e2296afd1705208c"
 dependencies = [
  "iptools",
  "log",
@@ -7375,7 +7375,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-mihomo"
 version = "0.6.0"
-source = "git+https://github.com/clash-orbit/tauri-plugin-mihomo?branch=main#ba8434c08c869916b8041d707ad66599bb5230b2"
+source = "git+https://github.com/clash-orbit/tauri-plugin-mihomo?branch=main#7a03d16f4d39b1bb885b7babe66b9e153e34b615"
 dependencies = [
  "arc-swap",
  "clashmap",
