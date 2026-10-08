@@ -197,9 +197,9 @@ it('explains a startup core rejection instead of the generic fallback notice', a
     handleNoticeMessage(status, message, (key) => key, vi.fn())
   })
 
-  const [handlers, onSubscribed] = vi.mocked(subscribeVergeEvents).mock.calls[0]
+  const [handlers, onSubscribed] = vi.mocked(subscribeOrbitEvents).mock.calls[0]
   onSubscribed?.()
-  handlers['verge://notice-message']?.(['service_core::sidecar_fallback', ''])
+  handlers['orbit://notice-message']?.(['service_core::sidecar_fallback', ''])
   await new Promise((resolve) => setTimeout(resolve, 0))
 
   expect(showNotice.warning).toHaveBeenCalledExactlyOnceWith(

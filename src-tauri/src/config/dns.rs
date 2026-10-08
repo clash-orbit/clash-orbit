@@ -208,7 +208,7 @@ mod tests {
             ..IOrbit::default()
         };
         let saved = serde_yaml_ng::to_string(&confirmed)?;
-        let mut restarted: IVerge = serde_yaml_ng::from_str(&saved)?;
+        let mut restarted: IOrbit = serde_yaml_ng::from_str(&saved)?;
         let settings = restarted.dns_settings_for("one");
         let state = DnsOverrideState::new("one", source.clone(), settings.enabled, settings.confirmation);
         assert!(state.enabled);
