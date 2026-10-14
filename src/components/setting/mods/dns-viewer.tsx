@@ -35,7 +35,6 @@ import {
 import { useClash } from '@/hooks/use-clash'
 import { useOrbit } from '@/hooks/use-orbit'
 import { useProfiles } from '@/hooks/use-profiles'
-import { useOrbit } from '@/hooks/use-orbit'
 import {
   applyDnsConfig,
   getDnsConfigContent,
