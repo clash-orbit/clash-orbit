@@ -194,7 +194,7 @@ jobs:
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: '1.98.1'
+          toolchain: '1.99.0'
           targets: ${{ matrix.target }}
 
       - name: Add Rust Target
@@ -234,7 +234,7 @@ jobs:
 
       - name: Add Rust Target
         run: |
-          rustup target add ${{ matrix.target }} --toolchain 1.98.1 || rustup target add ${{ matrix.target }}
+          rustup target add ${{ matrix.target }} --toolchain 1.99.0 || rustup target add ${{ matrix.target }}
           rustup target list --installed
           echo "Rust target ${{ matrix.target }} installed."
 
@@ -289,7 +289,7 @@ jobs:
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: '1.98.1'
+          toolchain: '1.99.0'
           targets: ${{ matrix.target }}
 
       - name: Add Rust Target
@@ -366,7 +366,7 @@ jobs:
 
       - name: Add Rust Target
         run: |
-          rustup target add ${{ matrix.target }} --toolchain 1.98.1 || rustup target add ${{ matrix.target }}
+          rustup target add ${{ matrix.target }} --toolchain 1.99.0 || rustup target add ${{ matrix.target }}
           rustup target list --installed
           echo "Rust target ${{ matrix.target }} installed."
 
@@ -423,7 +423,7 @@ jobs:
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: '1.98.1'
+          toolchain: '1.99.0'
           targets: ${{ matrix.target }}
 
       - name: Add Rust Target
@@ -464,7 +464,7 @@ jobs:
 
       - name: Add Rust Target
         run: |
-          rustup target add ${{ matrix.target }} --toolchain 1.98.1 || rustup target add ${{ matrix.target }}
+          rustup target add ${{ matrix.target }} --toolchain 1.99.0 || rustup target add ${{ matrix.target }}
           rustup target list --installed
           echo "Rust target ${{ matrix.target }} installed."
 
@@ -568,7 +568,7 @@ jobs:
   # Winget submission is disabled on purpose. ClashVergeRev.ClashVergeRev is the
   # upstream project's winget identifier, so submitting this fork's installers to
   # it would overwrite upstream's package with unrelated builds. To publish your
-  # own package, submit ClashOrbit.ClashOrbit to microsoft/winget-pkgs once, set
+  # own package, submit ClashVergeRev.ClashVergeRev to microsoft/winget-pkgs once, set
   # the WINGET_TOKEN secret, then restore this job and add submit-to-winget back
   # to the notify-telegram needs list below.
   #
@@ -590,7 +590,7 @@ jobs:
   #     - name: Submit to Winget
   #       uses: vedantmgoyal9/winget-releaser@main
   #       with:
-  #         identifier: ClashOrbit.ClashOrbit
+  #         identifier: ClashVergeRev.ClashVergeRev
   #         version: ${{env.VERSION}}
   #         release-tag: v${{env.VERSION}}
   #         installers-regex: '_(arm64|x64|x86)-setup\.exe$'

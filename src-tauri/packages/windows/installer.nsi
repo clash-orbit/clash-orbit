@@ -549,7 +549,7 @@ Function CheckVCRuntime64
 FunctionEnd
 
 
-!macro CheckAllVergeProcesses
+!macro CheckAllOrbitProcesses
   ; Check if clash-orbit-service.exe is running
   !if "${INSTALLMODE}" == "currentUser"
     nsis_tauri_utils::FindProcessCurrentUser "clash-orbit-service.exe"
@@ -631,7 +631,7 @@ FunctionEnd
   ${EndIf}
 !macroend
 
-!macro StartVergeService
+!macro StartOrbitService
   ; Check if the service exists
   SimpleSC::ExistsService "clash_orbit_service"
   Pop $0  ; 0: service exists; other: service not exists
@@ -657,7 +657,7 @@ FunctionEnd
   ${EndIf}
 !macroend
 
-!macro RemoveVergeService
+!macro RemoveOrbitService
   ; Check if the service exists
   SimpleSC::ExistsService "clash_orbit_service"
   Pop $0  ; 0: service exists; other: service not exists
@@ -901,8 +901,9 @@ Section Install
 
   nsExec::Exec 'netsh int tcp res'
 
+  !include "Win\RestartManager.nsh"
   !insertmacro CheckIfAppIsRunning "${MAINBINARYNAME}.exe" "${PRODUCTNAME}"
-  !insertmacro CheckAllVergeProcesses
+  !insertmacro CheckAllOrbitProcesses
 
   ; Ensure startup folders exist
   CreateDirectory "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
@@ -922,26 +923,26 @@ Section Install
   StrCpy $R1 "Software\Microsoft\Windows\CurrentVersion\Run"
 
   SetRegView 64
-  ReadRegStr $R2 HKCU "$R1" "Clash Verge"
+  ReadRegStr $R2 HKCU "$R1" "Clash Orbit"
   ${If} $R2 != ""
-    DeleteRegValue HKCU "$R1" "Clash Verge"
+    DeleteRegValue HKCU "$R1" "Clash Orbit"
   ${EndIf}
-  ReadRegStr $R2 HKLM "$R1" "Clash Verge"
+  ReadRegStr $R2 HKLM "$R1" "Clash Orbit"
   ${If} $R2 != ""
-    DeleteRegValue HKLM "$R1" "Clash Verge"
+    DeleteRegValue HKLM "$R1" "Clash Orbit"
   ${EndIf}
-  ReadRegStr $R2 HKCU "$R1" "clash-verge"
+  ReadRegStr $R2 HKCU "$R1" "clash-orbit"
   ${If} $R2 != ""
-    DeleteRegValue HKCU "$R1" "clash-verge"
+    DeleteRegValue HKCU "$R1" "clash-orbit"
   ${EndIf}
-  ReadRegStr $R2 HKLM "$R1" "clash-verge"
+  ReadRegStr $R2 HKLM "$R1" "clash-orbit"
   ${If} $R2 != ""
-    DeleteRegValue HKLM "$R1" "clash-verge"
+    DeleteRegValue HKLM "$R1" "clash-orbit"
   ${EndIf}
 
   ; Remove legacy executables
-  IfFileExists "$INSTDIR\Clash Verge.exe" 0 +2
-    Delete "$INSTDIR\Clash Verge.exe"
+  IfFileExists "$INSTDIR\Clash Orbit.exe" 0 +2
+    Delete "$INSTDIR\Clash Orbit.exe"
 
   !insertmacro SetContext
 
@@ -979,7 +980,7 @@ Section Install
     ${IfThen} $0 != 0 ${|} DetailPrint "Staging orbit-mihomo-alpha returned $0" ${|}
   !endif
 
-  !insertmacro StartVergeService
+  !insertmacro StartOrbitService
 
   ; Create file associations
   {{#each file_associations as |association| ~}}
@@ -1101,8 +1102,8 @@ Section Uninstall
   !endif
 
   !insertmacro CheckIfAppIsRunning "${MAINBINARYNAME}.exe" "${PRODUCTNAME}"
-  !insertmacro CheckAllVergeProcesses
-  !insertmacro RemoveVergeService
+  !insertmacro CheckAllOrbitProcesses
+  !insertmacro RemoveOrbitService
 
   ; Remove cached window state files
   DetailPrint "Removing window-state.json / .window-state.json"
@@ -1114,26 +1115,26 @@ Section Uninstall
   StrCpy $R1 "Software\Microsoft\Windows\CurrentVersion\Run"
 
   SetRegView 64
-  ReadRegStr $R2 HKCU "$R1" "Clash Verge"
+  ReadRegStr $R2 HKCU "$R1" "Clash Orbit"
   ${If} $R2 != ""
-    DeleteRegValue HKCU "$R1" "Clash Verge"
+    DeleteRegValue HKCU "$R1" "Clash Orbit"
   ${EndIf}
-  ReadRegStr $R2 HKLM "$R1" "Clash Verge"
+  ReadRegStr $R2 HKLM "$R1" "Clash Orbit"
   ${If} $R2 != ""
-    DeleteRegValue HKLM "$R1" "Clash Verge"
+    DeleteRegValue HKLM "$R1" "Clash Orbit"
   ${EndIf}
-  ReadRegStr $R2 HKCU "$R1" "clash-verge"
+  ReadRegStr $R2 HKCU "$R1" "clash-orbit"
   ${If} $R2 != ""
-    DeleteRegValue HKCU "$R1" "clash-verge"
+    DeleteRegValue HKCU "$R1" "clash-orbit"
   ${EndIf}
-  ReadRegStr $R2 HKLM "$R1" "clash-verge"
+  ReadRegStr $R2 HKLM "$R1" "clash-orbit"
   ${If} $R2 != ""
-    DeleteRegValue HKLM "$R1" "clash-verge"
+    DeleteRegValue HKLM "$R1" "clash-orbit"
   ${EndIf}
 
   ; Remove legacy executables
-  IfFileExists "$INSTDIR\Clash Verge.exe" 0 +2
-    Delete "$INSTDIR\Clash Verge.exe"
+  IfFileExists "$INSTDIR\Clash Orbit.exe" 0 +2
+    Delete "$INSTDIR\Clash Orbit.exe"
 
   !insertmacro SetContext
 
@@ -1208,8 +1209,8 @@ Section Uninstall
     ${EndIf}
 
     ; Remove legacy public desktop shortcuts
-    Delete "C:\Users\Public\Desktop\Clash Verge.lnk"
-    Delete "C:\Users\Public\Desktop\clash-verge.lnk"
+    Delete "C:\Users\Public\Desktop\Clash Orbit.lnk"
+    Delete "C:\Users\Public\Desktop\clash-orbit.lnk"
 
     ; Remove legacy shortcuts from all user desktops
     DetailPrint "Removing ${PRODUCTNAME} shortcuts from all user desktops..."
@@ -1223,8 +1224,8 @@ Section Uninstall
       ReadRegStr $R3 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\$R2" "ProfileImagePath"
       ${If} $R3 != ""
         StrCpy $R4 "$R3\Desktop"
-        Delete "$R4\Clash Verge.lnk"
-        Delete "$R4\clash-verge.lnk"
+        Delete "$R4\Clash Orbit.lnk"
+        Delete "$R4\clash-orbit.lnk"
       ${EndIf}
       IntOp $R1 $R1 + 1
       Goto LegacyUserLoop
@@ -1233,22 +1234,22 @@ Section Uninstall
 
     ; Remove legacy start menu folders
     SetShellVarContext current
-    RMDir /r /REBOOTOK "$SMPROGRAMS\Clash Verge"
-    RMDir /r /REBOOTOK "$SMPROGRAMS\clash-verge"
+    RMDir /r /REBOOTOK "$SMPROGRAMS\Clash Orbit"
+    RMDir /r /REBOOTOK "$SMPROGRAMS\clash-orbit"
     !insertmacro SetContext
-    RMDir /r /REBOOTOK "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Clash Verge"
-    RMDir /r /REBOOTOK "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\clash-verge"
+    RMDir /r /REBOOTOK "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Clash Orbit"
+    RMDir /r /REBOOTOK "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\clash-orbit"
 
     ; Clean legacy registry keys
     SetRegView 64
-    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Clash Verge.exe"
-    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\clash-verge.exe"
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Clash Orbit.exe"
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\clash-orbit.exe"
     DeleteRegKey HKLM "Software\Clash Orbit"
-    DeleteRegKey HKLM "Software\Clash Verge"
+    DeleteRegKey HKLM "Software\Clash Orbit"
     DeleteRegKey HKCU "Software\Clash Orbit"
-    DeleteRegKey HKCU "Software\Clash Verge"
-    DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ClashVerge"
-    DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Clash Verge"
+    DeleteRegKey HKCU "Software\Clash Orbit"
+    DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ClashOrbit"
+    DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Clash Orbit"
 
     StrCpy $R1 0
     LegacyUninstallLoop:
@@ -1258,8 +1259,8 @@ Section Uninstall
       ${EndIf}
       ReadRegStr $R3 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$R2" "DisplayName"
       ${If} $R3 != ""
-        StrCmp $R3 "Clash Verge" 0 +3
-        StrCmp $R3 "clash-verge" 0 +2
+        StrCmp $R3 "Clash Orbit" 0 +3
+        StrCmp $R3 "clash-orbit" 0 +2
         DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$R2"
       ${EndIf}
       IntOp $R1 $R1 + 1

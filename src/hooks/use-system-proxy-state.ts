@@ -9,6 +9,7 @@ import {
   getEmbeddedServerPort,
   patchOrbitConfig,
 } from '@/services/cmds'
+import { mutate } from '@/services/mutate'
 import {
   removeCacheData,
   revalidateQueries,
@@ -64,10 +65,16 @@ export const useSystemProxyState = () => {
       while (pendingRef.current !== null) {
         const target = pendingRef.current
         pendingRef.current = null
-        await patchOrbitConfig({ enable_system_proxy: target })
+        await mutate(() => patchOrbitConfig({ enable_system_proxy: target }), {
+          id: 'toggle-system-proxy',
+          errorNotice: false,
+        })
         confirmed = target
         if (!target && orbit?.auto_close_connection) {
-          await closeAllConnections().catch(() => {})
+          await mutate(() => closeAllConnections(), {
+            id: 'close-all-connections',
+            errorNotice: false,
+          }).catch(() => {})
         }
       }
     } catch (error) {

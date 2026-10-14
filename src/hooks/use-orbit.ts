@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 
 import { getOrbitConfig, patchOrbitConfig } from '@/services/cmds'
+import { mutate } from '@/services/mutate'
 import { getPreloadConfig, setPreloadConfig } from '@/services/preload'
 import { setCacheData, useQuery } from '@/services/query-client'
 
@@ -38,13 +39,15 @@ export const useOrbit = () => {
     )
   }
 
-  const patchOrbit = useCallback(
-    async (value: Partial<IOrbitConfig>) => {
-      await patchOrbitConfig(value)
-      await refetch()
-    },
-    [refetch],
-  )
+  // Callers own the error toast (GuardState onCatch / page onError), so the
+  // funnel must not add a second one.
+  const patchOrbit = useCallback(async (value: Partial<IOrbitConfig>) => {
+    await mutate(() => patchOrbitConfig(value), {
+      id: 'patch-orbit-config',
+      revalidate: [['getOrbitConfig']],
+      errorNotice: false,
+    })
+  }, [])
 
   return {
     orbit,

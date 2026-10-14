@@ -5,10 +5,10 @@
   "features": {
     "ghcr.io/devcontainers/features/node:2": {
       "version": "24.21.0",
-      "pnpmVersion": "12.8.1"
+      "pnpmVersion": "12.10.0"
     },
     "ghcr.io/devcontainers/features/rust:1": {
-      "version": "1.98.1",
+      "version": "1.99.0",
       "profile": "default"
     },
     "ghcr.io/devcontainers/features/git:1": {},
@@ -29,7 +29,7 @@
         "biomejs.biome"
       ],
       "settings": {
-        "rust-analyzer.cargo.features": ["verge-dev"],
+        "rust-analyzer.cargo.features": ["orbit-dev"],
         "rust-analyzer.check.command": "clippy",
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "biomejs.biome",
