@@ -16,7 +16,7 @@ fn main() -> ExitCode {
 #[cfg(not(all(feature = "perf-harness", target_os = "macos")))]
 fn main() -> ExitCode {
     let default_parallelism = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(1);
-    let worker_limit = std::cmp::min(default_parallelism, 8);
+    let worker_limit = std::cmp::min(default_parallelism, 4);
     let blocking_limit = 2 * worker_limit;
 
     #[allow(clippy::unwrap_used)]
@@ -27,7 +27,7 @@ fn main() -> ExitCode {
         .thread_name_fn(|| {
             static ATOMIC_ID: AtomicUsize = AtomicUsize::new(0);
             let id = ATOMIC_ID.fetch_add(1, Ordering::SeqCst);
-            format!("clash-verge-runtime-{id}")
+            format!("clash-orbit-runtime-{id}")
         })
         .build()
         .unwrap();

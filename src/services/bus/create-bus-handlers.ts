@@ -71,12 +71,8 @@ export const createEventBus = (deps: BusHandlerDeps) => {
         'getRules',
         'getRuleProviders',
       ]),
-    'orbit://refresh-verge-config': () =>
-      deps.revalidateKeys([
-        'getOrbitConfig',
-        'getSystemProxy',
-        'getAutotemProxy',
-      ]),
+    'orbit://refresh-orbit-config': () =>
+      deps.revalidateKeys(['getOrbitConfig', 'getSystemProxy', 'getAutoProxy']),
     'orbit://refresh-profiles': () => deps.revalidateKeys(['getProfiles']),
     'orbit://refresh-proxy-config': handleRefreshProxyConfig,
     'orbit://notice-message': (payload) => deps.handleNotice(payload),

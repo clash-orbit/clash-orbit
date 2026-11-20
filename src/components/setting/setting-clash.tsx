@@ -40,7 +40,7 @@ const SettingClash = ({ onError }: Props) => {
   const { orbit, mutateOrbit } = useOrbit()
   const { current: currentProfile } = useProfiles()
   const dnsEnabled = currentProfile
-    ? (orbit?.profile_dns_settings?.[currentProfile.uid]?.enabled ??
+    ? (orbit?.profile_dns_settings?.[currentProfile.uid!]?.enabled ??
       orbit?.enable_dns_settings ??
       false)
     : false

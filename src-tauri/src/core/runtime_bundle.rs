@@ -4,7 +4,7 @@ use clash_orbit_service_ipc::{RemoteProvider, RuntimeAsset, RuntimeBundle};
 use serde_yaml_ng::{Mapping, Value};
 use sha2::{Digest as _, Sha256};
 use std::collections::{BTreeMap, HashSet};
-use std::path::{Component, Path, PathBuf};
+use std::path::{Component, Path, PathBuf, Prefix};
 
 pub(crate) const GEO_ASSETS: &[&str] = &[
     "Country.mmdb",
@@ -165,6 +165,7 @@ fn collect_runtime_parts(mut config: Value, config_root: &Path) -> Result<Runtim
         &mut assets,
         &mut remote_providers,
     )?;
+    collect_ssh_private_keys(&mut config, &config_root, &mut destinations, &mut assets);
     for filename in GEO_ASSETS {
         let source = config_root.join(filename);
         if source.is_file() && destinations.insert((*filename).to_string()) {
@@ -270,6 +271,75 @@ fn collect_provider_assets(
     Ok(())
 }
 
+/// Stages file-based ssh keys, which mihomo resolves against the core home directory.
+fn collect_ssh_private_keys(
+    config: &mut Value,
+    config_root: &Path,
+    destinations: &mut HashSet<String>,
+    assets: &mut Vec<RuntimeAsset>,
+) {
+    let Some(config) = config.as_mapping_mut() else {
+        return;
+    };
+    // mihomo parses `payload` for every provider type, eagerly as fallback proxies for file and http.
+    let mut proxy_lists = Vec::new();
+    for (key, value) in config.iter_mut() {
+        match key.as_str() {
+            Some("proxies") => proxy_lists.extend(value.as_sequence_mut()),
+            Some("proxy-providers") => proxy_lists.extend(
+                value
+                    .as_mapping_mut()
+                    .into_iter()
+                    .flat_map(Mapping::values_mut)
+                    .filter_map(|provider| provider.get_mut("payload").and_then(Value::as_sequence_mut)),
+            ),
+            _ => {}
+        }
+    }
+
+    for proxy in proxy_lists.into_iter().flatten().filter_map(Value::as_mapping_mut) {
+        if proxy.get("type").and_then(Value::as_str) != Some("ssh") {
+            continue;
+        }
+        // mihomo reads any value containing "PRIVATE KEY" as inline key material.
+        let Some(raw_path) = proxy
+            .get("private-key")
+            .and_then(Value::as_str)
+            .filter(|key| !key.is_empty() && !key.contains("PRIVATE KEY") && is_local_path(key))
+        else {
+            continue;
+        };
+        let Some(source) = local_provider_source(config_root, raw_path)
+            .ok()
+            .filter(|source| source.is_file())
+        else {
+            let name = proxy.get("name").and_then(Value::as_str).unwrap_or_default();
+            logging!(
+                warn,
+                Type::Config,
+                "ssh proxy {name:?} private key is unavailable below the config root; leaving it to the core"
+            );
+            continue;
+        };
+        // A root-level alias keeps the user's path away from service name rules and mihomo's inline-key test.
+        let source = source.to_string_lossy().into_owned();
+        let destination = allocate_provider_destination("ssh-private-key", &source, destinations);
+        assets.push(RuntimeAsset {
+            source,
+            destination: destination.clone(),
+        });
+        proxy.insert(Value::String("private-key".to_owned()), Value::String(destination));
+    }
+}
+
+/// Resolving a UNC or device path would authenticate to its server, so those stay with the core.
+fn is_local_path(raw_path: &str) -> bool {
+    match Path::new(raw_path).components().next() {
+        Some(Component::Prefix(prefix)) => matches!(prefix.kind(), Prefix::Disk(_) | Prefix::VerbatimDisk(_)),
+        _ => true,
+    }
+}
+
 fn local_provider_source(config_root: &Path, raw_path: &str) -> Result<PathBuf> {
     let path = Path::new(raw_path);
     let source = if path.is_absolute() {
@@ -348,7 +418,7 @@ mod tests {
 
     #[tokio::test]
     async fn conflicting_sources_get_separate_paths_in_config_bundle_and_readback() -> anyhow::Result<()> {
-        let root = std::env::temp_dir().join(format!("clash-verge-provider-paths-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("clash-orbit-provider-paths-{}", std::process::id()));
         std::fs::create_dir_all(&root)?;
         let mut config: serde_yaml_ng::Mapping = serde_yaml_ng::from_str(
             "rule-providers:\n  AppleDev:\n    type: http\n    url: https://one.example/AppleDev.yaml\n    path: ./providers/rule/AppleDev.yaml\n  mirror:\n    type: http\n    url: https://two.example/AppleDev.yaml\n    path: providers/rule/AppleDev.yaml\n",
@@ -432,7 +502,7 @@ mod tests {
 
     #[tokio::test]
     async fn collects_only_local_providers_and_existing_geo_assets() -> anyhow::Result<()> {
-        let root = std::env::temp_dir().join(format!("clash-verge-runtime-bundle-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("clash-orbit-runtime-bundle-{}", std::process::id()));
         std::fs::create_dir_all(root.join("providers"))?;
         std::fs::write(root.join("providers/local.yaml"), b"proxies: []\n")?;
         std::fs::write(root.join("Country.mmdb"), b"geo")?;
@@ -493,7 +563,7 @@ mod tests {
     #[tokio::test]
     async fn two_names_for_one_remote_file_are_folded_rather_than_refused() -> anyhow::Result<()> {
         // Identical repeats are one service-side file and are safe to fold.
-        let root = std::env::temp_dir().join(format!("clash-verge-bundle-dup-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("clash-orbit-bundle-dup-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&root);
         std::fs::create_dir_all(&root)?;
         let config = root.join("config.yaml");
@@ -514,7 +584,7 @@ mod tests {
 
     #[tokio::test]
     async fn two_sources_for_one_remote_file_are_refused() -> anyhow::Result<()> {
-        let root = std::env::temp_dir().join(format!("clash-verge-bundle-conflict-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("clash-orbit-bundle-conflict-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&root);
         std::fs::create_dir_all(&root)?;
         let config = root.join("config.yaml");
@@ -537,7 +607,7 @@ mod tests {
     #[tokio::test]
     async fn an_odd_provider_is_left_alone_instead_of_failing_the_whole_bundle() -> anyhow::Result<()> {
         // Odd providers accepted by mihomo must not block the rest of the bundle.
-        let root = std::env::temp_dir().join(format!("clash-verge-bundle-odd-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("clash-orbit-bundle-odd-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&root);
         std::fs::create_dir_all(&root)?;
         let config = root.join("config.yaml");
@@ -568,7 +638,7 @@ mod tests {
 
     #[tokio::test]
     async fn rejects_provider_paths_outside_the_config_root() -> anyhow::Result<()> {
-        let root = std::env::temp_dir().join(format!("clash-verge-runtime-bundle-outside-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("clash-orbit-runtime-bundle-outside-{}", std::process::id()));
         std::fs::create_dir_all(&root)?;
         let config = root.join("config.yaml");
         let outside = root
