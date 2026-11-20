@@ -26,9 +26,7 @@ const SettingPage = () => {
   )
 
   const toGithubDoc = useLockFn(() =>
-    openExternalUrl('https://clashorbit.kejizero.xyz').catch(
-      onError,
-    ),
+    openExternalUrl('https://clashorbit.kejizero.xyz').catch(onError),
   )
 
   const toTelegramChannel = useLockFn(() =>

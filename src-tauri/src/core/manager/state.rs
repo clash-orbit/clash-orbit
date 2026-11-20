@@ -456,7 +456,7 @@ mod core_cache_tests {
     use std::os::unix::fs::PermissionsExt as _;
 
     fn scratch(name: &str) -> anyhow::Result<std::path::PathBuf> {
-        let root = std::env::temp_dir().join(format!("clash-verge-core-cache-{name}-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("clash-orbit-core-cache-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&root);
         std::fs::create_dir_all(&root)?;
         Ok(root)

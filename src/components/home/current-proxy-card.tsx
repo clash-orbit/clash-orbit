@@ -47,10 +47,7 @@ import {
   useCoreDataStatus,
   useProxiesData,
 } from '@/providers/app-data-context'
-import { syncTrayProxySelection } from '@/services/cmds'
 import delayManager from '@/services/delay'
-import { mutate } from '@/services/mutate'
-import { profileTestUrls } from '@/services/proxy-test-url'
 import {
   findCurrentGroupMember,
   getRecord,
@@ -63,8 +60,8 @@ import {
 import { debugLog } from '@/utils/debug'
 import { compareByDelay, DEFAULT_DELAY_TIMEOUT } from '@/utils/delay'
 
-const STORAGE_KEY_GROUP = 'clash-verge-selected-proxy-group'
-const STORAGE_KEY_SORT_TYPE = 'clash-verge-proxy-sort-type'
+const STORAGE_KEY_GROUP = 'clash-orbit-selected-proxy-group'
+const STORAGE_KEY_SORT_TYPE = 'clash-orbit-proxy-sort-type'
 
 const AUTO_CHECK_DEFAULT_INTERVAL_MINUTES = 5
 const AUTO_CHECK_INITIAL_DELAY_MS = 100
@@ -423,7 +420,7 @@ interface PersistentProxySelectProps
   value: string
   selectedName: string
   groupName: string
-  fixed?: string
+  fixed?: string | null
   selectedDelay: number
   options: ProxyOption[]
   onChange: (value: string) => void
@@ -678,20 +675,6 @@ export const CurrentProxyCard = () => {
     [proxyView],
   )
 
-  useEffect(() => {
-    if (!selectedGroup) return
-    const customUrl = currentProfile
-      ? profileTestUrls(currentProfile)[selectedGroup.name]
-      : undefined
-    delayManager.setUrl(
-      selectedGroup.name,
-      customUrl?.trim() ||
-        selectedGroup.testUrl?.trim() ||
-        orbit?.default_latency_test?.trim() ||
-        'http://cp.cloudflare.com/generate_204',
-    )
-  }, [selectedGroup, currentProfile, orbit?.default_latency_test])
-
   const unsortedProxyOptions = useMemo(
     () => optionsForGroup(selectedGroup),
     [optionsForGroup, selectedGroup],
@@ -785,8 +768,8 @@ export const CurrentProxyCard = () => {
       // The profile selection is the durable source across core restarts and run modes.
       handleSelectChange(
         selectedGroup.name,
-        previousProxy,
-        selectedGroup.fixed,
+        previousProxy!,
+        selectedGroup.fixed!,
       )({
         target: { value: nextName },
       })
@@ -924,12 +907,6 @@ export const CurrentProxyCard = () => {
     }
 
     refreshProxy()
-    mutate(() => syncTrayProxySelection(), {
-      id: 'sync-tray-selection',
-      errorNotice: false,
-    }).catch((error) => {
-      console.error('[CurrentProxyCard] Failed to sync tray latency:', error)
-    })
   })
 
   const proxyOptions = useMemo(
@@ -940,7 +917,7 @@ export const CurrentProxyCard = () => {
             unsortedProxyOptions,
             sortType,
             delays.of,
-            defaultLatencyTimeout,
+            defaultLatencyTimeout!,
           ),
     [
       delays,

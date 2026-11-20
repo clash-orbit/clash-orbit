@@ -9,12 +9,14 @@ use clash_orbit_draft::SharedDraft;
 
 /// 获取Orbit配置
 #[tauri::command]
+#[specta::specta]
 pub async fn get_orbit_config() -> CmdResult<SharedDraft<IOrbit>> {
     feat::fetch_orbit_config().await.stringify_err()
 }
 
 /// 修改Orbit配置
 #[tauri::command]
+#[specta::specta]
 pub async fn patch_orbit_config(payload: IOrbit) -> CmdResult {
     let operation = system_proxy_operation(&payload);
     let result = match operation {

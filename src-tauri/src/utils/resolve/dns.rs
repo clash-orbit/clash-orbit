@@ -154,7 +154,7 @@ mod tests {
     fn restore_dns_state_dir_defaults_to_app_data_but_honors_legacy_file() {
         use super::restore_dns_state_dir;
 
-        let root = std::env::temp_dir().join(format!("clash-verge-dns-{}", nanoid::nanoid!()));
+        let root = std::env::temp_dir().join(format!("clash-orbit-dns-{}", nanoid::nanoid!()));
         let resource_dir = root.join("resources");
         let state_dir = root.join("app-data");
         std::fs::create_dir_all(&resource_dir).expect("create test resource directory");
