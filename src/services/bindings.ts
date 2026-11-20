@@ -312,21 +312,6 @@ export type FailedOperation =
   | 'systemProxyRestore'
   | 'systemProxyGuard'
 
-/**  Define the `profiles.yaml` schema */
-export type IProfiles = IProfiles_Serialize | IProfiles_Deserialize
-
-/**  Define the `profiles.yaml` schema */
-export type IProfiles_Deserialize = {
-  current?: string | null
-  items?: PrfItem_Deserialize[] | null
-}
-
-/**  Define the `profiles.yaml` schema */
-export type IProfiles_Serialize = {
-  current: string | null
-  items: PrfItem_Serialize[] | null
-}
-
 /**  ### `orbit.yaml` schema */
 export type IOrbit = IOrbit_Serialize | IOrbit_Deserialize
 
@@ -530,6 +515,21 @@ export type IOrbit_Serialize = {
   enable_tray_speed?: boolean | null
 }
 
+/**  Define the `profiles.yaml` schema */
+export type IProfiles = IProfiles_Serialize | IProfiles_Deserialize
+
+/**  Define the `profiles.yaml` schema */
+export type IProfiles_Deserialize = {
+  current?: string | null
+  items?: PrfItem_Deserialize[] | null
+}
+
+/**  Define the `profiles.yaml` schema */
+export type IProfiles_Serialize = {
+  current: string | null
+  items: PrfItem_Serialize[] | null
+}
+
 export type IconInfo = {
   name: string
   previous_t: string
@@ -614,6 +614,20 @@ export type NoticeStatus =
   | 'config_core::change_error'
   | 'mixed_port::fallback'
   | 'mixed_port::fallback_error'
+
+export type OrbitEventPayloads = {
+  'orbit://refresh-clash-config': null
+  'orbit://refresh-orbit-config': null
+  'orbit://refresh-profiles': null
+  'orbit://refresh-proxy-config': null
+  'orbit://notice-message': [NoticeStatus, string]
+  'profile-changed': string
+  'orbit://timer-updated': string
+  'profile-update-started': ProfileUpdatePayload
+  'profile-update-completed': ProfileUpdatePayload
+  'orbit://run-state-changed': RunStateView
+  'orbit://pending-failures-changed': null
+}
 
 export type PendingAction =
   | 'install'
@@ -1021,20 +1035,6 @@ export type ValidationOutcome =
   | { status: 'busy' }
 
 export type ValidationSkipReason = 'exiting' | 'debounced'
-
-export type OrbitEventPayloads = {
-  'orbit://refresh-clash-config': null
-  'orbit://refresh-orbit-config': null
-  'orbit://refresh-profiles': null
-  'orbit://refresh-proxy-config': null
-  'orbit://notice-message': [NoticeStatus, string]
-  'profile-changed': string
-  'orbit://timer-updated': string
-  'profile-update-started': ProfileUpdatePayload
-  'profile-update-completed': ProfileUpdatePayload
-  'orbit://run-state-changed': RunStateView
-  'orbit://pending-failures-changed': null
-}
 
 export type WebDavFile = {
   href: string
