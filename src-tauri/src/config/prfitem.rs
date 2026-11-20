@@ -35,6 +35,40 @@ fn compat_user_agent() -> std::string::String {
     format!("clash-verge/v{}", env!("CARGO_PKG_VERSION"))
 }
 
+/// Re-fetch a profile that came back as an empty skeleton, this time with the UA those
+/// providers expect. Best effort: any failure leaves the caller's parse result untouched.
+async fn retry_with_compat_user_agent(
+    url: &str,
+    proxy_type: ProxyType,
+    timeout: u64,
+    accept_invalid_certs: bool,
+    yaml: &mut Mapping,
+) {
+    let Ok(response) = NetworkManager::new()
+        .get(
+            url,
+            proxy_type,
+            Some(timeout),
+            Some(compat_user_agent().into()),
+            accept_invalid_certs,
+        )
+        .await
+    else {
+        return;
+    };
+    if !response.status().is_success() {
+        return;
+    }
+    let data = response.text();
+    let data = data.trim_start_matches('\u{feff}');
+    let Ok(retry_yaml) = serde_yaml_ng::from_str::<Mapping>(data) else {
+        return;
+    };
+    if profile_has_nodes(&retry_yaml) {
+        *yaml = retry_yaml;
+    }
+}
+
 pub(super) fn normalize_profile_home_url(raw: &str) -> Option<String> {
     let url = Url::parse(raw.trim()).ok()?;
 
@@ -396,27 +430,7 @@ impl PrfItem {
         // this product's own UA as the default and retry once with a UA those providers are
         // known to serve, but never override a UA the caller picked explicitly.
         if !profile_has_nodes(&yaml) && user_agent.is_none() {
-            let compat = compat_user_agent();
-            if let Ok(retry) = NetworkManager::new()
-                .get(
-                    url.as_str(),
-                    proxy_type,
-                    Some(timeout),
-                    Some(compat.into()),
-                    accept_invalid_certs,
-                )
-                .await
-            {
-                if retry.status().is_success() {
-                    let retry_data = retry.text();
-                    let retry_data = retry_data.trim_start_matches('\u{feff}');
-                    if let Ok(retry_yaml) = serde_yaml_ng::from_str::<Mapping>(retry_data) {
-                        if profile_has_nodes(&retry_yaml) {
-                            yaml = retry_yaml;
-                        }
-                    }
-                }
-            }
+            retry_with_compat_user_agent(url.as_str(), proxy_type, timeout, accept_invalid_certs, &mut yaml).await;
         }
 
         if !profile_has_nodes(&yaml) {
@@ -624,6 +638,7 @@ mod tests {
     use super::profile_has_nodes;
     use serde_yaml_ng::Mapping;
 
+    #[allow(clippy::expect_used)]
     fn parse(yaml: &str) -> Mapping {
         serde_yaml_ng::from_str(yaml).expect("fixture yaml")
     }
